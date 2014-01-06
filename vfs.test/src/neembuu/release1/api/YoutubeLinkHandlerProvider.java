@@ -90,8 +90,9 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
 
     @Override
     public boolean canHandle(String url) {
-        LOGGER.log(Level.INFO,"Youtube can handle this? ", url.startsWith("http://www.youtube.com/"));
-        return url.startsWith("http://www.youtube.com/");
+        LOGGER.log(Level.INFO,"Youtube can handle this? ", url.startsWith("http://www.youtube.com/ or https " ));
+        // we need to make use of regex here
+        return url.startsWith("http://www.youtube.com/") || url.startsWith("https://www.youtube.com/");
     }
 
     @Override
