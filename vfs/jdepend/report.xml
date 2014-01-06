@@ -1,0 +1,419 @@
+<?xml version="1.0"?>
+<JDepend>
+    <Packages>
+
+        <Package name="java.io">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="java.lang">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="java.lang.annotation">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="java.lang.reflect">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="java.nio">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="java.nio.channels">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="java.text">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="java.util">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="java.util.concurrent">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="java.util.concurrent.atomic">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="java.util.logging">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="javax.swing">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="jpfm">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="jpfm.operations">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="jpfm.operations.readwrite">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="jpfm.util">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="jpfm.volume">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="neembuu.config">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="neembuu.diskmanager">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="neembuu.rangearray">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="neembuu.util.logging">
+            <error>No stats available: package referenced, but not analyzed.</error>
+        </Package>
+
+        <Package name="neembuu.vfs.connection">
+            <Stats>
+                <TotalClasses>8</TotalClasses>
+                <ConcreteClasses>3</ConcreteClasses>
+                <AbstractClasses>5</AbstractClasses>
+                <Ca>1</Ca>
+                <Ce>4</Ce>
+                <A>0.62</A>
+                <I>0.8</I>
+                <D>0.42</D>
+                <V>1</V>
+            </Stats>
+
+            <AbstractClasses>
+                <Class sourceFile="Connection.java">
+                    neembuu.vfs.connection.Connection
+                </Class>
+                <Class sourceFile="ConnectionInterfaceForUI.java">
+                    neembuu.vfs.connection.ConnectionInterfaceForUI
+                </Class>
+                <Class sourceFile="ConnectionLifeListener.java">
+                    neembuu.vfs.connection.ConnectionLifeListener
+                </Class>
+                <Class sourceFile="NewConnectionProvider.java">
+                    neembuu.vfs.connection.NewConnectionProvider
+                </Class>
+                <Class sourceFile="TransientConnectionListener.java">
+                    neembuu.vfs.connection.TransientConnectionListener
+                </Class>
+            </AbstractClasses>
+
+            <ConcreteClasses>
+                <Class sourceFile="NewConnectionParams.java">
+                    neembuu.vfs.connection.NewConnectionParams
+                </Class>
+                <Class sourceFile="NewConnectionParams.java">
+                    neembuu.vfs.connection.NewConnectionParams$1
+                </Class>
+                <Class sourceFile="NewConnectionParams.java">
+                    neembuu.vfs.connection.NewConnectionParams$Builder
+                </Class>
+            </ConcreteClasses>
+
+            <DependsUpon>
+                <Package>java.lang</Package>
+                <Package>neembuu.vfs.progress</Package>
+                <Package>neembuu.vfs.readmanager</Package>
+                <Package>neembuu.vfs.throttle</Package>
+            </DependsUpon>
+
+            <UsedBy>
+                <Package>neembuu.vfs.readmanager</Package>
+            </UsedBy>
+        </Package>
+
+        <Package name="neembuu.vfs.file">
+            <Stats>
+                <TotalClasses>2</TotalClasses>
+                <ConcreteClasses>0</ConcreteClasses>
+                <AbstractClasses>2</AbstractClasses>
+                <Ca>1</Ca>
+                <Ce>5</Ce>
+                <A>1</A>
+                <I>0.83</I>
+                <D>0.83</D>
+                <V>1</V>
+            </Stats>
+
+            <AbstractClasses>
+                <Class sourceFile="FileBeingDownloaded.java">
+                    neembuu.vfs.file.FileBeingDownloaded
+                </Class>
+                <Class sourceFile="SeekableConnectionFile.java">
+                    neembuu.vfs.file.SeekableConnectionFile
+                </Class>
+            </AbstractClasses>
+
+            <ConcreteClasses>
+            </ConcreteClasses>
+
+            <DependsUpon>
+                <Package>java.lang</Package>
+                <Package>jpfm.volume</Package>
+                <Package>neembuu.rangearray</Package>
+                <Package>neembuu.vfs.progress</Package>
+                <Package>neembuu.vfs.readmanager</Package>
+            </DependsUpon>
+
+            <UsedBy>
+                <Package>neembuu.vfs.readmanager</Package>
+            </UsedBy>
+        </Package>
+
+        <Package name="neembuu.vfs.progress">
+            <Stats>
+                <TotalClasses>2</TotalClasses>
+                <ConcreteClasses>0</ConcreteClasses>
+                <AbstractClasses>2</AbstractClasses>
+                <Ca>4</Ca>
+                <Ce>2</Ce>
+                <A>1</A>
+                <I>0.33</I>
+                <D>0.33</D>
+                <V>1</V>
+            </Stats>
+
+            <AbstractClasses>
+                <Class sourceFile="DownloadSpeedProvider.java">
+                    neembuu.vfs.progress.DownloadSpeedProvider
+                </Class>
+                <Class sourceFile="ProgressListener.java">
+                    neembuu.vfs.progress.ProgressListener
+                </Class>
+            </AbstractClasses>
+
+            <ConcreteClasses>
+            </ConcreteClasses>
+
+            <DependsUpon>
+                <Package>java.lang</Package>
+                <Package>java.util</Package>
+            </DependsUpon>
+
+            <UsedBy>
+                <Package>neembuu.vfs.connection</Package>
+                <Package>neembuu.vfs.file</Package>
+                <Package>neembuu.vfs.readmanager</Package>
+                <Package>neembuu.vfs.throttle</Package>
+            </UsedBy>
+        </Package>
+
+        <Package name="neembuu.vfs.readmanager">
+            <Stats>
+                <TotalClasses>22</TotalClasses>
+                <ConcreteClasses>12</ConcreteClasses>
+                <AbstractClasses>10</AbstractClasses>
+                <Ca>3</Ca>
+                <Ce>24</Ce>
+                <A>0.45</A>
+                <I>0.89</I>
+                <D>0.34</D>
+                <V>1</V>
+            </Stats>
+
+            <AbstractClasses>
+                <Class sourceFile="DownloadDataChannel.java">
+                    neembuu.vfs.readmanager.DownloadDataChannel
+                </Class>
+                <Class sourceFile="DownloadSource.java">
+                    neembuu.vfs.readmanager.DownloadSource
+                </Class>
+                <Class sourceFile="DownloadedRegion.java">
+                    neembuu.vfs.readmanager.DownloadedRegion
+                </Class>
+                <Class sourceFile="NewReadHandlerProvider.java">
+                    neembuu.vfs.readmanager.NewReadHandlerProvider
+                </Class>
+                <Class sourceFile="ReadRequestHandler.java">
+                    neembuu.vfs.readmanager.ReadRequestHandler
+                </Class>
+                <Class sourceFile="ReadRequestState.java">
+                    neembuu.vfs.readmanager.ReadRequestState
+                </Class>
+                <Class sourceFile="RegionAvailability.java">
+                    neembuu.vfs.readmanager.RegionAvailability
+                </Class>
+                <Class sourceFile="RequestSpeedProvider.java">
+                    neembuu.vfs.readmanager.RequestSpeedProvider
+                </Class>
+                <Class sourceFile="TotalFileReadStatistics.java">
+                    neembuu.vfs.readmanager.TotalFileReadStatistics
+                </Class>
+                <Class sourceFile="WaitForExpansionOrCreateNewConnectionPolicy.java">
+                    neembuu.vfs.readmanager.WaitForExpansionOrCreateNewConnectionPolicy
+                </Class>
+            </AbstractClasses>
+
+            <ConcreteClasses>
+                <Class sourceFile="NewReadHandlerProviderImpl.java">
+                    neembuu.vfs.readmanager.NewReadHandlerProviderImpl
+                </Class>
+                <Class sourceFile="PendingRequestsState.java">
+                    neembuu.vfs.readmanager.PendingRequestsState
+                </Class>
+                <Class sourceFile="ProfileableReadRequestImpl.java">
+                    neembuu.vfs.readmanager.ProfileableReadRequestImpl
+                </Class>
+                <Class sourceFile="ReadQueueManager.java">
+                    neembuu.vfs.readmanager.ReadQueueManager
+                </Class>
+                <Class sourceFile="ReadQueueManager.java">
+                    neembuu.vfs.readmanager.ReadQueueManager$CASE
+                </Class>
+                <Class sourceFile="ReadQueueManager.java">
+                    neembuu.vfs.readmanager.ReadQueueManager$DefaultNewConnectionPolicy
+                </Class>
+                <Class sourceFile="RegionHandler.java">
+                    neembuu.vfs.readmanager.RegionHandler
+                </Class>
+                <Class sourceFile="RegionHandler.java">
+                    neembuu.vfs.readmanager.RegionHandler$1
+                </Class>
+                <Class sourceFile="RegionHandler.java">
+                    neembuu.vfs.readmanager.RegionHandler$DownloadDataChannelToImpl
+                </Class>
+                <Class sourceFile="RegionHandler.java">
+                    neembuu.vfs.readmanager.RegionHandler$ReadRequestElement
+                </Class>
+                <Class sourceFile="RegionHandler.java">
+                    neembuu.vfs.readmanager.RegionHandler$TransientConnectionListenerImpl
+                </Class>
+                <Class sourceFile="SeekableConnectionFileImpl.java">
+                    neembuu.vfs.readmanager.SeekableConnectionFileImpl
+                </Class>
+            </ConcreteClasses>
+
+            <DependsUpon>
+                <Package>java.io</Package>
+                <Package>java.lang</Package>
+                <Package>java.lang.annotation</Package>
+                <Package>java.lang.reflect</Package>
+                <Package>java.nio</Package>
+                <Package>java.nio.channels</Package>
+                <Package>java.text</Package>
+                <Package>java.util</Package>
+                <Package>java.util.concurrent</Package>
+                <Package>java.util.concurrent.atomic</Package>
+                <Package>java.util.logging</Package>
+                <Package>javax.swing</Package>
+                <Package>jpfm</Package>
+                <Package>jpfm.operations</Package>
+                <Package>jpfm.operations.readwrite</Package>
+                <Package>jpfm.util</Package>
+                <Package>jpfm.volume</Package>
+                <Package>neembuu.config</Package>
+                <Package>neembuu.diskmanager</Package>
+                <Package>neembuu.rangearray</Package>
+                <Package>neembuu.util.logging</Package>
+                <Package>neembuu.vfs.connection</Package>
+                <Package>neembuu.vfs.file</Package>
+                <Package>neembuu.vfs.progress</Package>
+            </DependsUpon>
+
+            <UsedBy>
+                <Package>neembuu.vfs.connection</Package>
+                <Package>neembuu.vfs.file</Package>
+                <Package>neembuu.vfs.throttle</Package>
+            </UsedBy>
+        </Package>
+
+        <Package name="neembuu.vfs.throttle">
+            <Stats>
+                <TotalClasses>6</TotalClasses>
+                <ConcreteClasses>4</ConcreteClasses>
+                <AbstractClasses>2</AbstractClasses>
+                <Ca>1</Ca>
+                <Ce>7</Ce>
+                <A>0.33</A>
+                <I>0.88</I>
+                <D>0.21</D>
+                <V>1</V>
+            </Stats>
+
+            <AbstractClasses>
+                <Class sourceFile="Throttle.java">
+                    neembuu.vfs.throttle.Throttle
+                </Class>
+                <Class sourceFile="ThrottleStateListener.java">
+                    neembuu.vfs.throttle.ThrottleStateListener
+                </Class>
+            </AbstractClasses>
+
+            <ConcreteClasses>
+                <Class sourceFile="DynamicCPSPauser.java">
+                    neembuu.vfs.throttle.DynamicCPSPauser
+                </Class>
+                <Class sourceFile="GeneralThrottle.java">
+                    neembuu.vfs.throttle.GeneralThrottle
+                </Class>
+                <Class sourceFile="ThrottleState.java">
+                    neembuu.vfs.throttle.ThrottleState
+                </Class>
+                <Class sourceFile="ThrottledInputStream.java">
+                    neembuu.vfs.throttle.ThrottledInputStream
+                </Class>
+            </ConcreteClasses>
+
+            <DependsUpon>
+                <Package>java.io</Package>
+                <Package>java.lang</Package>
+                <Package>java.util</Package>
+                <Package>java.util.logging</Package>
+                <Package>neembuu.util.logging</Package>
+                <Package>neembuu.vfs.progress</Package>
+                <Package>neembuu.vfs.readmanager</Package>
+            </DependsUpon>
+
+            <UsedBy>
+                <Package>neembuu.vfs.connection</Package>
+            </UsedBy>
+        </Package>
+    </Packages>
+
+    <Cycles>
+        <Package Name="neembuu.vfs.connection">
+            <Package>neembuu.vfs.throttle</Package>
+            <Package>neembuu.vfs.readmanager</Package>
+            <Package>neembuu.vfs.connection</Package>
+        </Package>
+
+        <Package Name="neembuu.vfs.file">
+            <Package>neembuu.vfs.readmanager</Package>
+            <Package>neembuu.vfs.connection</Package>
+            <Package>neembuu.vfs.throttle</Package>
+            <Package>neembuu.vfs.readmanager</Package>
+        </Package>
+
+        <Package Name="neembuu.vfs.readmanager">
+            <Package>neembuu.vfs.connection</Package>
+            <Package>neembuu.vfs.throttle</Package>
+            <Package>neembuu.vfs.readmanager</Package>
+        </Package>
+
+        <Package Name="neembuu.vfs.throttle">
+            <Package>neembuu.vfs.readmanager</Package>
+            <Package>neembuu.vfs.connection</Package>
+            <Package>neembuu.vfs.throttle</Package>
+        </Package>
+
+    </Cycles>
+</JDepend>

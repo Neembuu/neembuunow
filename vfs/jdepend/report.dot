@@ -1,0 +1,211 @@
+
+digraph g {
+        graph [
+	    rankdir = "LR"
+	];
+	node [
+	    fontsize = "12"
+	    fontname = "Courier"
+	    shape = "ellipse"
+	];
+	edge[];
+	"java.io" [
+        label="java.io | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "java.lang" [
+        label="java.lang | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "java.lang.annotation" [
+        label="java.lang.annotation | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "java.lang.reflect" [
+        label="java.lang.reflect | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "java.nio" [
+        label="java.nio | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "java.nio.channels" [
+        label="java.nio.channels | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "java.text" [
+        label="java.text | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "java.util" [
+        label="java.util | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "java.util.concurrent" [
+        label="java.util.concurrent | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "java.util.concurrent.atomic" [
+        label="java.util.concurrent.atomic | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "java.util.logging" [
+        label="java.util.logging | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "javax.swing" [
+        label="javax.swing | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "jpfm" [
+        label="jpfm | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "jpfm.operations" [
+        label="jpfm.operations | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "jpfm.operations.readwrite" [
+        label="jpfm.operations.readwrite | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "jpfm.util" [
+        label="jpfm.util | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "jpfm.volume" [
+        label="jpfm.volume | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "neembuu.config" [
+        label="neembuu.config | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "neembuu.diskmanager" [
+        label="neembuu.diskmanager | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "neembuu.rangearray" [
+        label="neembuu.rangearray | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "neembuu.util.logging" [
+        label="neembuu.util.logging | Total Classes: "
+	shape="record"
+	color=".99 0.0 .9"
+	style=filled
+    ];
+    "neembuu.vfs.connection" [
+        label="neembuu.vfs.connection | Total Classes: 8"
+	shape="record"
+	color=".99 0.42 .9"
+	style=filled
+    ];
+    "neembuu.vfs.connection" -> "java.lang"
+    "neembuu.vfs.connection" -> "neembuu.vfs.progress"
+    "neembuu.vfs.connection" -> "neembuu.vfs.readmanager"
+    "neembuu.vfs.connection" -> "neembuu.vfs.throttle"
+    "neembuu.vfs.file" [
+        label="neembuu.vfs.file | Total Classes: 2"
+	shape="record"
+	color=".99 0.83 .9"
+	style=filled
+    ];
+    "neembuu.vfs.file" -> "java.lang"
+    "neembuu.vfs.file" -> "jpfm.volume"
+    "neembuu.vfs.file" -> "neembuu.rangearray"
+    "neembuu.vfs.file" -> "neembuu.vfs.progress"
+    "neembuu.vfs.file" -> "neembuu.vfs.readmanager"
+    "neembuu.vfs.progress" [
+        label="neembuu.vfs.progress | Total Classes: 2"
+	shape="record"
+	color=".99 0.33 .9"
+	style=filled
+    ];
+    "neembuu.vfs.progress" -> "java.lang"
+    "neembuu.vfs.progress" -> "java.util"
+    "neembuu.vfs.readmanager" [
+        label="neembuu.vfs.readmanager | Total Classes: 22"
+	shape="record"
+	color=".99 0.34 .9"
+	style=filled
+    ];
+    "neembuu.vfs.readmanager" -> "java.io"
+    "neembuu.vfs.readmanager" -> "java.lang"
+    "neembuu.vfs.readmanager" -> "java.lang.annotation"
+    "neembuu.vfs.readmanager" -> "java.lang.reflect"
+    "neembuu.vfs.readmanager" -> "java.nio"
+    "neembuu.vfs.readmanager" -> "java.nio.channels"
+    "neembuu.vfs.readmanager" -> "java.text"
+    "neembuu.vfs.readmanager" -> "java.util"
+    "neembuu.vfs.readmanager" -> "java.util.concurrent"
+    "neembuu.vfs.readmanager" -> "java.util.concurrent.atomic"
+    "neembuu.vfs.readmanager" -> "java.util.logging"
+    "neembuu.vfs.readmanager" -> "javax.swing"
+    "neembuu.vfs.readmanager" -> "jpfm"
+    "neembuu.vfs.readmanager" -> "jpfm.operations"
+    "neembuu.vfs.readmanager" -> "jpfm.operations.readwrite"
+    "neembuu.vfs.readmanager" -> "jpfm.util"
+    "neembuu.vfs.readmanager" -> "jpfm.volume"
+    "neembuu.vfs.readmanager" -> "neembuu.config"
+    "neembuu.vfs.readmanager" -> "neembuu.diskmanager"
+    "neembuu.vfs.readmanager" -> "neembuu.rangearray"
+    "neembuu.vfs.readmanager" -> "neembuu.util.logging"
+    "neembuu.vfs.readmanager" -> "neembuu.vfs.connection"
+    "neembuu.vfs.readmanager" -> "neembuu.vfs.file"
+    "neembuu.vfs.readmanager" -> "neembuu.vfs.progress"
+    "neembuu.vfs.throttle" [
+        label="neembuu.vfs.throttle | Total Classes: 6"
+	shape="record"
+	color=".99 0.21 .9"
+	style=filled
+    ];
+    "neembuu.vfs.throttle" -> "java.io"
+    "neembuu.vfs.throttle" -> "java.lang"
+    "neembuu.vfs.throttle" -> "java.util"
+    "neembuu.vfs.throttle" -> "java.util.logging"
+    "neembuu.vfs.throttle" -> "neembuu.util.logging"
+    "neembuu.vfs.throttle" -> "neembuu.vfs.progress"
+    "neembuu.vfs.throttle" -> "neembuu.vfs.readmanager"
+    
+}
