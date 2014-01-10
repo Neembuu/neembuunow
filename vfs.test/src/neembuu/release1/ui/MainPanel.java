@@ -312,7 +312,7 @@ public class MainPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_neembuuVirtualFolderButtonMouseExited
 
     private void neembuuVirtualFolderButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_neembuuVirtualFolderButtonMouseEntered
-        neembuuVirtualFolderButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/logo_7_selected.PNG"))); // NOI18N
+        neembuuVirtualFolderButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/logo_7_selected.png"))); // NOI18N
     }//GEN-LAST:event_neembuuVirtualFolderButtonMouseEntered
 
     private void addLinksButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLinksButtonActionPerformed

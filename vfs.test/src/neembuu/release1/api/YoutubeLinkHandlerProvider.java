@@ -201,8 +201,17 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
             HttpResponse response = httpClient.execute(request);
             String responseString = EntityUtils.toString(response.getEntity());
             ArrayList<String> urls= findTextData(responseString);
-            long length = NeembuuHttpClient.calculateLength(urls.get(0)); //the first quality
-            return new YoutubeLinkHandlerProvider.YoutubeLinkHandler(filename, length, urls.get(0));
+            long length = -1;
+            String url_direct = "";
+            for (int i = 0; i < urls.size(); i++) {
+                url_direct = urls.get(i);
+                length = NeembuuHttpClient.calculateLength(url_direct); //the first quality
+                if(length>-1){
+                    break;
+                }
+            }
+            
+            return new YoutubeLinkHandlerProvider.YoutubeLinkHandler(filename, length, url_direct);
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }

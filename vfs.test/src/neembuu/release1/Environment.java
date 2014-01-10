@@ -46,6 +46,7 @@ public class Environment {
                     //urlpth = urlpth + "neembuu.properties";
                     Main.getLOGGER().log(Level.INFO,"Running from jar, using properties = " + urlpth);
                     propertiesFile = new File(new URL(urlpth).toURI());
+                    return propertiesFile;
                 } else {
                     Main.getLOGGER().log(Level.INFO,"Asumming because code source=" + src.getLocation().toString());
                     throw new NullPointerException();
@@ -54,7 +55,7 @@ public class Environment {
             }
 
         } catch (Exception a) {
-            Main.getLOGGER().log(Level.SEVERE, "Error initializing environment");
+            Main.getLOGGER().log(Level.SEVERE, "Error initializing environment",a);
         }
         
         Main.getLOGGER().log(Level.INFO,"Could not initialize environment");
