@@ -97,7 +97,7 @@ public class AddLinkAction implements Runnable {
                             }
                         }
                     } else {
-                        mp.showIndefiniteProgress(true, "Only http links allowed.");
+                        mp.showIndefiniteProgress(true, "Only http/https links allowed.");
                     }
                 } catch (MalformedURLException any) {
                     mp.showIndefiniteProgress(true, "Format of a link is incorrect");

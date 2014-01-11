@@ -91,11 +91,17 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
         }
     }
 
+    /**
+     * Inspired by: <a href="http://stackoverflow.com/questions/3717115/regular-expression-for-youtube-links">Stack Overflow</a>
+     * @param url
+     * @return 
+     */
     @Override
     public boolean canHandle(String url) {
-        LOGGER.log(Level.INFO,"Youtube can handle this? ", url.startsWith("http://www.youtube.com/ or https " ));
-        // we need to make use of regex here
-        return url.startsWith("http://www.youtube.com/") || url.startsWith("https://www.youtube.com/");
+        boolean result = url.matches("https?://(www.youtube.com/watch\\?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=]*)?");
+        LOGGER.log(Level.INFO,"Youtube can handle this? ", result);
+        
+        return result;
     }
 
     @Override

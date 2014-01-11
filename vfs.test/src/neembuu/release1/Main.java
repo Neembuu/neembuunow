@@ -58,9 +58,10 @@ public final class Main {
         nui.initialize(this);
         mountManager.initialize(this);
         
-	LinkHandlerProviders.registerProvider(new DirectLinkHandlerProvider());
         LinkHandlerProviders.registerProvider(new YoutubeLinkHandlerProvider());
         
+        //DefaultLinkHandler is the default handler
+        LinkHandlerProviders.registerDefaultProvider(new DirectLinkHandlerProvider());
     }
 
     public TroubleHandler getTroubleHandler() {
