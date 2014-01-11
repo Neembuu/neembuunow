@@ -15,10 +15,9 @@ import neembuu.diskmanager.DiskManager;
 import neembuu.diskmanager.DiskManagerParams;
 import neembuu.diskmanager.DiskManagers;
 import neembuu.release1.api.LinkHandlerProviders;
-import neembuu.release1.api.YoutubeLinkHandlerProvider;
+import neembuu.release1.defaultImpl.YoutubeLinkHandlerProvider;
 import neembuu.release1.defaultImpl.DirectLinkHandlerProvider;
 import neembuu.release1.ui.NeembuuUI;
-import neembuu.util.logging.LoggerUtil;
 import neembuu.vfs.file.TroubleHandler;
 
 /**
@@ -86,7 +85,8 @@ public final class Main {
     }
     
     private Logger initLogger(){
-        return LoggerUtil.getLogger();
+        //return neembuu.release1.log.LoggerUtil.getLogger("Main");
+        return neembuu.util.logging.LoggerUtil.getLogger();
     }
     
     static Main get() {

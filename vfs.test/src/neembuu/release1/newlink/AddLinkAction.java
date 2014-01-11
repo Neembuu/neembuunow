@@ -7,6 +7,9 @@ package neembuu.release1.newlink;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -18,9 +21,12 @@ import neembuu.release1.api.LinkHandlerProvider;
 import neembuu.release1.api.LinkHandlerProviders;
 import neembuu.release1.api.VirtualFile;
 import neembuu.release1.api.VirtualFilesParams;
-import neembuu.release1.defaultImpl.SimpleVirtualFileProvider;
-import neembuu.release1.ui.LinkPanel;
+import neembuu.release1.defaultImpl.OneToOneVirtualFileProvider;
+import neembuu.release1.defaultImpl.SimplyOpenTheVideoFile;
+import neembuu.release1.defaultImpl.SplitGroupProcessor;
+import neembuu.release1.ui.Constraint;
 import neembuu.release1.ui.MainPanel;
+import neembuu.release1.ui.SingleFileLinkUI;
 
 /**
  *
@@ -29,8 +35,8 @@ import neembuu.release1.ui.MainPanel;
 public class AddLinkAction implements Runnable {
     
     private final MainPanel mp;
-    private final SimpleVirtualFileProvider svfp
-                = new SimpleVirtualFileProvider();
+    private final OneToOneVirtualFileProvider svfp
+                = new OneToOneVirtualFileProvider();
     private Main main;
     
     public AddLinkAction(MainPanel mp) {
@@ -129,24 +135,79 @@ public class AddLinkAction implements Runnable {
         }
     }
 
+    
+    
     private void doLinks(List<Link> l){
-        
+        SplitGroupProcessor splitGroupProcessor = new SplitGroupProcessor();
+        SimplyOpenTheVideoFile simplyOpenTheVideoFile = new SimplyOpenTheVideoFile();
+                
+        List<VirtualFile> virtualFiles = new ArrayList<VirtualFile>();
         for(Link l1 : l){
             try{
-                doLink(l1);
+                virtualFiles.add(makeVirtualFile(l1));
             }catch(Exception a){
                 JOptionPane.showMessageDialog(mp, a.getMessage(), "Could not create file for "+l1.getLink(), JOptionPane.ERROR_MESSAGE);
                 Main.getLOGGER().log(Level.INFO, "Problem in creating virtual file "+ l1.getLink(), a);
             }
         }
+        
+        List<VirtualFile> splits = splitGroupProcessor.canHandle(virtualFiles);
+        if(splits!=null){
+            if(handleSplits(splitGroupProcessor, splits)){
+                virtualFiles.removeAll(splits);
+            }
+            
+            splitGroupProcessor.openSuitableFile(splits, main.getMountManager());
+        }
+        for (VirtualFile virtualFile : virtualFiles) {
+            main.getNui().getLinksContainer().addLinkUI(virtualFile.getVirtualFilesParams().getLinkUI(),0);
+        }
+        
+        simplyOpenTheVideoFile.openSuitableFile(virtualFiles, main.getMountManager() );
+        
+        // ConstrainUtility.constrain((DirectoryStream)main.getMountManager().getFileSystem().getRootAttributes()); 
+        // this makes each file aware of existence of other filein the same virtual
+        // directory. This way if user has added two files but is watching
+        // only one, the other files will cease downloading
         mp.showIndefiniteProgress(false, "");
     }
     
-    private void doLink(Link l)throws Exception{
+    private boolean handleSplits(SplitGroupProcessor splitGroupProcessor, List<VirtualFile> splits){
+        try{
+            splitGroupProcessor.handle(splits, main.getMountManager());
+        }catch(Exception a){
+            Main.getLOGGER().log(Level.INFO, "Could not handle splits", a);
+            return false;
+        }
+        splitGroupProcessor.openSuitableFile(splits, main.getMountManager());
+
+        Collections.sort(splits, new Comparator<VirtualFile>() {
+            @Override
+            public int compare(VirtualFile o1, VirtualFile o2) {
+                return o1.getConnectionFile().getDownloadConstrainHandler().index()
+                        - o2.getConnectionFile().getDownloadConstrainHandler().index();
+            }
+        });
+        int i = 0;
+        for (VirtualFile virtualFile : splits) {
+            if(i<splits.size() -1 ){
+                virtualFile.getVirtualFilesParams().getLinkUI().setContraintComponent(new Constraint());
+            }
+            main.getNui().getLinksContainer().addLinkUI(virtualFile.getVirtualFilesParams().getLinkUI(),i);
+            i++;
+        }
+        
+        
+        
+        return true;
+    }
+    
+    private VirtualFile makeVirtualFile(Link l)throws Exception{
         // use virtual file providers
         String fileName = l.getLinkHandler().getGroupName();
         
         fileName = main.getMountManager().getSuitableFileName(fileName);
+        SingleFileLinkUI singleFileLinkUI = new SingleFileLinkUI(main.getNui(), main.getMountManager());
         
         VirtualFilesParams vfp = VirtualFilesParams.Builder.create()
                 .setDiskManager(main.getDiskManager())
@@ -154,19 +215,12 @@ public class AddLinkAction implements Runnable {
                 .setFileName(fileName)
                 .setLinkHandler(l.getLinkHandler())
                 .setTroubleHandler(main.getTroubleHandler())
+                .setLinkUI(singleFileLinkUI)
                 .build();
         VirtualFile vf = svfp.create(vfp).get(0);
         main.getMountManager().addFile(vf);
-        LinkPanel lp = new LinkPanel();
-        lp.setFile(vf,main);
+        singleFileLinkUI.init(vf);
         
-        main.getNui().getLinksContainer().addLinkPanel(lp);
-        
-        
-        
-        
-        if(open){
-            lp.openVirtualFile();
-        }
+        return vf;
     }
 }

@@ -46,6 +46,14 @@ public class MountManager implements InstallerCallbackListener{
         filename = checkConflict(filename);
         return filename;
     }
+
+    public SimpleReadOnlyFileSystem getFileSystem() {
+        return fs;
+    }
+    
+    public VectorRootDirectory getRootDirectory(){
+        return volume;
+    }
     
     private String checkConflict(String filename){
         for(FileAttributesProvider fap : volume){

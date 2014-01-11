@@ -9,6 +9,7 @@ package neembuu.release1.ui;
 import java.util.logging.Level;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
+import neembuu.release1.ui.LinkPanel;
 
 /**
  *

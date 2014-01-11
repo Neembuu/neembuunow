@@ -112,11 +112,6 @@ public final class NeembuuUI {
         lc.updateLayout();
     }
     
-    private void addLink(){
-        lc.addLinkPanel(new LinkPanel());
-        lc.updateLayout();
-    }
-    
     class CloseHandler extends WindowAdapter {
         @Override
         public void windowClosing(WindowEvent e) {

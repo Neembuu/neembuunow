@@ -54,7 +54,7 @@ final class Graph {
     
     private void initValues(final Range arrayElement){  
         try {
-            file = linksPanel.vf.getConnectionFile();
+            file = linksPanel.singleFileLinkUI.getVirtualFile().getConnectionFile();
         } catch (NullPointerException noe) {
             Main.getLOGGER().log(Level.SEVERE, "", noe);
             return;
@@ -101,7 +101,7 @@ final class Graph {
         if(arrayElement==null){
             if(findFirst){
                 try{
-                    UnsyncRangeArrayCopy copy = linksPanel.vf.getConnectionFile().getRegionHandlers().tryToGetUnsynchronizedCopy();
+                    UnsyncRangeArrayCopy copy = linksPanel.singleFileLinkUI.getVirtualFile().getConnectionFile().getRegionHandlers().tryToGetUnsynchronizedCopy();
                     for (int i = 0; i < copy.size(); i++) {
                         RegionHandler rh = (RegionHandler)copy.get(i).getProperty();
                         if(rh.isAlive()){

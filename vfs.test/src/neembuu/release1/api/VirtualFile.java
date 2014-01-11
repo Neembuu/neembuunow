@@ -17,6 +17,5 @@ public interface VirtualFile {
     UIRangeArrayAccess getRegions();
     SeekableConnectionFile getConnectionFile();
     VirtualFilesParams getVirtualFilesParams();
-    
-     boolean tryUpdating(String newUrl);
+    boolean tryUpdating(String newUrl);
 }

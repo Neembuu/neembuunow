@@ -9,17 +9,12 @@ package neembuu.release1.ui;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JPanel;
 import javax.swing.Timer;
-import jpfm.annotations.NonBlocking;
 import neembuu.rangearray.DissolvabilityRule;
-import neembuu.rangearray.ModificationType;
 import neembuu.rangearray.Range;
 import neembuu.rangearray.RangeArray;
 import neembuu.rangearray.RangeArrayFactory;
-import neembuu.rangearray.RangeArrayListener;
 import neembuu.rangearray.RangeArrayParams;
-import neembuu.rangearray.RangeArrayUtils;
 import neembuu.rangearray.RangeUtils;
 import neembuu.rangearray.UIRangeArrayAccess;
 import neembuu.rangearray.UnsyncRangeArrayCopy;
@@ -161,18 +156,17 @@ public class Progress {
         for (int i = 0; i < regionHandlersUnsync.size(); i++) {
             Range<RegionHandler> r = regionHandlersUnsync.get(i);
             totalDownloaded += RangeUtils.getSize(r);
-            overallProgress.addElement(r.starting(), r.ending(),false);
+            overallProgress.addElement(r.starting(), r.getProperty().authorityLimit(),false);
         }
 
         
         overallProgressUnsync = overallProgress.tryToGetUnsynchronizedCopy();
         for (int i = 0; i < overallProgressUnsync.size(); i++) {
-            Range<RegionHandler> r = overallProgressUnsync.get(i);
-            if(RangeUtils.contains(r, latestRequestEnding, latestRequestEnding)){
-                if(latestRequestEnding < r.ending()){
-                    overallProgress.addElement(latestRequestEnding+1,r.ending(),true);
-                    break;
-                }
+            Range r = overallProgressUnsync.get(i);
+            if(r.starting() < latestRequestEnding &&
+                    latestRequestEnding < r.ending()){
+                overallProgress.addElement(latestRequestEnding+1,r.ending(),true);
+                break;
             }
         }
         
@@ -188,7 +182,7 @@ public class Progress {
         total_Downloaded = newTotal;
         long left = vf.getConnectionFile().getFileSize() - total_Downloaded;
         if(left == 0){
-            lp.saveBtn.setVisible(true);
+            lp.rightControlsPanel.saveBtn.setVisible(true);
         }else if(total_Downloaded > vf.getConnectionFile().getFileSize()){
             throw new RuntimeException("Total download size of file greater than filesize");
         } 

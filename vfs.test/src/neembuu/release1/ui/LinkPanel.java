@@ -18,17 +18,15 @@ import java.io.File;
 import java.util.logging.Level;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import neembuu.release1.Main;
-import neembuu.release1.api.VirtualFile;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public class LinkPanel extends javax.swing.JPanel {
+final class LinkPanel extends javax.swing.JPanel {
 
     private TextBubbleBorder border;
     final Graph graph;
@@ -41,16 +39,11 @@ public class LinkPanel extends javax.swing.JPanel {
     int ht_old = 0;
     int ht_new = 0;
     
-    int state = 1;
-    LinksContainer lc;
+    int state = 1;    
     
-    VirtualFile vf;
-    Main m;
-    
-    
-    JButton saveBtn;
-    JButton crossBtn;
-    
+    final RightControlsPanel rightControlsPanel = new RightControlsPanel();
+    final FileIconPanel fileIconPanel = new FileIconPanel();
+    final SingleFileLinkUI singleFileLinkUI;
     
     private final String downloadFullFileToolTip = "<html>"
                 + "<b>Download entire file mode</b><br/>"
@@ -68,7 +61,12 @@ public class LinkPanel extends javax.swing.JPanel {
     /**
      * Creates new form FilePanel
      */
-    public LinkPanel() {
+    LinkPanel() {
+        this(null);
+    }
+        
+    LinkPanel(SingleFileLinkUI singleFileLinkUI) {
+        this.singleFileLinkUI = singleFileLinkUI;
         border = new TextBubbleBorder(Colors.BORDER , 4, 16, 0);
         border.getBorderInsets(null).bottom = 8;
         border.getBorderInsets(null).top = 8;
@@ -82,18 +80,12 @@ public class LinkPanel extends javax.swing.JPanel {
         changeDownloadModeButton.setToolTipText(downloadFullFileToolTip);
     }
     
-    public void setFile(VirtualFile vf, Main m ){
-        this.vf = vf;
-        this.m = m;
-        fileNameLabel.setText(vf.getConnectionFile().getName());
+    void setFile(){
+
+        fileNameLabel.setText(singleFileLinkUI.getVirtualFile().getConnectionFile().getName());
         updateFileSizeString();
-        progress.init(this,vf);
-        crossBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                closeAction();
-            }
-        });
+        progress.init(this,singleFileLinkUI.getVirtualFile());
+
         try{
             if(!getAsRealFile().exists()){
                 throw new IllegalStateException("File not created yet");
@@ -106,7 +98,12 @@ public class LinkPanel extends javax.swing.JPanel {
                 clr = javax.swing.filechooser.FileSystemView.getFileSystemView().getSystemIcon( getAsRealFile() );
             }
             bw = TintedGreyScaledImage.getTintedImage(getBF(clr), Colors.TINTED_IMAGE, false);
-            makeOpenButton(vlcPane, bw, clr);
+            fileIconPanel.makeOpenButton(vlcPane, bw, clr, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    openVirtualFile();
+                }
+            } );
         }catch(Exception a){
             Main.getLOGGER().log(Level.INFO, "Could not find icon, using default", a);
         }
@@ -134,36 +131,36 @@ public class LinkPanel extends javax.swing.JPanel {
     }
     
     void closeAction(){
-        int x = JOptionPane.showConfirmDialog(m.getNui().getFrame(),"Are you sure you want to delete this file","Delete",JOptionPane.YES_NO_OPTION);
+        int x = JOptionPane.showConfirmDialog(singleFileLinkUI.getNeembuuUI().getFrame(),"Are you sure you want to delete this file","Delete",JOptionPane.YES_NO_OPTION);
         if(x == JOptionPane.YES_OPTION){
             closeAction(null);
         }
     }
     
     void closeAction(File outputFilePath){
-        m.getMountManager().removeFile(vf);
+        singleFileLinkUI.getMountManager().removeFile(singleFileLinkUI.getVirtualFile());
         try{
-            vf.getConnectionFile().closeCompletely();
+            singleFileLinkUI.getVirtualFile().getConnectionFile().closeCompletely();
         }catch(Exception a){
             Main.getLOGGER().log(Level.SEVERE, "Erorr in completely closing file",a);
         }
         
         try{
-            vf.getConnectionFile().getFileStorageManager().completeSession(outputFilePath, vf.getConnectionFile().getFileSize());
+            singleFileLinkUI.getVirtualFile().getConnectionFile().getFileStorageManager().completeSession(outputFilePath, singleFileLinkUI.getVirtualFile().getConnectionFile().getFileSize());
         }catch(Exception a){
             Main.getLOGGER().log(Level.SEVERE, "Could not save file",a);
-            JOptionPane.showMessageDialog(m.getNui().getFrame(), a.getMessage(),"Could not save file", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(singleFileLinkUI.getNeembuuUI().getFrame(), a.getMessage(),"Could not save file", JOptionPane.ERROR_MESSAGE);
         }
         
-        lc.removeLinkPanel(this);
+        singleFileLinkUI.getLinkUIContainer().removeLinkUI(singleFileLinkUI);
     }
     
     void saveFileClicked(){
         javax.swing.JFileChooser fileChooser = new javax.swing.JFileChooser();
         fileChooser.setSelectedFile(new File(System.getProperty("java.home")+File.separator+
-                vf.getConnectionFile().getName()));
+                singleFileLinkUI.getVirtualFile().getConnectionFile().getName()));
         fileChooser.setFileSelectionMode(javax.swing.JFileChooser.FILES_ONLY);
-        int retVal = fileChooser.showSaveDialog(m.getNui().getFrame());
+        int retVal = fileChooser.showSaveDialog(singleFileLinkUI.getNeembuuUI().getFrame());
         if(retVal == javax.swing.JFileChooser.APPROVE_OPTION){
             closeAction(fileChooser.getSelectedFile().getAbsoluteFile());
         }else {
@@ -514,45 +511,37 @@ public class LinkPanel extends javax.swing.JPanel {
 
     private void linkEditButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_linkEditButtonActionPerformed
         // TODO add your handling code here:
-        //vf.getRegions()
+        //singleFileLinkUI.getVirtualFile().getRegions()
                 
     }//GEN-LAST:event_linkEditButtonActionPerformed
 
+    private JPanel getFileIconPanelWithButton(){
+        return fileIconPanel.getFileIconPanelWithButton(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openVirtualFile();
+            }
+        });
+    }
+    
     private JPanel getRightControlPanel(){
-        JPanel panel = new JPanel();
-        
-        saveBtn = HiddenBorderButton.make("images/save.png", "images/save_s.png",false);
-        crossBtn = HiddenBorderButton.make("images/cross.png", "images/cross_s.png",false);
-        JButton downBtn = HiddenBorderButton.make("images/down.png", "images/down_s.png",false);
-        
-        downBtn.addActionListener(new ActionListener() {
+        return rightControlsPanel.getRightControlPanel(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 expandContractPressed();
             }
-        });
-        saveBtn.addActionListener(new ActionListener() {
+        }, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 saveFileClicked();
             }
+        }, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                closeAction();
+            }
         });
-        
-        saveBtn.setBounds(0, 8, 24, 24);
-        crossBtn.setBounds(25, 8, 24, 24);
-        downBtn.setBounds(50, 8, 24, 24);
-        
-        panel.add(saveBtn);
-        panel.add(crossBtn);
-        panel.add(downBtn);
-        
-        saveBtn.setToolTipText("Save File");
-        saveBtn.setVisible(false);
-        crossBtn.setToolTipText("Delete file");
-        downBtn.setToolTipText("Show/Hide more controls");
-        return panel;
     }
-
 
     private void initHeight(){
         sizeAndProgressPane.setVisible(false);
@@ -587,37 +576,11 @@ public class LinkPanel extends javax.swing.JPanel {
             ht_old = ht_medium;
         }state++;
         ht_old = ht_new;
-        lc.animateShrinkActionPerformed();
         
+        singleFileLinkUI.getLinkUIContainer().animateShrinkActionPerformed(singleFileLinkUI);
     }
     
-    private JPanel getFileIconPanelWithButton() {
-        JPanel panel = new JPanel();
-        final TintedGreyScaledImage image = TintedGreyScaledImage.make("/neembuu/release1/ui/images/vlc.png",false);
-        makeOpenButton(panel,image.getTintedImage(Colors.TINTED_IMAGE ), image.getBaseImage() );
-        return panel;
-    }
-    
-    JButton openButton = null;
-    
-    private void makeOpenButton(JPanel panel, Icon bw, Icon clr){
-        if(openButton!=null){
-            panel.remove(openButton);
-        }
-        openButton = HiddenBorderButton.make(bw,clr,false);
-        openButton.setBounds(0, 0, 32, 32);
-        openButton.setToolTipText("Click to Open/Watch");
-        panel.add(openButton);
-        openButton.addActionListener(new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                openVirtualFile();
-            }
-        });
-        
-        
-    }
     
     public void openVirtualFile(){
         try{
@@ -630,9 +593,9 @@ public class LinkPanel extends javax.swing.JPanel {
         }
     }
     
-    File getAsRealFile(){
-        return new File(m.getMountManager().getMount().getMountLocation().getAsFile(),
-                    vf.getConnectionFile().getName());
+    private File getAsRealFile(){
+        return new File(singleFileLinkUI.getMountManager().getMount().getMountLocation().getAsFile(),
+                    singleFileLinkUI.getVirtualFile().getConnectionFile().getName());
     }
     
     int getH(double f){
@@ -676,7 +639,7 @@ public class LinkPanel extends javax.swing.JPanel {
     
     
     private void updateFileSizeString(){
-        double sz = vf.getConnectionFile().getFileSize();
+        double sz = singleFileLinkUI.getVirtualFile().getConnectionFile().getFileSize();
         String suffix;
         if(sz < 1000){
             suffix = " B";
@@ -700,14 +663,7 @@ public class LinkPanel extends javax.swing.JPanel {
         }
         fileSizeLabel.setText(sz+ " "+suffix);
     }
-    
-    
-    public static void main(String[] args) {
-        TestLinkPanel.main(args);
-    }
 
-    
-    
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

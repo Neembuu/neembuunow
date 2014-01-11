@@ -19,6 +19,7 @@ public final class VirtualFilesParams {
     private final DiskManager diskManager;
     private final TroubleHandler troubleHandler;
     private final String fileName;
+    private final LinkUI linkUI;
 
     public VirtualFilesParams(Builder b) {
         this.link = b.link;
@@ -26,6 +27,7 @@ public final class VirtualFilesParams {
         this.diskManager = b.diskManager;
         this.troubleHandler = b.troubleHandler;
         this.fileName = b.fileName;
+        this.linkUI = b.linkUI;
     }
 
     public Link getLink() {
@@ -47,13 +49,18 @@ public final class VirtualFilesParams {
     public String getFileName() {
         return fileName;
     }
-    
+
+    public LinkUI getLinkUI() {
+        return linkUI;
+    }
+
     public static final class Builder {
         private Link link;
         private LinkHandler linkHandler;
         private DiskManager diskManager;
         private TroubleHandler troubleHandler;
         private String fileName;
+        private LinkUI linkUI;
         
         private Builder(){
             
@@ -74,6 +81,11 @@ public final class VirtualFilesParams {
         
         public Builder setLink(Link link) {
             this.link = link;
+            return this;
+        }
+
+        public Builder setLinkUI(LinkUI linkUI) {
+            this.linkUI = linkUI;
             return this;
         }
 

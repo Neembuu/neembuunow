@@ -14,7 +14,7 @@ import jpfm.FileAttributesProvider;
  * @author Shashank Tulsyan
  */
 public final class ConstrainUtility {    
-    public static void constrain(DirectoryStream ds){
+    public static void constrain(Iterable<FileAttributesProvider> ds){
         // first unconstrain
         Iterator<FileAttributesProvider> it = ds.iterator();
         LinkedList<DownloadConstrainHandler> handlers = new LinkedList<DownloadConstrainHandler>();

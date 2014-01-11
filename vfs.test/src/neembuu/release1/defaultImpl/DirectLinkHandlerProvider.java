@@ -230,14 +230,15 @@ public class DirectLinkHandlerProvider implements LinkHandlerProvider {
             
             
             long length = response.getEntity().getContentLength();
+            request.abort();
             LOGGER.log(Level.INFO, "File size found = {0}", length);
             if(length<0){
                 LOGGER.info("length < 0 , not setting");
             }
             else {
+                
                 return new DirectLinkHandler(fileName,length,url);
             }
-            request.abort();
         }catch(Exception any){
             LOGGER.log(Level.INFO,"Can\'t get filesize",any);
         }

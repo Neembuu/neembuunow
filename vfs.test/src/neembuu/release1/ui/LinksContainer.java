@@ -10,18 +10,22 @@ import java.util.ArrayList;
 import javax.swing.GroupLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import neembuu.release1.api.LinkUI;
+import neembuu.release1.api.LinkUIContainer;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public final class LinksContainer {
-    public void animateShrinkActionPerformed() {
+public final class LinksContainer implements LinkUIContainer {
+    
+    private void animateShrinkActionPerformed() {
         adjustHeightOfMainWindow(1);
         adjustHeightOfLinksSection(1f);
     }
     
-    private final ArrayList<LinkPanel> linkPanels = new ArrayList<LinkPanel>();
+    private final ArrayList<LinkUI> linkPanels = new ArrayList<LinkUI>();
+    private final ArrayList<Constraint> constraints = new ArrayList<Constraint>();
     private final MainPanel mp;
     private final JFrame mainFrame;
     private final JPanel linksPanel;
@@ -32,18 +36,26 @@ public final class LinksContainer {
         linksPanel = mp.linksPanel;
     }
     
-    public void addLinkPanel(LinkPanel lp){
-        lp.lc = this;
-        linkPanels.add(lp);
+    public void addLinkUI(LinkUI lpI){
+        addLinkUI(lpI, -1);
+    }
+    
+    public void addLinkUI(LinkUI lpI, int index){
+        lpI.initLinkUIContainer(this);
+        if(index< 0){
+            linkPanels.add(lpI);
+        }else {
+            linkPanels.add(index,lpI);
+        }
         updateLayout();
     }
     
-    public void removeLinkPanel(LinkPanel lp){
+    /*public void removeLinkPanel(LinkPanel lp){
         lp.lc = null;
         linkPanels.remove(lp);
         linksPanel.remove(lp);
         updateLayout();
-    }
+    }*/
     
     public void setToInitialHeight(){
         adjustHeightOfLinksSection(1);
@@ -54,9 +66,12 @@ public final class LinksContainer {
         //doing horizontal alignment
         GroupLayout linksPanelLayout = (GroupLayout)linksPanel.getLayout();
         GroupLayout.ParallelGroup parallelGroup = linksPanelLayout.createParallelGroup();
-        for (LinkPanel linkPanel : linkPanels) {
+        for (LinkUI l : linkPanels) {
             parallelGroup.addComponent(
-                    linkPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE);
+                    l.getJComponent(), javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE);
+            if(l.getContraintComponent()!=null){
+                parallelGroup.addComponent(l.getContraintComponent(),javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE);
+            }
         }
         linksPanelLayout.setHorizontalGroup(linksPanelLayout.createSequentialGroup()
                 .addGap(left, left, left)
@@ -81,8 +96,8 @@ public final class LinksContainer {
             mainFrame.setSize(mainFrame.getMinimumSize().width,ht);
         }
         else {
-            for (LinkPanel linkPanel : linkPanels) {
-                ht+=linkPanel.getH(f);
+            for (LinkUI l : linkPanels) {
+                ht+=l.getH(f);
                 ht+=bottom;
             }
             
@@ -98,13 +113,34 @@ public final class LinksContainer {
     private void adjustHeightOfLinksSection(double f){
         GroupLayout linksPanelLayout = (GroupLayout)linksPanel.getLayout();
         GroupLayout.SequentialGroup sequentialGroup = linksPanelLayout.createSequentialGroup();
-        for (LinkPanel linkPanel : linkPanels) {
+        
+        for (LinkUI l : linkPanels) {
             sequentialGroup
-                .addComponent(linkPanel, javax.swing.GroupLayout.DEFAULT_SIZE, linkPanel.getMinH(), linkPanel.getH(f))
-                .addGap(bottom, bottom, bottom);
+                .addComponent(l.getJComponent(), javax.swing.GroupLayout.DEFAULT_SIZE, l.getMinH(), l.getH(f));
+            if(l.getContraintComponent()==null){
+                sequentialGroup.addGap(bottom, bottom, bottom);
+            }else {
+                sequentialGroup.addComponent(l.getContraintComponent(),javax.swing.GroupLayout.DEFAULT_SIZE,20,20);
+            }
+
         }
         linksPanelLayout.setVerticalGroup(linksPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                 .addGroup(sequentialGroup));
     }
+
+    @Override
+    public void removeLinkUI(LinkUI uI) {
+        uI.uninitLinkUIContainer(this);
+        linkPanels.remove(uI);
+        linksPanel.remove(uI.getJComponent());
+        updateLayout();
+    }
+
+    @Override
+    public void animateShrinkActionPerformed(LinkUI source) {
+        animateShrinkActionPerformed();
+    }
+    
+    
     
 }

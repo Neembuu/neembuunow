@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.CodeSource;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -38,27 +39,27 @@ public class Environment {
                     urlpth = urlpth.substring(0, urlpth.lastIndexOf('/'));
                     urlpth = urlpth.substring(0, urlpth.lastIndexOf('/') + 1);
                     urlpth = urlpth + "release1_development_environment/";
-                    Main.getLOGGER().log(Level.INFO,"Running in development mode, using properties = " + urlpth);
+                    Logger.getGlobal().log(Level.INFO,"Running in development mode, using properties = " + urlpth);
                     return new File(new URL(urlpth).toURI());
                 } else if (src.getLocation().toString().endsWith(".jar")) {
                     String urlpth = src.getLocation().toString();
                     urlpth = urlpth.substring(0, urlpth.lastIndexOf('/') + 1);
                     //urlpth = urlpth + "neembuu.properties";
-                    Main.getLOGGER().log(Level.INFO,"Running from jar, using properties = " + urlpth);
+                    Logger.getGlobal().log(Level.INFO,"Running from jar, using properties = " + urlpth);
                     propertiesFile = new File(new URL(urlpth).toURI());
                     return propertiesFile;
                 } else {
-                    Main.getLOGGER().log(Level.INFO,"Asumming because code source=" + src.getLocation().toString());
+                    Logger.getGlobal().log(Level.INFO,"Asumming because code source=" + src.getLocation().toString());
                     throw new NullPointerException();
                     //assume = true;
                 }
             }
 
         } catch (Exception a) {
-            Main.getLOGGER().log(Level.SEVERE, "Error initializing environment",a);
+            Logger.getGlobal().log(Level.SEVERE, "Error initializing environment",a);
         }
         
-        Main.getLOGGER().log(Level.INFO,"Could not initialize environment");
+        Logger.getGlobal().log(Level.INFO,"Could not initialize environment");
         throw new NullPointerException();
     }
 }
