@@ -133,7 +133,7 @@ public class SimplyOpenTheVideoFile implements LinkGroupProcessor {
 
     @Override
     public void openSuitableFile(List<VirtualFile> virtualFiles, MountManager mountManager) {
-        DirectoryStream root = (DirectoryStream)mountManager.getFileSystem().getRootAttributes();
+        DirectoryStream root = (DirectoryStream)mountManager.getRootDirectory();
         String basePath = getMountLocation(mountManager);
         for (VirtualFile virtualFile : virtualFiles) {
             String path = path(virtualFile.getConnectionFile().getParent(), root, basePath);

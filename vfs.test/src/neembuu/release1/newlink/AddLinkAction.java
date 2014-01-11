@@ -152,7 +152,7 @@ public class AddLinkAction implements Runnable {
         }
         
         List<VirtualFile> splits = splitGroupProcessor.canHandle(virtualFiles);
-        if(splits!=null){
+        if(splits!=null && splits.size()>0 ){
             if(handleSplits(splitGroupProcessor, splits)){
                 virtualFiles.removeAll(splits);
             }

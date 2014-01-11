@@ -25,7 +25,7 @@ public final class LinksContainer implements LinkUIContainer {
     }
     
     private final ArrayList<LinkUI> linkPanels = new ArrayList<LinkUI>();
-    private final ArrayList<Constraint> constraints = new ArrayList<Constraint>();
+    //private final ArrayList<Constraint> constraints = new ArrayList<Constraint>();
     private final MainPanel mp;
     private final JFrame mainFrame;
     private final JPanel linksPanel;
@@ -120,7 +120,7 @@ public final class LinksContainer implements LinkUIContainer {
             if(l.getContraintComponent()==null){
                 sequentialGroup.addGap(bottom, bottom, bottom);
             }else {
-                sequentialGroup.addComponent(l.getContraintComponent(),javax.swing.GroupLayout.DEFAULT_SIZE,20,20);
+                sequentialGroup.addComponent(l.getContraintComponent(),javax.swing.GroupLayout.DEFAULT_SIZE,10,19);
             }
 
         }

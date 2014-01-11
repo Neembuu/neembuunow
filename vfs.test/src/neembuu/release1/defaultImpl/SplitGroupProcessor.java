@@ -93,7 +93,7 @@ public class SplitGroupProcessor implements LinkGroupProcessor {
         synchronized (splitVirtualFiles) {
             for (VirtualFile vf : splitVirtualFiles) {
                 mountManager.getRootDirectory().remove(vf.getConnectionFile());
-                vf.getConnectionFile().setParent(null);
+                vf.getConnectionFile().setParent((DirectoryStream)bcm.getFileSytem().getRootAttributes());
                 // the file does not exist, therefore the open button should be
                 // disabled
                 vf.getVirtualFilesParams().getLinkUI().deactivateOpenButton(true);
