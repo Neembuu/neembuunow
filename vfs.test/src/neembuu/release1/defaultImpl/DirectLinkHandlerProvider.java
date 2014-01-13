@@ -18,42 +18,20 @@
 
 package neembuu.release1.defaultImpl;
 
-import java.security.KeyStore;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import neembuu.config.GlobalTestSettings;
 import neembuu.release1.api.File;
 import neembuu.release1.api.LinkHandler;
 import neembuu.release1.log.LoggerUtil;
 import neembuu.release1.api.LinkHandlerProvider;
-import neembuu.release1.util.NeembuuHttpClient;
+import neembuu.release1.httpclient.NHttpClient;
 import neembuu.vfs.connection.NewConnectionProvider;
 import neembuu.vfs.connection.sampleImpl.DownloadManager;
-import org.apache.http.HttpConnection;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.AuthState;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.ClientContext;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.impl.DefaultHttpClientConnection;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.SingleClientConnManager;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.ExecutionContext;
-import org.apache.http.protocol.HttpContext;
 
 /**
  *
@@ -121,83 +99,12 @@ public class DirectLinkHandlerProvider implements LinkHandlerProvider {
         }
     }
     
-    
-    private DefaultHttpClient newClient(){
-        DefaultHttpClient client = new DefaultHttpClient();
-        GlobalTestSettings.ProxySettings proxySettings 
-                        = GlobalTestSettings.getGlobalProxySettings();
-        HttpContext context = new BasicHttpContext();
-        SchemeRegistry schemeRegistry = new SchemeRegistry();
-        
-        schemeRegistry.register(new Scheme("http", new PlainSocketFactory(), 80));
-        
-        try{
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            schemeRegistry.register(new Scheme("https", new SSLSocketFactory(keyStore), 8080));
-        }catch(Exception a){
-            a.printStackTrace(System.err);
-        }
-
-        context.setAttribute(
-                ClientContext.SCHEME_REGISTRY,
-                schemeRegistry);
-        context.setAttribute(
-                ClientContext.AUTHSCHEME_REGISTRY,
-                new BasicScheme()/*file.httpClient.getAuthSchemes()*/);
-        
-        
-        context.setAttribute(
-                ClientContext.COOKIESPEC_REGISTRY,
-                client.getCookieSpecs()/*file.httpClient.getCookieSpecs()*/
-                );
-
-        BasicCookieStore basicCookieStore = new BasicCookieStore();
-
-        context.setAttribute(
-                ClientContext.COOKIE_STORE,
-                basicCookieStore/*file.httpClient.getCookieStore()*/);
-        context.setAttribute(
-                ClientContext.CREDS_PROVIDER,
-                new BasicCredentialsProvider()/*file.httpClient.getCredentialsProvider()*/);
-
-        HttpConnection hc = new DefaultHttpClientConnection();
-        context.setAttribute(
-                ExecutionContext.HTTP_CONNECTION,
-                hc);
-
-        //System.out.println(file.httpClient.getParams().getParameter("http.useragent"));
-        HttpParams httpParams = new BasicHttpParams();
-        
-        if(proxySettings!=null){
-            AuthState as = new AuthState();
-            as.setCredentials(new UsernamePasswordCredentials(proxySettings.userName, proxySettings.password));
-            as.setAuthScope(AuthScope.ANY);
-            as.setAuthScheme(new BasicScheme());
-            httpParams.setParameter(ClientContext.PROXY_AUTH_STATE,as);
-            httpParams.setParameter("http.proxy_host", new HttpHost(proxySettings.host, proxySettings.port));
-        }
-        
-        client = new DefaultHttpClient(new SingleClientConnManager(
-                httpParams/*file.httpClient.getParams()*/,
-                schemeRegistry),
-                httpParams/*file.httpClient.getParams()*/);
-        
-        
-        if(proxySettings!=null){
-            client.getCredentialsProvider().setCredentials(
-                AuthScope.ANY,
-                new UsernamePasswordCredentials(proxySettings.userName, proxySettings.password));
-        }
-        
-        return client;
-    }
-    
     public final DirectLinkHandler getDirectLinkHandler(String url){
         
         String fileName = url.substring(url.lastIndexOf('/')+1);
         
         try{
-            DefaultHttpClient httpClient = NeembuuHttpClient.getInstance();
+            DefaultHttpClient httpClient = NHttpClient.getInstance();
             HttpGet request = new HttpGet(url);
 
             HttpResponse response = httpClient.execute(request);
