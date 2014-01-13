@@ -20,7 +20,11 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import neembuu.rangearray.Range;
+import neembuu.rangearray.UIRangeArrayAccess;
 import neembuu.release1.Main;
+import neembuu.vfs.file.SeekableConnectionFile;
+import neembuu.vfs.readmanager.RegionHandler;
 
 /**
  *
@@ -32,14 +36,14 @@ final class LinkPanel extends javax.swing.JPanel {
     final Graph graph;
     final Progress progress;
     
-    final int ht_smallest = 50;
-    final int ht_medium = 80;
-    final int ht_tallest = 300;
+    private final int ht_smallest = 50;
+    private final int ht_medium = 80;
+    private final int ht_tallest = 300;
     
-    int ht_old = 0;
-    int ht_new = 0;
+    private int ht_old = 0;
+    private int ht_new = 0;
     
-    int state = 1;    
+    private int state = 1;    
     
     final RightControlsPanel rightControlsPanel = new RightControlsPanel();
     final FileIconPanel fileIconPanel = new FileIconPanel();
@@ -78,6 +82,7 @@ final class LinkPanel extends javax.swing.JPanel {
         graph = new Graph(this);
         progress =  new Progress();
         changeDownloadModeButton.setToolTipText(downloadFullFileToolTip);
+        killConnectionButton.setEnabled(false);
     }
     
     void setFile(){
@@ -486,11 +491,30 @@ final class LinkPanel extends javax.swing.JPanel {
 
     private void killConnectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_killConnectionButtonActionPerformed
         // TODO add your handling code here:
-        
+        Range selection =  progress.getSelectedRange();
+        if(selection == null){
+            throw new RuntimeException("Null connection was selected. The kill button should automatically disable if no connection is selected");
+        }
+        UIRangeArrayAccess regions = singleFileLinkUI.getVirtualFile().getConnectionFile().getRegionHandlers();
+        selection = regions.getUnsynchronized(selection.ending());
+        try{
+            ((neembuu.vfs.readmanager.impl.BasicRegionHandler)selection.getProperty()).
+                    getConnection().abort();
+        }catch(Exception any){
+            Main.getLOGGER().log(Level.SEVERE, "Connection killing exception", any);
+        }
     }//GEN-LAST:event_killConnectionButtonActionPerformed
 
     private void nextConnectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextConnectionButtonActionPerformed
-        // TODO add your handling code here:
+        Range initial =  progress.getSelectedRange();
+        UIRangeArrayAccess regions = singleFileLinkUI.getVirtualFile().getConnectionFile().getRegionHandlers();
+        if(initial == null){
+            initial = regions.getFirst();
+        }else {
+            initial = regions.getUnsynchronized(initial.ending());
+        }
+        Range next = regions.getNext(initial);
+        progress.switchToRegion(next);
     }//GEN-LAST:event_nextConnectionButtonActionPerformed
 
     private void changeDownloadModeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeDownloadModeButtonActionPerformed
@@ -503,11 +527,24 @@ final class LinkPanel extends javax.swing.JPanel {
             changeDownloadModeButton.setBackground(Colors.PROGRESS_BAR_FILL_BUFFER);
             changeDownloadModeButton.setToolTipText(downloadFullFileToolTip);
         }
+    
+        SeekableConnectionFile file = singleFileLinkUI.getVirtualFile().getConnectionFile();
+        file.setAutoCompleteEnabled(!file.isAutoCompleteEnabled());
+        
+        progress.repaint(); // the color of progress bar change this needs to be notified.
     }//GEN-LAST:event_changeDownloadModeButtonActionPerformed
 
     private void previousConnectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousConnectionButtonActionPerformed
         // TODO add your handling code here:
-        //progress.
+        Range initial =  progress.getSelectedRange();
+        UIRangeArrayAccess regions = singleFileLinkUI.getVirtualFile().getConnectionFile().getRegionHandlers();
+        if(initial == null){
+            initial = regions.getFirst();
+        }else {
+            initial = regions.getUnsynchronized(initial.ending());
+        }
+        Range previous = regions.getPrevious(initial);
+        progress.switchToRegion(previous);
     }//GEN-LAST:event_previousConnectionButtonActionPerformed
 
     private void linkEditButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_linkEditButtonActionPerformed
@@ -516,6 +553,7 @@ final class LinkPanel extends javax.swing.JPanel {
                 
     }//GEN-LAST:event_linkEditButtonActionPerformed
 
+    
     private JPanel getFileIconPanelWithButton(){
         return fileIconPanel.getFileIconPanelWithButton(new ActionListener() {
             @Override
@@ -553,7 +591,7 @@ final class LinkPanel extends javax.swing.JPanel {
         ht_old = ht_new = ht_smallest;
     }
     
-    private void expandContractPressed(){
+    private void expandContractPressed(){        
         if(state%3==0){
             sizeAndProgressPane.setVisible(false);
             graphPanel.setVisible(false);{
@@ -577,7 +615,6 @@ final class LinkPanel extends javax.swing.JPanel {
             ht_old = ht_medium;
         }state++;
         ht_old = ht_new;
-        
         singleFileLinkUI.getLinkUIContainer().animateShrinkActionPerformed(singleFileLinkUI);
     }
     
@@ -665,7 +702,25 @@ final class LinkPanel extends javax.swing.JPanel {
         fileSizeLabel.setText(sz+ " "+suffix);
     }
 
+    public ExpansionState getExpansionState(){
+        int s = this.state%3;
+        switch (s) {
+            case 0:
+                return ExpansionState.FullyExpanded;
+            case 1:
+                return ExpansionState.Contracted;
+            case 2:
+                return ExpansionState.SemiExpanded;
+            default:
+                return ExpansionState.Contracted;
+        }
+    }
     
+    public enum ExpansionState {
+        Contracted,
+        SemiExpanded,
+        FullyExpanded
+    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton changeDownloadModeButton;
@@ -675,7 +730,7 @@ final class LinkPanel extends javax.swing.JPanel {
     private javax.swing.JLabel fileSizeLabel;
     javax.swing.JPanel graphPanel;
     private javax.swing.JPanel hiddenStatsPane;
-    private javax.swing.JButton killConnectionButton;
+    javax.swing.JButton killConnectionButton;
     private javax.swing.JButton linkEditButton;
     private javax.swing.JButton nextConnectionButton;
     private javax.swing.JButton previousConnectionButton;

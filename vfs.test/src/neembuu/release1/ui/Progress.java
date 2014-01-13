@@ -9,6 +9,7 @@ package neembuu.release1.ui;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.NumberFormat;
 import javax.swing.Timer;
 import neembuu.rangearray.DissolvabilityRule;
 import neembuu.rangearray.Range;
@@ -38,6 +39,14 @@ public class Progress {
     private RangeArray<Boolean> overallProgress;
     
     private LinkPanel lp;
+    private long total_Downloaded = 0;
+    
+    private UnsyncRangeArrayCopy regionHandlersUnsync;
+    private UnsyncRangeArrayCopy overallProgressUnsync;
+    private UIRangeArrayAccess downloadedRegionHandlers ;        
+    private volatile long latestRequestStarting,latestRequestEnding;
+    
+    private Range selectedRange = null;
     
     void init(LinkPanel lp,final VirtualFile vf){
         this.vf = vf;
@@ -60,9 +69,16 @@ public class Progress {
                     public Color getColor(Color defaultColor, Range element, RangeArrayElementColorProvider.SelectionState selectionState) {
                         Object p = element.getProperty();
                         Color base = Colors.PROGRESS_BAR_FILL_ACTIVE;
+                        if(!vf.getConnectionFile().isAutoCompleteEnabled()){
+                            base = Colors.PROGRESS_DOWNLOAD_LESS_MODE;
+                        }
+                        
                         if(p!=null){
                             if(p==Boolean.TRUE){
                                 base = Colors.PROGRESS_BAR_FILL_BUFFER;
+                                if(!vf.getConnectionFile().isAutoCompleteEnabled()){
+                                    base = Colors.TINTED_IMAGE;
+                                }
                                 switch (selectionState) {
                                     case LIST: base = RangeArrayComponent.lightenColor(base, 0.9f); break;
                                     case MOUSE_OVER: base = RangeArrayComponent.lightenColor(base, 0.8f); break;
@@ -128,15 +144,14 @@ public class Progress {
         t.start();
     }
     
-    long total_Downloaded = 0;
+    
     public long totalDownloaded(){
         return total_Downloaded;
     }
     
-    UnsyncRangeArrayCopy regionHandlersUnsync;
-    UnsyncRangeArrayCopy overallProgressUnsync;
-    UIRangeArrayAccess downloadedRegionHandlers ;        
-    volatile long latestRequestStarting,latestRequestEnding;
+    public void repaint(){
+        progress.repaint();
+    }
     
     void handleChange(){
         downloadedRegionHandlers = vf.getConnectionFile().getRegionHandlers();
@@ -194,12 +209,50 @@ public class Progress {
         }
     }
     
-    void rangeSelected(Range arrayElement){
+    private void rangeSelected(Range arrayElement){
+        this.selectedRange = arrayElement;
         lp.graph.initGraph(arrayElement);
+        lp.killConnectionButton.setEnabled(arrayElement!=null);
     }
     
-    String getToolTipText(Range element, long absolutePosition, long largestEntry, RangeArrayElementColorProvider.SelectionState selectionState) {
-        return null;
+    public void switchToRegion(Range arrayElement){
+        lp.killConnectionButton.setEnabled(arrayElement!=null);
+        if(arrayElement==null){
+            return;
+        }
+        progress.selectRange(arrayElement);
+    }
+    
+
+    public Range getSelectedRange() {
+        return selectedRange;
+    }
+    
+    private String getToolTipText(Range element, long absolutePosition, long largestEntry, RangeArrayElementColorProvider.SelectionState selectionState) {
+        if(element==null){
+            return null;
+        }
+        String defaultString = element.starting()+"->"+element.ending();
+        if(lp.getExpansionState()!=LinkPanel.ExpansionState.FullyExpanded){
+            return defaultString;
+        }
+        
+        if(downloadedRegionHandlers==null){    
+            return defaultString+ " not initialized ";
+        }
+        element = downloadedRegionHandlers.getUnsynchronized(absolutePosition);
+        if(element==null || !(element.getProperty() instanceof RegionHandler) ){
+            return defaultString+ " not RegionHandler ";
+        }
+        
+        RegionHandler regionHandler = (RegionHandler)element.getProperty();
+        String toRet = "";
+        if(vf.getConnectionFile().getDownloadConstrainHandler().isComplete()){
+            toRet = "File completely downloaded \n";
+        }
+        return toRet + NumberFormat.getInstance().format( regionHandler.getThrottleStatistics().getDownloadSpeed_KiBps())+" KBps \n"+
+                " RequestSpeed = " + NumberFormat.getInstance().format( regionHandler.getThrottleStatistics().getRequestSpeed_KiBps())+" KBps \n"+
+                (regionHandler.isAlive()?"alive":"dead")+" "+(regionHandler.isMainDirectionOfDownload()?"main":"notmain")  ;
     }
 
 }

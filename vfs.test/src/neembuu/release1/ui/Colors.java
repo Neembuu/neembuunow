@@ -19,6 +19,7 @@ public final class Colors {
             PROGRESS_BAR_BACKGROUND     = hsl(35, 69, 209, HSLSource.MSEXCEL),
             NIMBUS_BASE                 = hsl(35, 100, 135, HSLSource.MSEXCEL), 
             TEXT_BACKGROUND             = hsl(35, 100, 254, HSLSource.MSEXCEL), 
+            PROGRESS_DOWNLOAD_LESS_MODE = hsl(35, 72, 120, HSLSource.MSEXCEL), 
             //SIZ9_POST_BACKGROUND        = hsl(31, 73, 248, HSLSource.MSEXCEL),
             
             CONTROL_ICONS               = hsl(140, 255, 58, HSLSource.MSEXCEL), 
@@ -26,7 +27,7 @@ public final class Colors {
             PROGRESS_BAR_FILL_BUFFER   = hsl(140, 85, 212, HSLSource.MSEXCEL);
     
             
-    ;
+    
 
     private static Color rgb(int r, int g, int b) {
         return new Color(r, g, b);
