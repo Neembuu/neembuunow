@@ -6,6 +6,7 @@
 
 package neembuu.release1.ui;
 
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import neembuu.release1.Main;
 
@@ -109,11 +110,21 @@ public class MainPanel extends javax.swing.JPanel {
         aboutButton.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.aboutButton.text")); // NOI18N
         aboutButton.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         aboutButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        aboutButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aboutButtonActionPerformed(evt);
+            }
+        });
 
         helpButton.setFont(new java.awt.Font("Futura-Light", 0, 14)); // NOI18N
         helpButton.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.helpButton.text")); // NOI18N
         helpButton.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         helpButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        helpButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                helpButtonActionPerformed(evt);
+            }
+        });
 
         showAddLinkUIButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/+.png"))); // NOI18N
         showAddLinkUIButton.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.showAddLinkUIButton.text")); // NOI18N
@@ -323,6 +334,23 @@ public class MainPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
         nui.addLinks(false);
     }//GEN-LAST:event_addOnlyFilesButtonActionPerformed
+
+    private void aboutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutButtonActionPerformed
+        // TODO add your handling code here:
+        try{
+            java.awt.Desktop.getDesktop().browse(new java.net.URI("http://neembuu.com/now/"));
+        }catch(Exception a){
+            JOptionPane.showMessageDialog(nui.getFrame(), "Please visit\nhttp://neembuu.com/now/", "Could not automatically open link", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_aboutButtonActionPerformed
+
+    private void helpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_helpButtonActionPerformed
+        try{
+            java.awt.Desktop.getDesktop().browse(new java.net.URI("http://neembuu.com/now/help/"));
+        }catch(Exception a){
+            JOptionPane.showMessageDialog(nui.getFrame(), "Please visit\nhttp://neembuu.com/now/help/", "Could not automatically open link", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_helpButtonActionPerformed
 
     public String getLinksText(){
         return listOfLinks.getText();
