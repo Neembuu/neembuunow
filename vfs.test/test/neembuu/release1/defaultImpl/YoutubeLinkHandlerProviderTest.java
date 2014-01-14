@@ -6,6 +6,8 @@
 
 package neembuu.release1.defaultImpl;
 
+import java.util.logging.Level;
+import neembuu.release1.Main;
 import neembuu.release1.api.LinkHandler;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -45,30 +47,35 @@ public class YoutubeLinkHandlerProviderTest {
     @Test
     public void testCanHandle() {
         System.out.println("canHandle");
-        String url = "http://www.youtube.com/watch?v=N0fPuYR3I_k"; //Normal
-        String url1 = "http://youtu.be/N0fPuYR3I_k"; //Minified
-        String url2 = "http://www.youtube.com/watch?v=iwGFalTRHDA&feature=related"; //With other parameters
-        String url3 = "http://youtu.be/t-ZRX8984sc";
-        String url4 = "https://www.youtube.com/watch?v=N0fPuYR3I_k"; //Https
         
-        String invalidUrl = "http://www.youtuabe.com/watch?v=N0fPuYR3I_k";
-        String invalidUrl1 = "http://www.youtube.com/watch?v=N0fPuYR3I_k&&asds";
-        String invalidUrl2 = "http://www.youtube.it/watch?v=N0fPuYR3I_k";
+        //Valid
+        String urls[] = {
+            "http://www.youtube.com/watch?v=N0fPuYR3I_k", //Normal
+            "http://youtu.be/N0fPuYR3I_k", //Minified
+            "http://www.youtube.com/watch?v=iwGFalTRHDA&feature=related", //With other parameters
+            "http://youtu.be/t-ZRX8984sc", //With a special char: "-"
+            "https://www.youtube.com/watch?v=N0fPuYR3I_k" //Https
+        }; 
+        
+        
+        //Invalid
+        String invalidUrls[] = {
+            "http://www.youtuabe.com/watch?v=N0fPuYR3I_k",
+            "http://www.youtube.com/watch?v=N0fPuYR3I_k&&asds",
+            "http://www.youtube.it/watch?v=N0fPuYR3I_k"
+        };
         
         YoutubeLinkHandlerProvider instance = new YoutubeLinkHandlerProvider();
         
         //Valid
-        assertTrue(instance.canHandle(url));
-        assertTrue(instance.canHandle(url1));
-        assertTrue(instance.canHandle(url2));
-        assertTrue(instance.canHandle(url3));
-        assertTrue(instance.canHandle(url4));
-        
+        for (String url : urls) {
+            assertTrue(instance.canHandle(url));
+        }
         
         //Invalid
-        assertFalse(instance.canHandle(invalidUrl));
-        assertFalse(instance.canHandle(invalidUrl1));
-        assertFalse(instance.canHandle(invalidUrl2));
+        for (String url : invalidUrls) {
+            assertFalse(instance.canHandle(url));
+        }
     }
 
     /**
@@ -77,13 +84,25 @@ public class YoutubeLinkHandlerProviderTest {
     @Test
     public void testGetLinkHandler() {
         System.out.println("getLinkHandler");
-        String url = "";
-        YoutubeLinkHandlerProvider instance = new YoutubeLinkHandlerProvider();
-        LinkHandler expResult = null;
-        LinkHandler result = instance.getLinkHandler(url);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        
+        String urls[] = {
+            "http://www.youtube.com/watch?v=N0fPuYR3I_k", //Normal
+            "http://youtu.be/N0fPuYR3I_k", //Minified
+            "http://www.youtube.com/watch?v=iwGFalTRHDA&feature=related", //With other parameters
+            "http://youtu.be/t-ZRX8984sc", //With a special char: "-"
+            "https://www.youtube.com/watch?v=N0fPuYR3I_k" //Https
+        }; 
+        
+        YoutubeLinkHandlerProvider fnasp = new YoutubeLinkHandlerProvider();
+        
+        for (String singleUrl : urls) {
+            LinkHandler fnas = fnasp.getLinkHandler(singleUrl);
+        
+//            Main.getLOGGER().log(Level.INFO, "Added={0} {1} l={2}", new Object[]{fnas.getGroupName(), fnas.getGroupSize(), singleUrl});
+
+            assertTrue(singleUrl + " foundSize() = " + fnas.foundSize(), fnas.foundSize());
+        }
+        
     }
     
 }

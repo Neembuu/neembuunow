@@ -2,19 +2,15 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package neembuu.release1.util;
+package neembuu.release1.httpclient;
 
-import java.io.IOException;
 import java.security.KeyStore;
 import neembuu.config.GlobalTestSettings;
 import org.apache.http.HttpConnection;
 import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.AuthState;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
@@ -31,18 +27,16 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
-import org.openide.util.Exceptions;
 
 /**
- *
+ * Neembuu HttpClient.
  * @author davidepastore
  */
-public class NeembuuHttpClient {
+public class NHttpClient {
     
     private static DefaultHttpClient httpClient = null;
     
-    private NeembuuHttpClient(){
+    private NHttpClient(){
         
     }
     
@@ -122,48 +116,6 @@ public class NeembuuHttpClient {
         
         }
         return httpClient;
-    }
-    
-    
-    /**
-     * Calculate the length
-     * @param url
-     * @return the length
-     */
-    public static long calculateLength(String url){
-        try {
-            DefaultHttpClient httpClient = NeembuuHttpClient.getInstance();
-            HttpGet httpGet = new HttpGet(url);
-            HttpResponse response = httpClient.execute(httpGet);
-            long length = response.getEntity().getContentLength();
-            System.out.println("Length: "+ length);
-            EntityUtils.consume(response.getEntity());
-            return length;
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        return -1;
-    }
-    
-    
-    /**
-     * Get the content type of a url.
-     * @param url
-     * @return the content type.
-     */
-    public static String getContentType(String url){
-        try {
-            DefaultHttpClient httpClient = NeembuuHttpClient.getInstance();
-            HttpGet httpGet = new HttpGet(url);
-            HttpResponse response = httpClient.execute(httpGet);
-            String contentType = response.getEntity().getContentType().getValue();
-            System.out.println("Content Type: "+ contentType);
-            EntityUtils.consume(response.getEntity());
-            return contentType;
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        return null;
     }
     
 }
