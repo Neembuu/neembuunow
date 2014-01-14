@@ -45,6 +45,7 @@ import neembuu.rangearray.RangeArrayFactory;
 import neembuu.vfs.file.DownloadConstrainHandler;
 import net.jcip.annotations.NotThreadSafe;
 import static jpfm.util.ReadUtils.*;
+import neembuu.vfs.file.TroubleHandler;
 import neembuu.vfs.readmanager.WaitForExpansionOrCreateNewConnectionPolicy.Result;
 
 /**
@@ -1165,11 +1166,18 @@ public final class ReadQueueManager
         
         
         private void findRequestsPendingSinceALongTime(){
-            if(System.currentTimeMillis()<lastCheckTime+60000){return;}
+            if(System.currentTimeMillis()< lastCheckTime + 
+                    Math.min(
+                            TroubleHandler.DEFAULT_CHECKING_INTERAL_MILLISECONDS,
+                            provider.getTroubleHandler().preferredCheckingInterval())){
+                return;
+            }
             lastCheckTime = System.currentTimeMillis();
             UnsyncRangeArrayCopy<RegionHandler> uh 
                         = handlers.tryToGetUnsynchronizedCopy();
-            long atlestMillisec = 5000;
+            long atlestMillisec = Math.min(
+                    TroubleHandler.DEFAULT_PENDING_ATLEAST_FOR_MILLISECONDS,
+                    provider.getTroubleHandler().pendingAtleastFor());
             LinkedList<ReadRequest> pendingRrs = new LinkedList<ReadRequest>();
             // concept of main should be in favour of those connection that are starving
             for (int i = 0; i < uh.size(); i++) {

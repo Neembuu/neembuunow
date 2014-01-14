@@ -14,11 +14,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import neembuu.release1.Main;
+import neembuu.release1.api.IndefiniteTask;
 import neembuu.release1.newlink.AddLinkAction;
 
 /**
@@ -32,11 +35,12 @@ public final class NeembuuUI {
     private final AddLinkAction ala;
     
     private Main main;
+    private final LinkedList<IndefiniteTask> indefiniteTasks = new LinkedList<IndefiniteTask>();
     
     public NeembuuUI() {
         this.jf = makeJFrame();
         this.mp = new MainPanel(this);
-        ala = new AddLinkAction(mp);
+        ala = new AddLinkAction(this,mp);
         mp.neembuuVirtualFolderButton.setEnabled(false);
         this.lc = new LinksContainer(mp,jf);
     }
@@ -56,9 +60,23 @@ public final class NeembuuUI {
         return jf;
     }
     
-    public void showIndefiniteProgress(boolean t,String message){
-        
-        mp.showIndefiniteProgress(t, message);
+    public IndefiniteTask showIndefiniteProgress(String message){
+        IndefTask it = new IndefTask(message);
+        indefiniteTasks.add(it);
+        updateIndefTasks();
+        return it;
+    }
+    
+    private void updateIndefTasks(){
+        if(indefiniteTasks.isEmpty()){
+            mp.showIndefiniteProgress(false, null);
+            return;
+        }
+        String message = "";
+        for (IndefiniteTask indefiniteTask : indefiniteTasks) {
+            message+=indefiniteTask.displayMessage()+"\n";
+        }
+        mp.showIndefiniteProgress(true, message);
     }
     
     public static void initLookAndFeel(){
@@ -142,5 +160,49 @@ public final class NeembuuUI {
                 }
             }
         });
+    }
+    
+    
+    private final class IndefTask implements IndefiniteTask{
+        private final String message;
+        private final long submittedOn = System.currentTimeMillis();
+        private AtomicLong finishedOn = new AtomicLong(-1);
+        
+        public IndefTask(String message) {
+            this.message = message;
+        }
+        
+        @Override
+        public String displayMessage() {
+            return message;
+        }
+
+        @Override
+        public long submittedOn() {
+            return submittedOn;
+        }
+
+        @Override
+        public long completedOn() {
+            if(!hasCompleted()){
+                throw new IllegalStateException("Task not completed");
+            }
+            return finishedOn.get();
+        }
+
+        @Override
+        public void done() throws IllegalStateException {
+            if(!finishedOn.compareAndSet(-1, System.currentTimeMillis())){
+                throw new IllegalStateException("Task alreadt completed on "+finishedOn.get());
+            }
+            indefiniteTasks.remove(this);
+            updateIndefTasks();
+        }
+
+        @Override
+        public boolean hasCompleted() {
+            return finishedOn.get() > 0;
+        }
+        
     }
 }

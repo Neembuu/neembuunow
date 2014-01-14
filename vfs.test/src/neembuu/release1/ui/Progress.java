@@ -9,7 +9,7 @@ package neembuu.release1.ui;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.NumberFormat;
+import java.util.logging.Level;
 import javax.swing.Timer;
 import neembuu.rangearray.DissolvabilityRule;
 import neembuu.rangearray.Range;
@@ -19,6 +19,7 @@ import neembuu.rangearray.RangeArrayParams;
 import neembuu.rangearray.RangeUtils;
 import neembuu.rangearray.UIRangeArrayAccess;
 import neembuu.rangearray.UnsyncRangeArrayCopy;
+import neembuu.release1.Main;
 import neembuu.release1.api.VirtualFile;
 import neembuu.swing.RangeArrayComponent;
 import neembuu.swing.RangeArrayComponentBuilder;
@@ -48,7 +49,7 @@ public class Progress {
     
     private Range selectedRange = null;
     
-    void init(LinkPanel lp,final VirtualFile vf){
+    void init(final LinkPanel lp,final VirtualFile vf){
         this.vf = vf;
         this.lp = lp;
         overallProgress = RangeArrayFactory.newDefaultRangeArray(new RangeArrayParams.Builder()
@@ -137,7 +138,15 @@ public class Progress {
                     // file has been closed
                     ((Timer)e.getSource()).stop();
                 }
-                handleChange();
+                if(lp.getExpansionState()==LinkPanel.ExpansionState.Contracted){
+                    // no point in painting
+                    return;
+                }
+                try{
+                    handleChange();
+                }catch(Exception a){
+                    Main.getLOGGER().log(Level.FINE, "Error in refreshing graphs",a);
+                }
             }
         });
         
@@ -153,17 +162,9 @@ public class Progress {
         progress.repaint();
     }
     
-    void handleChange(){
+    void handleChange(){        
         downloadedRegionHandlers = vf.getConnectionFile().getRegionHandlers();
 
-        lp.totalDownloadSpeed.setText(Math.round(vf.getConnectionFile().getTotalFileReadStatistics()
-                    .getTotalAverageDownloadSpeedProvider().getDownloadSpeed_KiBps())
-            +" KBps");
-        lp.totalRequestSpeed.setText(Math.round(
-                vf.getConnectionFile().getTotalFileReadStatistics().getTotalAverageRequestSpeedProvider().getRequestSpeed_KiBps())
-                +" KBps");
-        
-        
         long totalDownloaded = 0;
 
         regionHandlersUnsync = downloadedRegionHandlers.tryToGetUnsynchronizedCopy();
@@ -189,8 +190,6 @@ public class Progress {
         
         //progress.setUpdateQuickly(true);
         progress.repaint();
-        
-
     }
     
     private void updateTotalDownloaded(long newTotal){
@@ -212,15 +211,20 @@ public class Progress {
     private void rangeSelected(Range arrayElement){
         this.selectedRange = arrayElement;
         lp.graph.initGraph(arrayElement);
-        lp.killConnectionButton.setEnabled(arrayElement!=null);
+        if(arrayElement!=null){
+            lp.killConnectionButton.setEnabled(true);
+            lp.selectedConnectionLabel.setText(">"+arrayElement.starting());
+        }else {
+            lp.killConnectionButton.setEnabled(false);
+        }
     }
     
     public void switchToRegion(Range arrayElement){
-        lp.killConnectionButton.setEnabled(arrayElement!=null);
         if(arrayElement==null){
+            lp.selectedConnectionLabel.setText("No connection selected");
             return;
         }
-        progress.selectRange(arrayElement);
+        progress.selectRange(arrayElement);// this sends call to rangeSelected(Range arrayElemt)
     }
     
 
@@ -228,31 +232,85 @@ public class Progress {
         return selectedRange;
     }
     
-    private String getToolTipText(Range element, long absolutePosition, long largestEntry, RangeArrayElementColorProvider.SelectionState selectionState) {
-        if(element==null){
-            return null;
+    public String getSelectedRangeTooltip(){
+        String toRet = null;
+        try{
+            toRet= getToolTipText(selectedRange, selectedRange.starting(), vf.getConnectionFile().getFileSize(), null);
+        }catch(Exception a){
+            
         }
-        String defaultString = element.starting()+"->"+element.ending();
+        return toRet;
+    }
+    
+    private String getToolTipText(Range element, long absolutePosition, long largestEntry, RangeArrayElementColorProvider.SelectionState selectionState) {
+        String totalSpeeds = "\n("+totalDownloadSpeed()+","+totalRequestSpeed()+")KBps\n";
+        if(element==null){
+            return "<html>"+ absolutePosition+totalSpeeds+"</html>";
+        }
+        String region_start_end = element.starting()+","+
+                c(Colors.PROGRESS_BAR_FILL_ACTIVE)+element.ending()+c_();
         if(lp.getExpansionState()!=LinkPanel.ExpansionState.FullyExpanded){
-            return defaultString;
+            return "<html>"+region_start_end+totalSpeeds+"</html>";
         }
         
         if(downloadedRegionHandlers==null){    
-            return defaultString+ " not initialized ";
+            return "<html>"+region_start_end+ " not initialized </html>";
         }
         element = downloadedRegionHandlers.getUnsynchronized(absolutePosition);
         if(element==null || !(element.getProperty() instanceof RegionHandler) ){
-            return defaultString+ " not RegionHandler ";
+            return "<html>"+region_start_end+ " not RegionHandler </html>";
         }
         
-        RegionHandler regionHandler = (RegionHandler)element.getProperty();
-        String toRet = "";
-        if(vf.getConnectionFile().getDownloadConstrainHandler().isComplete()){
-            toRet = "File completely downloaded \n";
+        RegionHandler r = (RegionHandler)element.getProperty();
+        String region_start_end_auth = region_start_end;
+        region_start_end_auth+=","+c(Colors.PROGRESS_DOWNLOAD_LESS_MODE)+r.authorityLimit()+c_()+"\n";
+        //vf.getConnectionFile().getDownloadConstrainHandler().isComplete()
+        return "<html>"+region_start_end_auth + "("+downloadSpeed(r)+","+requestSpeed(r)+")KBps\n"+
+                isAlive(r)+","+isMain(r)+","+throttlingState()+"</html>";
+    }
+    
+    private String isAlive(RegionHandler r){
+        return r.isAlive()?c(Colors.PROGRESS_BAR_FILL_ACTIVE)+"alive"+c_():"dead";
+    }
+    
+    private String isMain(RegionHandler r){
+        return (r.isMainDirectionOfDownload()?"main":"notmain");
+    }
+
+    private String downloadSpeed(RegionHandler r){
+        return c(Colors.PROGRESS_DOWNLOAD_LESS_MODE)+Math.round(r.getThrottleStatistics().getDownloadSpeed_KiBps())+c_();
+    }
+    
+    private String requestSpeed(RegionHandler r){
+        return c(Colors.PROGRESS_BAR_FILL_ACTIVE)+Math.round(r.getThrottleStatistics().getRequestSpeed_KiBps())+c_();
+    }
+    
+    private String totalDownloadSpeed(){
+        return c(Colors.PROGRESS_DOWNLOAD_LESS_MODE)+Math.round(vf.getConnectionFile().getTotalFileReadStatistics()
+                    .getTotalAverageDownloadSpeedProvider().getDownloadSpeed_KiBps())+c_();
+    }
+    
+    private String totalRequestSpeed(){
+        return c(Colors.PROGRESS_BAR_FILL_ACTIVE)+Math.round(
+                vf.getConnectionFile().getTotalFileReadStatistics().getTotalAverageRequestSpeedProvider().getRequestSpeed_KiBps())
+                +c_();
+    }
+    
+    private String throttlingState(){
+        String throttlingState = "";
+        try {
+            throttlingState = ((RegionHandler)selectedRange.getProperty()).getThrottleStatistics().getThrottleState().toString();
+        } catch (Exception e) {
         }
-        return toRet + NumberFormat.getInstance().format( regionHandler.getThrottleStatistics().getDownloadSpeed_KiBps())+" KBps \n"+
-                " RequestSpeed = " + NumberFormat.getInstance().format( regionHandler.getThrottleStatistics().getRequestSpeed_KiBps())+" KBps \n"+
-                (regionHandler.isAlive()?"alive":"dead")+" "+(regionHandler.isMainDirectionOfDownload()?"main":"notmain")  ;
+        return throttlingState;
+    }
+    
+    private static String c(Color c){
+        return "<font color=#"+ Integer.toHexString(c.getRGB()).substring(2)+ ">";
+    }
+    
+    private static String c_(){
+        return "</font>";
     }
 
 }

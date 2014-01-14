@@ -4,6 +4,7 @@
  */
 package neembuu.release1;
 
+import java.util.ArrayList;
 import neembuu.vfs.test.*;
 import java.util.List;
 import javax.swing.JFrame;
@@ -12,6 +13,8 @@ import jpfm.JPfmError;
 import jpfm.mount.Mount;
 import jpfm.operations.AlreadyCompleteException;
 import jpfm.operations.readwrite.ReadRequest;
+import neembuu.release1.api.IndefiniteTask;
+import neembuu.release1.ui.NeembuuUI;
 import neembuu.vfs.connection.NewConnectionParams;
 import neembuu.vfs.file.TroubleHandler;
 
@@ -21,28 +24,80 @@ import neembuu.vfs.file.TroubleHandler;
  */
 public final class UnprofessionalTroubleHandler implements TroubleHandler{
 
-    private final JFrame mf;
+    private final NeembuuUI nui;
 
-    public UnprofessionalTroubleHandler(JFrame mf) {
-        this.mf = mf;
+    public UnprofessionalTroubleHandler(NeembuuUI nui) {
+        this.nui = nui;
     }
     
     @Override
     public void cannotCreateANewConnection(NewConnectionParams ncp, int numberOfRetries) {
-        JOptionPane.showMessageDialog(mf, ncp.toString(), "Internet problem : retries "+numberOfRetries+" times",JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(nui.getFrame(), ncp.toString(), "Internet problem : retries "+numberOfRetries+" times",JOptionPane.ERROR_MESSAGE);
+    }
+
+    private IndefiniteTask buffering = null;
+    
+    @Override
+    public void readRequestsPendingSinceALongTime(List<ReadRequest> pendingReadRequest, long atleastMillisec) {
+        List<ReadRequest> pendingSince = findPendingSince(pendingReadRequest, 1000);
+        
+        if(!pendingSince.isEmpty()){
+            if(buffering!=null){
+                buffering = nui.showIndefiniteProgress("Buffering");
+            }
+        }else {
+            if(buffering!=null){
+                buffering.done();
+            }
+        }
+        List<ReadRequest> seriousPendingReadRequest = findPendingSince(pendingReadRequest, DEFAULT_PENDING_ATLEAST_FOR_MILLISECONDS);
+        if(!seriousPendingReadRequest.isEmpty()){
+            seriouslyPendingSinceALongTime(seriousPendingReadRequest);
+        }
+        
     }
 
     @Override
-    public void readRequestsPendingSinceALongTime(List<ReadRequest> pendingReadRequest, long atleastMillisec) {
+    public long preferredCheckingInterval() {
+        return 1000;
+    }
+
+    @Override
+    public long pendingAtleastFor() {
+        return 5000;
+    }
+    
+    private List<ReadRequest> findPendingSince(List<ReadRequest> pendingReadRequest, long checlAtleast){
+        List<ReadRequest> pendingSince = new ArrayList<ReadRequest>();
+        for (ReadRequest rr : pendingReadRequest) {
+            if(System.currentTimeMillis() - 
+                    rr.getCreationTime() > checlAtleast){
+                pendingSince.add(rr);
+            }
+        }
+        return pendingSince;
+    }
+    
+    private long lastPopupShowTime = System.currentTimeMillis();
+    
+    private void seriouslyPendingSinceALongTime(List<ReadRequest> pendingReadRequest){
         String message = "Press okay to continue trying.\n"
                 + "Cancel to forecefully complete the requests.\n"
                 + "Following requests pending since a long time.\n";
         for (ReadRequest rr : pendingReadRequest) {
             message+=rr.toString()+"\n";
         }
-        int ret = JOptionPane.showConfirmDialog(mf, 
+       
+        if(System.currentTimeMillis() - lastPopupShowTime < DEFAULT_CHECKING_INTERAL_MILLISECONDS){
+            return;
+        }else {
+            lastPopupShowTime = System.currentTimeMillis();
+        }
+        
+        /*int ret = JOptionPane.showConfirmDialog(nui.getFrame(), 
                 message, 
-                "Watch as you download might be inefficient",JOptionPane.OK_CANCEL_OPTION);
+                "Watch as you download might be inefficient",JOptionPane.OK_CANCEL_OPTION);*/
+        int ret = JOptionPane.CANCEL_OPTION;
         RuntimeException re = new RuntimeException("User forced completion of requests");
         if(ret==JOptionPane.CANCEL_OPTION){
             for (ReadRequest rr : pendingReadRequest) {
@@ -53,7 +108,7 @@ public final class UnprofessionalTroubleHandler implements TroubleHandler{
                 }
             }
         }
-        
     }
+    
     
 }

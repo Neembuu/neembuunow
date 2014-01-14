@@ -67,20 +67,15 @@ final class Graph {
             }
         }
 
-        if(currentlySelectedRegion==null){
-            linksPanel.throttlingStateLabel.setText("");
-            return;
-        }
-
         final Timer updateGraphTimer = new Timer(500, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(!linksPanel.graphPanel.isVisible() ||file.getParent()==null || currentlySelectedRegion==null){
+                if(linksPanel.getExpansionState()!=LinkPanel.ExpansionState.FullyExpanded ||
+                        file.getParent()==null || 
+                        currentlySelectedRegion==null){
                     ((Timer)e.getSource()).stop();
                     return;
                 }
-
-                linksPanel.throttlingStateLabel.setText(currentlySelectedRegion.getThrottleStatistics().getThrottleState().toString());
                 
                 support.addValues(System.currentTimeMillis(), new long[]{
                     (long)currentlySelectedRegion.getThrottleStatistics().getDownloadSpeed_KiBps(),
@@ -118,7 +113,7 @@ final class Graph {
         }else {
             initValues(arrayElement);
             SimpleXYChartDescriptor descriptor =
-                    SimpleXYChartDescriptor.decimal(0, 50, 50, 1d, true, 30);
+                    SimpleXYChartDescriptor.decimal(0, 20, 20, 1d, true, 100);
             descriptor.addLineFillItems("Download Speed");
             descriptor.addLineFillItems("Request Speed");
             descriptor.setYAxisDescription("<html>Speed (KiB/s)</html>");

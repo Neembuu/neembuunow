@@ -8,6 +8,7 @@ package neembuu.release1.ui;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import neembuu.release1.Main;
 
 /**
@@ -82,6 +83,11 @@ public class MainPanel extends javax.swing.JPanel {
         setBackground(new java.awt.Color(204, 204, 255));
 
         upperControlsPane.setBackground(new java.awt.Color(255, 255, 255));
+        upperControlsPane.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                upperControlsPaneMouseClicked(evt);
+            }
+        });
 
         neembuuVirtualFolderButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/logo_7_unselected.PNG"))); // NOI18N
         neembuuVirtualFolderButton.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.neembuuVirtualFolderButton.text")); // NOI18N
@@ -352,6 +358,10 @@ public class MainPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_helpButtonActionPerformed
 
+    private void upperControlsPaneMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_upperControlsPaneMouseClicked
+        Main.printPendingRequests();
+    }//GEN-LAST:event_upperControlsPaneMouseClicked
+
     public String getLinksText(){
         return listOfLinks.getText();
     }
@@ -360,13 +370,15 @@ public class MainPanel extends javax.swing.JPanel {
         listOfLinks.setText(a);
     }
     
-    public void showIndefiniteProgress(boolean t,String message){
-        /*message = "<html><div style='text-align: center;'>"
-                + message
-                + "</div></html>";*/
-        progressAnimated.setVisible(t);
+    void showIndefiniteProgress(boolean t,String message){
+        if(!t){
+            progressAnimated.setVisible(false);
+            statusLabel.setVisible(false);
+            return;
+        }
+        progressAnimated.setVisible(true);
         statusLabel.setText(message);
-        statusLabel.setVisible(t);
+        statusLabel.setVisible(true);
     }
     public void addLinkProgressSet(String a){
         linkAddStatusLabel.setText(a);

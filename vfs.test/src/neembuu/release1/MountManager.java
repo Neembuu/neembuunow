@@ -21,6 +21,7 @@ import jpfm.util.UniversallyValidFileName;
 import jpfm.volume.CommonFileAttributesProvider;
 import jpfm.volume.vector.VectorRootDirectory;
 import neembuu.config.GlobalTestSettings;
+import neembuu.release1.api.IndefiniteTask;
 import neembuu.release1.api.VirtualFile;
 import neembuu.release1.pismo.InstallerCallbackListener;
 import neembuu.release1.pismo.PismoInstaller;
@@ -30,7 +31,7 @@ import neembuu.release1.ui.InstallPermissionAndProgress;
  *
  * @author Shashank Tulsyan
  */
-public class MountManager implements InstallerCallbackListener{
+public class MountManager {
     Mount mount;
     JPfm.Manager manager = null;
     
@@ -122,51 +123,66 @@ public class MountManager implements InstallerCallbackListener{
             if (attempt < 2) {
                 // TODO : show a gui message informing user that Pismo is being
                 // installed
-                PismoInstaller.tryInstallingPismoFileMount(false, this);
+                PismoInstaller.tryInstallingPismoFileMount(false, new ICBL());
                 return mount(attempt + 1, mntLoc);
             }
         }
         throw new RuntimeException("Neither can use pismo file mount nor can install it. Retried " + attempt + " time(s)");
     }
 
-    @Override
-    public void informUserAboutInstallation() {
-        InstallPermissionAndProgress.showMessage(Main.get());
-        Main.get().getNui().showIndefiniteProgress(true, "Installing PismoFileMount");
-    }
+    private final class ICBL implements InstallerCallbackListener {
+        private IndefiniteTask installationProgress = null;
+        private IndefiniteTask installationTakingTooLong = null;
+        
+        @Override
+        public void informUserAboutInstallation() {
+            InstallPermissionAndProgress.showMessage(Main.get());
+            installationProgress = Main.get().getNui().showIndefiniteProgress("Installing PismoFileMount");
+        }
 
-    @Override
-    public void installationTakingTooLong(int c) {
-        if(c<10){
-            Main.get().getNui().showIndefiniteProgress(true, "Installation is taking longer than usual : "+c+"seconds ellapsed");
-        }else if(c>10 && c<20){
-            Main.get().getNui().showIndefiniteProgress(true, "Neembuu will quitting if it takes longer than 2mins to install this");
-        }else if(c>20){
-            JOptionPane.showMessageDialog(Main.get().getNui().getFrame(), "Installation of Pismo failed or stuck.", "Application will exit", JOptionPane.ERROR_MESSAGE);
-            System.exit(c);
+        @Override
+        public void installationTakingTooLong(int c) {
+            if(c<60){
+                if(installationTakingTooLong!=null){
+                   installationTakingTooLong.done();
+                }
+                installationTakingTooLong = Main.get().getNui().showIndefiniteProgress("Installation is taking longer than usual : "+c+"seconds ellapsed");
+            }else if(c>60 && c<90){
+                if(installationTakingTooLong!=null){
+                   installationTakingTooLong.done();
+                }
+                installationTakingTooLong = Main.get().getNui().showIndefiniteProgress("Neembuu will quitting if it takes longer than 2mins to install this");
+            }else if(c>90){
+                JOptionPane.showMessageDialog(Main.get().getNui().getFrame(), "Installation of Pismo failed or stuck.", "Application will exit", JOptionPane.ERROR_MESSAGE);
+                System.exit(c);
+            }
+        }
+
+        @Override
+        public void installationSuccessful() {
+            if(installationTakingTooLong!=null){
+                installationTakingTooLong.done();
+            }
+            if(installationProgress!=null){
+                installationProgress.done();
+            }
+        }
+
+        @Override
+        public void installationFailed() {
+            java.io.File logFilePath = Application.getResource("install_logs.txt");
+            String logfileText = "The log file mentions the exact reason.";
+            try{
+                java.awt.Desktop.getDesktop().open(logFilePath);
+            }catch(Exception a){
+                logfileText = logfileText+"\n"+logFilePath.getName();
+            }
+            JOptionPane.showMessageDialog(Main.get().getNui().getFrame(), 
+                    "Your sandboxing or antivirus environment \n"
+                    + "might be preventing installation.\n"
+                    + logfileText, 
+                    "Installation failed. Neembuu will exit", JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
         }
     }
-
-    @Override
-    public void installationSuccessful() {
-        Main.get().getNui().showIndefiniteProgress(false,"");       
-    }
-
-    @Override
-    public void installationFailed() {
-        java.io.File logFilePath = Application.getResource("install_logs.txt");
-        String logfileText = "The log file mentions the exact reason.";
-        try{
-            java.awt.Desktop.getDesktop().open(logFilePath);
-        }catch(Exception a){
-            logfileText = logfileText+"\n"+logFilePath.getName();
-        }
-        JOptionPane.showMessageDialog(Main.get().getNui().getFrame(), 
-                "Your sandboxing or antivirus environment \n"
-                + "might be preventing installation.\n"
-                + logfileText, 
-                "Installation failed. Neembuu will exit", JOptionPane.ERROR_MESSAGE);
-        System.exit(-1);
-    }
-    
 }

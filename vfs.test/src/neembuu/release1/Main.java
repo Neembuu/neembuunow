@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jpfm.fs.FSUtils;
 import neembuu.diskmanager.DiskManager;
 import neembuu.diskmanager.DiskManagerParams;
 import neembuu.diskmanager.DiskManagers;
@@ -34,7 +35,8 @@ public final class Main {
     
     public Main() {
         this.nui = new NeembuuUI();
-        troubleHandler = new UnprofessionalTroubleHandler(nui.getFrame());
+        troubleHandler = new UnprofessionalTroubleHandler(nui);
+
         mountManager = new MountManager();
         
         String basePath = null;
@@ -94,7 +96,9 @@ public final class Main {
         return InstHolder.m;
     }
     
-    
+    public static void printPendingRequests(){
+        FSUtils.printIncompleteOperationsBasic(get().mountManager.getFileSystem());
+    }
     
     private static class InstHolder {
         private static Main m = new Main();

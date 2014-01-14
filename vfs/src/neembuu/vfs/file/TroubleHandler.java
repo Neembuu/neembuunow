@@ -45,4 +45,26 @@ public interface TroubleHandler {
      * @param atleastMillisec 
      */
     void readRequestsPendingSinceALongTime(List<ReadRequest> pendingReadRequest, long atleastMillisec);
+    
+    /**
+     * The responsible manager, checks for pending readrequest after {@link #DEFAULT_CHECKING_INTERAL_MILLISECONDS }
+     * or {@link #preferredCheckingInterval() } whichever is lesser.
+     * If it finds such a readrequest, it is forwarded to {@link #readRequestsPendingSinceALongTime(java.util.List, long) }
+     * @return the minimum interval of time after which this trouble handler should be updated with 
+     * list of requests pending.
+     */
+    long preferredCheckingInterval();
+    
+    /**
+     * The responsible manager, checks if a readrequest is pending for atleast {@link #DEFAULT_PENDING_ATLEAST_FOR_MILLISECONDS }
+     * or {@link #pendingAtleastFor() } whichever is lesser.
+     * If it finds such a readrequest, it is forwarded to {@link #readRequestsPendingSinceALongTime(java.util.List, long) }
+     * @return the number of milliseconds for which the request must be pending
+     * requests pending for an interval less than this would be ignored
+     * and not send to {@link #readRequestsPendingSinceALongTime(java.util.List, long) }
+     */
+    long pendingAtleastFor();
+    
+    static int DEFAULT_CHECKING_INTERAL_MILLISECONDS = 60000;
+    static int DEFAULT_PENDING_ATLEAST_FOR_MILLISECONDS = 5000;
 }

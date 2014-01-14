@@ -1810,7 +1810,10 @@ public class RangeArrayImpl<P>
         UnsyncRangeArrayCopy rs = tryToGetUnsynchronizedCopy();
         for(int i=rs.size()-1;i>=0;i--){
             int val = RangeUtils.compare(rs.get(i), element);
-            if(val==0)return rs.get(i+1);
+            if(val==0){
+                if(i+1>rs.size())return null;
+                return rs.get(i+1);
+            }
             else if(val<0)return null;
         }return null;
     }

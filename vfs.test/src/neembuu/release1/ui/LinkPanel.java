@@ -22,9 +22,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import neembuu.rangearray.Range;
 import neembuu.rangearray.UIRangeArrayAccess;
+import neembuu.rangearray.UnsyncRangeArrayCopy;
 import neembuu.release1.Main;
 import neembuu.vfs.file.SeekableConnectionFile;
-import neembuu.vfs.readmanager.RegionHandler;
 
 /**
  *
@@ -193,9 +193,6 @@ final class LinkPanel extends javax.swing.JPanel {
         graphPanel = new javax.swing.JPanel();
         hiddenStatsPane = new javax.swing.JPanel();
         selectedConnectionLabel = new javax.swing.JLabel();
-        throttlingStateLabel = new javax.swing.JLabel();
-        totalDownloadSpeed = new javax.swing.JLabel();
-        totalRequestSpeed = new javax.swing.JLabel();
         connectionControlPane = new javax.swing.JPanel();
         previousConnectionButton = new javax.swing.JButton();
         nextConnectionButton = new javax.swing.JButton();
@@ -320,36 +317,20 @@ final class LinkPanel extends javax.swing.JPanel {
 
         selectedConnectionLabel.setText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.selectedConnectionLabel.text")); // NOI18N
 
-        throttlingStateLabel.setText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.throttlingStateLabel.text")); // NOI18N
-
-        totalDownloadSpeed.setText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.totalDownloadSpeed.text")); // NOI18N
-
-        totalRequestSpeed.setText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.totalRequestSpeed.text")); // NOI18N
-
         javax.swing.GroupLayout hiddenStatsPaneLayout = new javax.swing.GroupLayout(hiddenStatsPane);
         hiddenStatsPane.setLayout(hiddenStatsPaneLayout);
         hiddenStatsPaneLayout.setHorizontalGroup(
             hiddenStatsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(hiddenStatsPaneLayout.createSequentialGroup()
-                .addGap(4, 4, 4)
-                .addComponent(selectedConnectionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(throttlingStateLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(totalRequestSpeed)
-                .addGap(18, 18, Short.MAX_VALUE)
-                .addComponent(totalDownloadSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, hiddenStatsPaneLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(selectedConnectionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         hiddenStatsPaneLayout.setVerticalGroup(
             hiddenStatsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, hiddenStatsPaneLayout.createSequentialGroup()
                 .addGap(0, 0, 0)
-                .addGroup(hiddenStatsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(selectedConnectionLabel)
-                    .addComponent(throttlingStateLabel)
-                    .addComponent(totalDownloadSpeed)
-                    .addComponent(totalRequestSpeed)))
+                .addComponent(selectedConnectionLabel))
         );
 
         connectionControlPane.setBackground(new java.awt.Color(255, 255, 255));
@@ -419,11 +400,11 @@ final class LinkPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(nextConnectionButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(killConnectionButton, javax.swing.GroupLayout.DEFAULT_SIZE, 82, Short.MAX_VALUE)
+                .addComponent(killConnectionButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(linkEditButton, javax.swing.GroupLayout.DEFAULT_SIZE, 44, Short.MAX_VALUE)
+                .addComponent(linkEditButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(changeDownloadModeButton, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+                .addComponent(changeDownloadModeButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         connectionControlPaneLayout.setVerticalGroup(
@@ -506,17 +487,48 @@ final class LinkPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_killConnectionButtonActionPerformed
 
     private void nextConnectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextConnectionButtonActionPerformed
-        Range initial =  progress.getSelectedRange();
         UIRangeArrayAccess regions = singleFileLinkUI.getVirtualFile().getConnectionFile().getRegionHandlers();
-        if(initial == null){
-            initial = regions.getFirst();
-        }else {
-            initial = regions.getUnsynchronized(initial.ending());
+        if(regions.isEmpty()){
+            return;
         }
+        Range initial =  progress.getSelectedRange();
+        initial = getClosestRange(initial);        
         Range next = regions.getNext(initial);
         progress.switchToRegion(next);
     }//GEN-LAST:event_nextConnectionButtonActionPerformed
 
+    private Range getClosestRange(Range initial){        
+        UIRangeArrayAccess regions = singleFileLinkUI.getVirtualFile().getConnectionFile().getRegionHandlers();
+        UnsyncRangeArrayCopy unsyncFncCopy = regions.tryToGetUnsynchronizedCopy();
+        
+        if(initial == null){
+            return regions.getFirst();
+        }
+        long ending = initial.ending();
+        initial = regions.getUnsynchronized(initial.ending());
+        
+        if(initial!=null){
+            return initial;
+        }
+        if(unsyncFncCopy.size()==0){
+            return null;
+        }
+        Range closest = unsyncFncCopy.get(0);
+        long dmin = ending - closest.ending();
+        for (int i = 0; i < unsyncFncCopy.size(); i++) {
+            Range range = unsyncFncCopy.get(i);
+            long d = ending - range.ending();
+            if (d<0) {
+                break;
+            }
+            if(d<dmin){
+                dmin = d;
+                closest = range;
+            }
+        }
+        return closest;
+    }
+    
     private void changeDownloadModeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeDownloadModeButtonActionPerformed
         if(changeDownloadModeButton.getModel().isSelected()){
             changeDownloadModeButton.setBackground(Colors.TINTED_IMAGE);
@@ -535,14 +547,12 @@ final class LinkPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_changeDownloadModeButtonActionPerformed
 
     private void previousConnectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousConnectionButtonActionPerformed
-        // TODO add your handling code here:
-        Range initial =  progress.getSelectedRange();
         UIRangeArrayAccess regions = singleFileLinkUI.getVirtualFile().getConnectionFile().getRegionHandlers();
-        if(initial == null){
-            initial = regions.getFirst();
-        }else {
-            initial = regions.getUnsynchronized(initial.ending());
+        if(regions.isEmpty()){
+            return;
         }
+        Range initial =  progress.getSelectedRange();
+        initial = getClosestRange(initial);        
         Range previous = regions.getPrevious(initial);
         progress.switchToRegion(previous);
     }//GEN-LAST:event_previousConnectionButtonActionPerformed
@@ -651,7 +661,6 @@ final class LinkPanel extends javax.swing.JPanel {
     private void hiddenPaneInit(){
         javax.swing.GroupLayout layout = (javax.swing.GroupLayout)hiddenStatsPane.getLayout();
         layout.setHonorsVisibility(selectedConnectionLabel, Boolean.FALSE);
-        layout.setHonorsVisibility(throttlingStateLabel, Boolean.FALSE);
         
         nextConnectionButton.setBackground(Colors.BUTTON_TINT);
         previousConnectionButton.setBackground(Colors.BUTTON_TINT);
@@ -661,14 +670,21 @@ final class LinkPanel extends javax.swing.JPanel {
         MouseAdapter ma = new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
+                String s = progress.getSelectedRangeTooltip();
+                if(s==null){s="";}
+                selectedConnectionLabel.setText(s.replace("\n", " "));
                 selectedConnectionLabel.setVisible(true);
-                throttlingStateLabel.setVisible(true);
             }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                mouseEntered(e);
+            }
+            
 
             @Override
             public void mouseExited(MouseEvent e) {
                 selectedConnectionLabel.setVisible(false);
-                throttlingStateLabel.setVisible(false);
             }
         }; 
         hiddenStatsPane.addMouseListener(ma);
@@ -739,9 +755,6 @@ final class LinkPanel extends javax.swing.JPanel {
     private javax.swing.JPanel rightCtrlPane;
     javax.swing.JLabel selectedConnectionLabel;
     javax.swing.JPanel sizeAndProgressPane;
-    javax.swing.JLabel throttlingStateLabel;
-    javax.swing.JLabel totalDownloadSpeed;
-    javax.swing.JLabel totalRequestSpeed;
     private javax.swing.JPanel vlcPane;
     // End of variables declaration//GEN-END:variables
 }

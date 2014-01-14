@@ -53,5 +53,15 @@ public final class SimpleTroubleHandler implements TroubleHandler{
         }
         
     }
+
+    @Override
+    public long preferredCheckingInterval() {
+        return DEFAULT_CHECKING_INTERAL_MILLISECONDS;
+    }
+
+    @Override
+    public long pendingAtleastFor() {
+        return DEFAULT_PENDING_ATLEAST_FOR_MILLISECONDS;
+    }
     
 }

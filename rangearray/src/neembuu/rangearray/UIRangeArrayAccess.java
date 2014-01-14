@@ -17,6 +17,8 @@ public interface UIRangeArrayAccess<P> extends UnsynchronizedAccess{
     public Range<P> getFirst();
     /**
      * For mouse event listener
+     * @param index the absolute index where the region is required
+     * @return region which contains the given absolute index
      */
     public Range<P> getUnsynchronized(long index);
 }

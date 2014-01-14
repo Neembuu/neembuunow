@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import neembuu.release1.Main;
+import neembuu.release1.api.IndefiniteTask;
 import neembuu.release1.api.LinkHandler;
 import neembuu.release1.api.Link;
 import neembuu.release1.api.LinkHandlerProvider;
@@ -26,6 +27,7 @@ import neembuu.release1.defaultImpl.SimplyOpenTheVideoFile;
 import neembuu.release1.defaultImpl.SplitGroupProcessor;
 import neembuu.release1.ui.Constraint;
 import neembuu.release1.ui.MainPanel;
+import neembuu.release1.ui.NeembuuUI;
 import neembuu.release1.ui.SingleFileLinkUI;
 
 /**
@@ -34,12 +36,14 @@ import neembuu.release1.ui.SingleFileLinkUI;
  */
 public class AddLinkAction implements Runnable {
     
-    private final MainPanel mp;
+    private Main main;
     private final OneToOneVirtualFileProvider svfp
                 = new OneToOneVirtualFileProvider();
-    private Main main;
+    private final NeembuuUI nui; 
+    private final MainPanel mp;
     
-    public AddLinkAction(MainPanel mp) {
+    public AddLinkAction(NeembuuUI nui,MainPanel mp) {
+        this.nui = nui;
         this.mp = mp;
     }
     
@@ -57,10 +61,12 @@ public class AddLinkAction implements Runnable {
     public void run() {
         String[] lnks = {};
         final LinkedList<Link> result = new LinkedList<Link>();
+        IndefiniteTask analyzingLinks = null;
+        IndefiniteTask lastErrorMessage = null;
         try{
             
             String linksText = mp.getLinksText();
-            mp.showIndefiniteProgress(true, "Analyzing links");
+            analyzingLinks = nui.showIndefiniteProgress("Analyzing links");
             Main.getLOGGER().info("Splitting links\n" + linksText);
 
             lnks = linksText.split("\n");
@@ -75,6 +81,7 @@ public class AddLinkAction implements Runnable {
             }
             lnks = a.toArray(new String[a.size()]);
 
+            
             for (int i = 0; i < lnks.length; i++) {
                 Main.getLOGGER().info("link=" + lnks[i]);
                 try {
@@ -83,7 +90,10 @@ public class AddLinkAction implements Runnable {
                         LinkHandlerProvider fnasp = 
                             LinkHandlerProviders.getWhichCanHandleOrDefault(lnks[i]);
                         if(fnasp==null){
-                            mp.showIndefiniteProgress(true, "Could not use a link");
+                            if(lastErrorMessage!=null){
+                                lastErrorMessage.done();
+                            }
+                            lastErrorMessage = nui.showIndefiniteProgress("Could not use a link");
                             Main.getLOGGER().log(Level.INFO, "Could not find handler for"+lnks[i]);
                         }else {
                             LinkHandler fnas = fnasp.getLinkHandler(lnks[i]);
@@ -97,10 +107,16 @@ public class AddLinkAction implements Runnable {
                             }
                         }
                     } else {
-                        mp.showIndefiniteProgress(true, "Only http/https links allowed.");
+                        if(lastErrorMessage!=null){
+                            lastErrorMessage.done();
+                        }
+                        lastErrorMessage = nui.showIndefiniteProgress("Only http/https links allowed.");
                     }
                 } catch (MalformedURLException any) {
-                    mp.showIndefiniteProgress(true, "Format of a link is incorrect");
+                    if(lastErrorMessage!=null){
+                        lastErrorMessage.done();
+                    }
+                    lastErrorMessage = nui.showIndefiniteProgress("Format of a link is incorrect");
                     Main.getLOGGER().log(Level.INFO, "Problem in adding link "+lnks[i], any);
                 }
             }
@@ -108,8 +124,10 @@ public class AddLinkAction implements Runnable {
         }catch(Exception a){
             Main.getLOGGER().log(Level.INFO, "Problem in adding link", a);
         }
-        
-        mp.showIndefiniteProgress(false, "");
+        if(lastErrorMessage!=null){
+            lastErrorMessage.done();
+        }
+        analyzingLinks.done();
         mp.addLinksPanelEnable(true);
         
         
@@ -130,8 +148,9 @@ public class AddLinkAction implements Runnable {
         }
         
         if(!result.isEmpty()){
-            mp.showIndefiniteProgress(true, "Making files");
+            IndefiniteTask makingFiles = nui.showIndefiniteProgress("Making files");
             doLinks(result);
+            makingFiles.done();
         }
     }
 
@@ -169,7 +188,6 @@ public class AddLinkAction implements Runnable {
         // this makes each file aware of existence of other filein the same virtual
         // directory. This way if user has added two files but is watching
         // only one, the other files will cease downloading
-        mp.showIndefiniteProgress(false, "");
     }
     
     private boolean handleSplits(SplitGroupProcessor splitGroupProcessor, List<VirtualFile> splits){
