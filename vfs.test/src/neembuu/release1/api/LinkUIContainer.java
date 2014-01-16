@@ -14,4 +14,6 @@ public interface LinkUIContainer {
     void removeLinkUI(LinkUI uI);
     
     void animateShrinkActionPerformed(LinkUI source);
+    
+    boolean contains(LinkUI uI);
 }

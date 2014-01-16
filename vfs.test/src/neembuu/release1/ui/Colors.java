@@ -20,6 +20,7 @@ public final class Colors {
             NIMBUS_BASE                 = hsl(35, 100, 135, HSLSource.MSEXCEL), 
             TEXT_BACKGROUND             = hsl(35, 100, 254, HSLSource.MSEXCEL), 
             PROGRESS_DOWNLOAD_LESS_MODE = hsl(35, 72, 120, HSLSource.MSEXCEL), 
+            OVERLAY                     = hsl(36, 71, 232, 0.3f, HSLSource.MSEXCEL),
             //SIZ9_POST_BACKGROUND        = hsl(31, 73, 248, HSLSource.MSEXCEL),
             
             CONTROL_ICONS               = hsl(140, 255, 58, HSLSource.MSEXCEL), 
@@ -33,10 +34,14 @@ public final class Colors {
         return new Color(r, g, b);
     }
     
+    private static Color hsl(int h, int s, int l,float alpha, HSLSource hSLSource){
+        int base = hSLSource.getBase();
+        return new Color(HSLColor.toRGB((float)h/base, (float)s/base, (float)l/base,alpha),true);
+    }
+    
     private static Color hsl(int h, int s, int l,HSLSource hSLSource){
         int base = hSLSource.getBase();
         return new Color(HSLColor.toRGB((float)h/base, (float)s/base, (float)l/base));
-        
     }
     
     public static enum HSLSource {
@@ -155,6 +160,10 @@ public final class Colors {
          */
         public static int toRGB(float h, float s, float l) {
             return toRGB(h, s, l, 1.0f);
+        }
+        
+        public static int toRGBA(float h, float s, float l, float a) {
+            return toRGB(h, s, l, a);
         }
 
         /**

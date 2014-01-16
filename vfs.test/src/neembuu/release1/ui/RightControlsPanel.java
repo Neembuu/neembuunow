@@ -44,10 +44,10 @@ public class RightControlsPanel {
         panel.add(crossBtn);
         panel.add(downBtn);
         
-        saveBtn.setToolTipText("Save File");
+        saveBtn.setToolTipText("Save a copy");
         saveBtn.setVisible(false);
-        crossBtn.setToolTipText("Delete file");
-        downBtn.setToolTipText("Show/Hide more controls");
+        crossBtn.setToolTipText("Close");
+        downBtn.setToolTipText("Details");
         return panel;
     }
 }

@@ -99,7 +99,7 @@ public final class NeembuuUI {
         jf.setFont(Fonts.FuturaLight);
         jf.setIconImage(new ImageIcon(NeembuuUI.class.getResource("images/7_ls_small_transparent_32x32.png") ).getImage());
         jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        jf.setMinimumSize(new Dimension(463,160));
+        jf.setMinimumSize(new Dimension(463+30,160));
         jf.setMaximumSize(new Dimension(463+200,700));
         jf.getContentPane().add(mp);
         jf.addWindowListener(new CloseHandler());

@@ -43,7 +43,9 @@ public final class SingleFileLinkUI implements LinkUI{
 
     @Override
     public void deactivateOpenButton(boolean deactivate) {
-        lp.fileIconPanel.openButton.setEnabled(!deactivate);
+        //lp.fileIconPanel.openButton.setEnabled(!deactivate);
+        //lp.fileIconPanel.openButton.setClickable(!deactivate);
+        lp.fileIconPanel.openButton.setVisible(!deactivate);
     }
 
     @Override

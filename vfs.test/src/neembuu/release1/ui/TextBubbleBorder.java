@@ -66,6 +66,14 @@ final class TextBubbleBorder extends AbstractBorder {
         this.left = left;
     }
 
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
     @Override
     public Insets getBorderInsets(Component c) {
         return insets;

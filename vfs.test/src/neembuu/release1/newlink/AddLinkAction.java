@@ -175,14 +175,16 @@ public class AddLinkAction implements Runnable {
             if(handleSplits(splitGroupProcessor, splits)){
                 virtualFiles.removeAll(splits);
             }
-            
-            splitGroupProcessor.openSuitableFile(splits, main.getMountManager());
+            if(this.open){
+                splitGroupProcessor.openSuitableFile(splits, main.getMountManager());
+            }
         }
         for (VirtualFile virtualFile : virtualFiles) {
             main.getNui().getLinksContainer().addLinkUI(virtualFile.getVirtualFilesParams().getLinkUI(),0);
         }
-        
-        simplyOpenTheVideoFile.openSuitableFile(virtualFiles, main.getMountManager() );
+        if(this.open){
+            simplyOpenTheVideoFile.openSuitableFile(virtualFiles, main.getMountManager() );
+        }
         
         // ConstrainUtility.constrain((DirectoryStream)main.getMountManager().getFileSystem().getRootAttributes()); 
         // this makes each file aware of existence of other filein the same virtual

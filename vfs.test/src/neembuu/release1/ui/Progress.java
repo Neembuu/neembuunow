@@ -9,6 +9,7 @@ package neembuu.release1.ui;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.ref.WeakReference;
 import java.util.logging.Level;
 import javax.swing.Timer;
 import neembuu.rangearray.DissolvabilityRule;
@@ -49,7 +50,7 @@ public class Progress {
     
     private Range selectedRange = null;
     
-    void init(final LinkPanel lp,final VirtualFile vf){
+    void init(LinkPanel lp,final VirtualFile vf){
         this.vf = vf;
         this.lp = lp;
         overallProgress = RangeArrayFactory.newDefaultRangeArray(new RangeArrayParams.Builder()
@@ -130,12 +131,14 @@ public class Progress {
             }
         });
         
+        final WeakReference<LinkPanel> lpWeakReference = new WeakReference<LinkPanel>(lp);
+        
         Timer t = new Timer(300, new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(vf.getConnectionFile().getParent()==null){
-                    // file has been closed
+                LinkPanel lp = lpWeakReference.get();
+                if(lp==null){
+                    Main.getLOGGER().info("LinkPanel for "+this+ " was garbage collected");
                     ((Timer)e.getSource()).stop();
                 }
                 if(lp.getExpansionState()==LinkPanel.ExpansionState.Contracted){

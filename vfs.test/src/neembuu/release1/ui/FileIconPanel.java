@@ -26,7 +26,7 @@ public class FileIconPanel {
         return panel;
     }
     
-    JButton openButton = null;
+    HiddenBorderButton openButton = null;
     
     void makeOpenButton(JPanel panel, Icon bw, Icon clr, ActionListener openVirtualFile){
         if(openButton!=null){

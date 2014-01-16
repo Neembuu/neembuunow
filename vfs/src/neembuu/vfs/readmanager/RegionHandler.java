@@ -79,6 +79,7 @@ public interface RegionHandler extends DownloadedRegion{
     /**
      * Called when virtual filesystem in unmounted, and thus all resources 
      * must be closed for good.
+     * @throws java.lang.Exception
      */
     void closeCompletely()throws Exception;
     

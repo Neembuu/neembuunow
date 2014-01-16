@@ -197,23 +197,24 @@ final class DefaultFileStorageManager implements FileStorageManager{
                 }
             });
             
-            long t = 0; long s=0,e=0;
-            for (int i = 0; i < drsms.size(); i++) {
-                s = drsms.get(i).starting(); e = drsms.get(i).endingByFileSize();
-                
-                if(i+1 < drsms.size()){
-                    e = Math.min(e, drsms.get(i+1).starting()-1);
-                }
-                
-                t+= e - s + 1 ;
-            }
-            if(t!=fileSize && outputFile!=null){
-                Exception a = new IllegalStateException("Download incomplete or corrupt. Total downloaded="+t+" Expected filesize="+fileSize);
-                //a.printStackTrace(System.err);// warning
-                throw a;
-            }
-            
             if(outputFile!=null){
+                long t = 0; long s=0,e=0;
+                for (int i = 0; i < drsms.size(); i++) {
+                    s = drsms.get(i).starting(); e = drsms.get(i).endingByFileSize();
+
+                    if(i+1 < drsms.size()){
+                        e = Math.min(e, drsms.get(i+1).starting()-1);
+                    }
+
+                    t+= e - s + 1 ;
+                }
+                if(t!=fileSize){
+                    Exception a = new IllegalStateException("Download incomplete or corrupt. Total downloaded="+t+" Expected filesize="+fileSize);
+                    //a.printStackTrace(System.err);// warning
+                    throw a;
+                }
+
+                
                 FileChannel fc = //new RandomAccessFile(outputFile, "w").getChannel();
                         FileChannel.open(outputFile.toPath(),
                             StandardOpenOption.WRITE,StandardOpenOption.CREATE

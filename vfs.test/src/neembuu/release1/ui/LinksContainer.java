@@ -140,7 +140,11 @@ public final class LinksContainer implements LinkUIContainer {
     public void animateShrinkActionPerformed(LinkUI source) {
         animateShrinkActionPerformed();
     }
-    
+
+    @Override
+    public boolean contains(LinkUI uI) {
+        return linkPanels.contains(uI);
+    }
     
     
 }
