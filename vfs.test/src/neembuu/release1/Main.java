@@ -18,6 +18,7 @@ import neembuu.diskmanager.DiskManagers;
 import neembuu.release1.api.LinkHandlerProviders;
 import neembuu.release1.defaultImpl.YoutubeLinkHandlerProvider;
 import neembuu.release1.defaultImpl.DirectLinkHandlerProvider;
+import neembuu.release1.ui.InitLookAndFeel;
 import neembuu.release1.ui.NeembuuUI;
 import neembuu.vfs.file.TroubleHandler;
 
@@ -105,7 +106,7 @@ public final class Main {
     }
     
     public static void main(String[] args) {
-        NeembuuUI.initLookAndFeel();
+        InitLookAndFeel.init();
         get().initialize();
     }
 

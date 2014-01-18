@@ -36,8 +36,7 @@ public final class HiddenBorderButton extends JButton{
         super(text);
     }
 
-    @Override
-    public JToolTip createToolTip() {
+    public JToolTip createToolTip_ignore() {
         JToolTip tip = new JToolTip(){
             /*@Override
             protected void paintComponent(final Graphics g) {
@@ -62,10 +61,10 @@ public final class HiddenBorderButton extends JButton{
             }
         }); 
         tip.setFont(Fonts.MyriadPro.deriveFont(16f));
-        tip.putClientProperty("Nimbus.Overrides", defaults);
+        //tip.putClientProperty("Nimbus.Overrides", defaults);
         
         tip.setComponent(this);
-        tip.setOpaque(false);
+        //tip.setOpaque(false);
         //tip.setBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 0));
         return tip;
     }

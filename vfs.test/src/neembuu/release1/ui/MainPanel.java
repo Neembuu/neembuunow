@@ -28,6 +28,19 @@ public class MainPanel extends javax.swing.JPanel {
         progressAnimated.setVisible(false);
         statusLabel.setVisible(false);
         initStyle();
+        // Nimbus is crazy it randomly resets modifications
+        // which is why, to be 100% that themed is applied, 
+        // we must also apply theme per component basis
+        // specially for scrollbars
+        InitLookAndFeel.themeScrolls(linksScrollPane); 
+        InitLookAndFeel.themeScrolls(listOfLinksScroll); 
+        
+        //title.setFont(Fonts.Amper.deriveFont(17f));
+        //title2.setFont(Fonts.Amper.deriveFont(16f));
+        title.setFont(Fonts.FuturaLight.deriveFont(18f));
+        title2.setFont(Fonts.FuturaLight.deriveFont(14f));
+        //title.setFont(Fonts.MyriadPro.deriveFont(18f));
+        //title2.setFont(Fonts.MyriadPro.deriveFont(16f));
     }
 
     private void initStyle(){
@@ -67,7 +80,7 @@ public class MainPanel extends javax.swing.JPanel {
         aboutButton = HiddenBorderButton.make("");
         helpButton = HiddenBorderButton.make("");
         showAddLinkUIButton = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
+        title2 = new javax.swing.JLabel();
         progressAnimated = new javax.swing.JLabel();
         statusLabel = new javax.swing.JLabel("",SwingConstants.CENTER);
         addLinksPanel = new javax.swing.JPanel();
@@ -143,8 +156,8 @@ public class MainPanel extends javax.swing.JPanel {
             }
         });
 
-        jLabel1.setFont(new java.awt.Font("Futura-Light", 0, 14)); // NOI18N
-        jLabel1.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.jLabel1.text")); // NOI18N
+        title2.setFont(new java.awt.Font("Futura-Light", 0, 14)); // NOI18N
+        title2.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.title2.text")); // NOI18N
 
         progressAnimated.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/Animation.gif"))); // NOI18N
         progressAnimated.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.progressAnimated.text")); // NOI18N
@@ -228,19 +241,18 @@ public class MainPanel extends javax.swing.JPanel {
                 .addGroup(upperControlsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(upperControlsPaneLayout.createSequentialGroup()
                         .addComponent(neembuuVirtualFolderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(upperControlsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(upperControlsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(upperControlsPaneLayout.createSequentialGroup()
                                 .addComponent(title)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel1))
+                                .addComponent(title2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(upperControlsPaneLayout.createSequentialGroup()
                                 .addGroup(upperControlsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(aboutButton)
                                     .addComponent(helpButton))
                                 .addGap(61, 61, 61)
-                                .addComponent(progressAnimated)
-                                .addGap(65, 65, 65))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, upperControlsPaneLayout.createSequentialGroup()
+                                .addComponent(progressAnimated))
+                            .addGroup(upperControlsPaneLayout.createSequentialGroup()
                                 .addGap(70, 70, 70)
                                 .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -261,7 +273,7 @@ public class MainPanel extends javax.swing.JPanel {
                             .addGroup(upperControlsPaneLayout.createSequentialGroup()
                                 .addGroup(upperControlsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(title, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(title2, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGroup(upperControlsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(upperControlsPaneLayout.createSequentialGroup()
                                         .addGap(2, 2, 2)
@@ -344,7 +356,8 @@ public class MainPanel extends javax.swing.JPanel {
     private void aboutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutButtonActionPerformed
         // TODO add your handling code here:
         try{
-            java.awt.Desktop.getDesktop().browse(new java.net.URI("http://neembuu.com/now/"));
+            //java.awt.Desktop.getDesktop().browse(new java.net.URI("http://neembuu.com/now/"));
+            throw new Exception();
         }catch(Exception a){
             JOptionPane.showMessageDialog(nui.getFrame(), "Please visit\nhttp://neembuu.com/now/", "Could not automatically open link", JOptionPane.INFORMATION_MESSAGE);
         }
@@ -404,7 +417,6 @@ public class MainPanel extends javax.swing.JPanel {
     javax.swing.JPanel addLinksPanel;
     private javax.swing.JButton addOnlyFilesButton;
     private javax.swing.JButton helpButton;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel linkAddStatusLabel;
     javax.swing.JPanel linksPanel;
@@ -416,6 +428,7 @@ public class MainPanel extends javax.swing.JPanel {
     private javax.swing.JButton showAddLinkUIButton;
     private javax.swing.JLabel statusLabel;
     private javax.swing.JLabel title;
+    private javax.swing.JLabel title2;
     private javax.swing.JPanel upperControlsPane;
     // End of variables declaration//GEN-END:variables
 }

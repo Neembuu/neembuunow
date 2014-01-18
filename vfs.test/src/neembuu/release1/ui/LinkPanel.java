@@ -675,7 +675,8 @@ final class LinkPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_linkEditButtonActionPerformed
 
     private void deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteActionPerformed
-        int x = JOptionPane.showConfirmDialog(singleFileLinkUI.getNeembuuUI().getFrame(),"Are you sure you want to delete this file","Delete",JOptionPane.YES_NO_OPTION);
+        int x;
+        x = JOptionPane.showConfirmDialog(singleFileLinkUI.getNeembuuUI().getFrame(),"Are you sure you want to delete this file","Delete",JOptionPane.YES_NO_OPTION);
         if(x == JOptionPane.YES_OPTION){
             saveAction(null);
         }

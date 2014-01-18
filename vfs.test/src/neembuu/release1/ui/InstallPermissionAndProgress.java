@@ -168,7 +168,7 @@ public class InstallPermissionAndProgress extends javax.swing.JPanel {
     }//GEN-LAST:event_exitButtonActionPerformed
 
     public static void main(String[] args) {
-        NeembuuUI.initLookAndFeel();
+        InitLookAndFeel.init();
         showMessage(null);
     }
 

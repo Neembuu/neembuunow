@@ -6,8 +6,10 @@
 
 package neembuu.release1.ui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,6 +22,10 @@ import java.util.logging.Level;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.Painter;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.plaf.nimbus.ScrollBarThumbPainter_Modified;
 import neembuu.release1.Main;
 import neembuu.release1.api.IndefiniteTask;
 import neembuu.release1.newlink.AddLinkAction;
@@ -77,15 +83,6 @@ public final class NeembuuUI {
             message+=indefiniteTask.displayMessage()+"\n";
         }
         mp.showIndefiniteProgress(true, message);
-    }
-    
-    public static void initLookAndFeel(){
-        try {
-            javax.swing.UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-            javax.swing.UIManager.put("nimbusBase", Colors.NIMBUS_BASE);
-        } catch (Exception lookandfeelexception) {
-            lookandfeelexception.printStackTrace(System.err);
-        }
     }
     
     void addLinks(boolean open) {

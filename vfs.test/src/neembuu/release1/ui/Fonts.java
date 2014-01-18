@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 public final class Fonts {
     public static final Font MyriadPro = initFont("MYRIADPRO-REGULAR.ttf");
     public static final Font FuturaLight = initFont("Futura-Light.ttf");
+    public static final Font Amper = initFont("hmampersand-regular-webfont.ttf");
     
     static java.awt.Font initFont(String fntName){
         try {
