@@ -8,8 +8,8 @@ package neembuu.release1.ui;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import neembuu.release1.Main;
+import neembuu.swing.TextBubbleBorder;
 
 /**
  *

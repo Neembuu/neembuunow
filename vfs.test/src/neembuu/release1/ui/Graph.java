@@ -22,6 +22,7 @@ import neembuu.rangearray.Range;
 import neembuu.rangearray.RangeUtils;
 import neembuu.rangearray.UnsyncRangeArrayCopy;
 import neembuu.release1.Main;
+import neembuu.release1.api.ui.ExpansionState;
 import neembuu.vfs.file.SeekableConnectionFile;
 import neembuu.vfs.readmanager.RegionHandler;
 import neembuu.vfs.test.MonitoredSeekableHttpFilePanel;
@@ -70,7 +71,7 @@ final class Graph {
         final Timer updateGraphTimer = new Timer(500, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(linksPanel.getExpansionState()!=LinkPanel.ExpansionState.FullyExpanded ||
+                if(linksPanel.expandAction.getExpansionState()!=ExpansionState.FullyExpanded ||
                         file.getParent()==null || 
                         currentlySelectedRegion==null){
                     ((Timer)e.getSource()).stop();

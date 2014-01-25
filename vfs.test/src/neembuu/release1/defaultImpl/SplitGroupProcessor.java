@@ -96,7 +96,7 @@ public class SplitGroupProcessor implements LinkGroupProcessor {
                 vf.getConnectionFile().setParent((DirectoryStream)bcm.getFileSytem().getRootAttributes());
                 // the file does not exist, therefore the open button should be
                 // disabled
-                vf.getVirtualFilesParams().getLinkUI().deactivateOpenButton(true);
+                vf.getUI().deactivateOpenButton(true);
             }
         }
     }

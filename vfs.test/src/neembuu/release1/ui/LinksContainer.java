@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import javax.swing.GroupLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import neembuu.release1.api.LinkUI;
-import neembuu.release1.api.LinkUIContainer;
+import neembuu.release1.api.ui.LinkUI;
+import neembuu.release1.api.ui.LinkUIContainer;
 
 /**
  *

@@ -20,12 +20,22 @@ import java.io.File;
 import java.util.logging.Level;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 import neembuu.rangearray.Range;
 import neembuu.rangearray.UIRangeArrayAccess;
 import neembuu.rangearray.UnsyncRangeArrayCopy;
 import neembuu.release1.Main;
+import neembuu.release1.api.ui.ExpansionState;
+import static neembuu.release1.api.ui.ExpansionState.Contracted;
+import static neembuu.release1.api.ui.ExpansionState.FullyExpanded;
+import static neembuu.release1.api.ui.ExpansionState.SemiExpanded;
+import neembuu.release1.api.ui.actions.ExpandAction;
+import neembuu.swing.TextBubbleBorder;
 import neembuu.vfs.file.SeekableConnectionFile;
 
 /**
@@ -47,9 +57,13 @@ final class LinkPanel extends javax.swing.JPanel {
     
     private int state = 1;    
     
-    final RightControlsPanel rightControlsPanel = new RightControlsPanel();
+    final RightControlsPanel rightControlsPanel = makeRightControlPanel();
     final FileIconPanel fileIconPanel = new FileIconPanel();
     final SingleFileLinkUI singleFileLinkUI;
+    
+    ExpandAction expandAction;
+    
+    final UIA uia = new UIA();
     
     private final String downloadFullFileToolTip = "<html>"
                 + "<b>Download entire file mode</b><br/>"
@@ -212,7 +226,7 @@ final class LinkPanel extends javax.swing.JPanel {
         vlcPane = getFileIconPanelWithButton();
         fileNamePane = new javax.swing.JPanel();
         fileNameLabel = new javax.swing.JLabel();
-        rightCtrlPane = getRightControlPanel();
+        rightCtrlPane = rightControlsPanel.getPanel();
         sizeAndProgressPane = new javax.swing.JPanel();
         fileSizeLabel = new javax.swing.JLabel();
         progressBarPanel = new javax.swing.JPanel();
@@ -697,8 +711,8 @@ final class LinkPanel extends javax.swing.JPanel {
         });
     }
     
-    private JPanel getRightControlPanel(){
-        return rightControlsPanel.getRightControlPanel(new ActionListener() {
+    private RightControlsPanel makeRightControlPanel(){
+        return RightControlsPanel.makeRightControlPanel(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 expandContractPressed();
@@ -887,37 +901,7 @@ final class LinkPanel extends javax.swing.JPanel {
         fileSizeLabel.setText(sz+ " "+suffix);
     }
 
-    public ExpansionState getExpansionState(){
-        int s = this.state%3;
-        switch (s) {
-            case 0:
-                return ExpansionState.FullyExpanded;
-            case 1:
-                return ExpansionState.Contracted;
-            case 2:
-                return ExpansionState.SemiExpanded;
-            default:
-                return ExpansionState.Contracted;
-        }
-    }
-    
-    public void setExpansionState(ExpansionState es){
-        switch (es) {
-            case FullyExpanded: setToFullyExpanded(); break;
-            case Contracted: setToContracted(); break;
-            case SemiExpanded: setToSemiExpanded(); break;
-            default:
-                throw new AssertionError();
-        }
-        ht_old = ht_new;
-        singleFileLinkUI.getLinkUIContainer().animateShrinkActionPerformed(singleFileLinkUI);
-    }
-    
-    public enum ExpansionState {
-        Contracted,
-        SemiExpanded,
-        FullyExpanded
-    }
+
     
     private static class TranslucentJPanel extends JPanel {
 
@@ -933,6 +917,36 @@ final class LinkPanel extends javax.swing.JPanel {
         }
 
     }
+    
+    private class UIA implements UIAccess {
+        @Override public JPanel actualContentsPanel(){ return actualContentsPanel; }
+        @Override public JToggleButton changeDownloadModeButton(){ return changeDownloadModeButton; }
+        @Override public JButton delete(){ return delete; }
+        @Override public JLabel fileNameLabel(){ return fileNameLabel; }
+        @Override public JPanel fileNamePane(){ return fileNamePane; }
+        @Override public JLabel fileSizeLabel(){ return fileSizeLabel; }
+        @Override public JPanel graphPanel(){ return graphPanel; }
+        @Override public JPanel hiddenStatsPane(){ return hiddenStatsPane; }
+        @Override public JButton killConnectionButton(){ return killConnectionButton; }
+        @Override public JLayeredPane layeredPane(){ return layeredPane; }
+        @Override public JButton linkEditButton(){ return linkEditButton; }
+        @Override public JButton nextConnectionButton(){ return nextConnectionButton; }
+        @Override public JPanel overlay(){ return overlay; }
+        @Override public JButton previousConnectionButton(){ return previousConnectionButton; }
+        @Override public JPanel progressBarPanel(){ return progressBarPanel; }
+        @Override public JLabel progressPercetLabel(){ return progressPercetLabel; }
+        @Override public JButton reEnableButton(){ return reEnableButton; }
+        @Override public RightControlsPanel rightControlsPanel(){ return rightControlsPanel; }
+        @Override public JLabel selectedConnectionLabel(){ return selectedConnectionLabel; }
+        @Override public JPanel sizeAndProgressPane(){ return sizeAndProgressPane; }
+        @Override public JPanel vlcPane(){ return vlcPane; }
+        @Override public TextBubbleBorder border() {return border; }
+        
+        //@Override public void setExpansionState(ExpansionState es){ LinkPanel.this.setExpansionState(es); }
+        
+        @Override public void repaintUI(){repaint(); } 
+    }
+    
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel actualContentsPanel;

@@ -173,14 +173,18 @@ public class AddLinkAction implements Runnable {
         List<VirtualFile> splits = splitGroupProcessor.canHandle(virtualFiles);
         if(splits!=null && splits.size()>0 ){
             if(handleSplits(splitGroupProcessor, splits)){
+                
                 virtualFiles.removeAll(splits);
             }
             if(this.open){
                 splitGroupProcessor.openSuitableFile(splits, main.getMountManager());
             }
         }
+        
+        initializeSingleUI(virtualFiles);
+        
         for (VirtualFile virtualFile : virtualFiles) {
-            main.getNui().getLinksContainer().addLinkUI(virtualFile.getVirtualFilesParams().getLinkUI(),0);
+            main.getNui().getLinksContainer().addLinkUI(virtualFile.getUI(),0);
         }
         if(this.open){
             simplyOpenTheVideoFile.openSuitableFile(virtualFiles, main.getMountManager() );
@@ -211,9 +215,9 @@ public class AddLinkAction implements Runnable {
         int i = 0;
         for (VirtualFile virtualFile : splits) {
             if(i<splits.size() -1 ){
-                virtualFile.getVirtualFilesParams().getLinkUI().setContraintComponent(new Constraint());
+                virtualFile.getUI().setContraintComponent(new Constraint());
             }
-            main.getNui().getLinksContainer().addLinkUI(virtualFile.getVirtualFilesParams().getLinkUI(),i);
+            main.getNui().getLinksContainer().addLinkUI(virtualFile.getUI(),i);
             i++;
         }
         
@@ -227,7 +231,10 @@ public class AddLinkAction implements Runnable {
         String fileName = l.getLinkHandler().getGroupName();
         
         fileName = main.getMountManager().getSuitableFileName(fileName);
-        SingleFileLinkUI singleFileLinkUI = new SingleFileLinkUI(main.getNui(), main.getMountManager());
+        if(fileName.length()>50){
+            fileName = fileName.substring(0,50);
+        }
+        //SingleFileLinkUI singleFileLinkUI = new SingleFileLinkUI(main.getNui(), main.getMountManager());
         
         VirtualFilesParams vfp = VirtualFilesParams.Builder.create()
                 .setDiskManager(main.getDiskManager())
@@ -235,12 +242,31 @@ public class AddLinkAction implements Runnable {
                 .setFileName(fileName)
                 .setLinkHandler(l.getLinkHandler())
                 .setTroubleHandler(main.getTroubleHandler())
-                .setLinkUI(singleFileLinkUI)
+                //.setLinkUI(singleFileLinkUI)
                 .build();
         VirtualFile vf = svfp.create(vfp).get(0);
         main.getMountManager().addFile(vf);
-        singleFileLinkUI.init(vf);
+        //singleFileLinkUI.init(vf);
         
         return vf;
     }
+    
+    private void initializeSingleUI(List<VirtualFile> vfs){
+        for (VirtualFile virtualFile : vfs) {
+            initializeSingleUI(virtualFile);
+        }
+    }
+    
+    private void initializeSingleUI(VirtualFile vf){
+        SingleFileLinkUI singleFileLinkUI = new SingleFileLinkUI(main.getNui(), main.getMountManager());
+        singleFileLinkUI.init(vf);
+        
+        vf.setUI(singleFileLinkUI);
+    }
+    
+    
+    private void initializeSplitUI(VirtualFile vf){
+        
+    }
+    
 }

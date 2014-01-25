@@ -22,7 +22,7 @@ import javax.swing.UIDefaults;
  *
  * @author Shashank Tulsyan
  */
-public final class HiddenBorderButton extends JButton{
+final class HiddenBorderButton extends JButton{
 
     private boolean clickable = true;
     

@@ -17,20 +17,50 @@ import javax.swing.JPanel;
  */
 public class RightControlsPanel {
     
-    JButton saveBtn;
-    JButton crossBtn;
+    private final JButton saveBtn;
+    private final JButton crossBtn;
+    private final JButton downBtn;
+    
+    private final JPanel panel;
+
+    RightControlsPanel(JButton saveBtn, JButton crossBtn, JButton downBtn, JPanel panel) {
+        this.saveBtn = saveBtn;
+        this.crossBtn = crossBtn;
+        this.downBtn = downBtn;
+        this.panel = panel;
+    }
+
+    public JButton getSaveBtn() {
+        return saveBtn;
+    }
+
+    public JButton getCrossBtn() {
+        return crossBtn;
+    }
+
+    public JButton getDownBtn() {
+        return downBtn;
+    }
+
+    public JPanel getPanel() {
+        return panel;
+    }
     
     
-    JPanel getRightControlPanel(
+    
+    static RightControlsPanel makeRightControlPanel(
             ActionListener expandContractPressed, 
             ActionListener saveFileClicked, 
             ActionListener closeAction
     ){
         JPanel panel = new JPanel();
+        JButton saveBtn;
+        JButton crossBtn;
+        JButton downBtn;
         
         saveBtn = HiddenBorderButton.make("images/save.png", "images/save_s.png",false);
         crossBtn = HiddenBorderButton.make("images/cross.png", "images/cross_s.png",false);
-        JButton downBtn = HiddenBorderButton.make("images/down.png", "images/down_s.png",false);
+        downBtn = HiddenBorderButton.make("images/down.png", "images/down_s.png",false);
         
         downBtn.addActionListener(expandContractPressed);
         saveBtn.addActionListener(saveFileClicked);
@@ -48,6 +78,7 @@ public class RightControlsPanel {
         saveBtn.setVisible(false);
         crossBtn.setToolTipText("Close");
         downBtn.setToolTipText("Details");
-        return panel;
+        
+        return new RightControlsPanel(saveBtn, crossBtn, downBtn, panel);
     }
 }

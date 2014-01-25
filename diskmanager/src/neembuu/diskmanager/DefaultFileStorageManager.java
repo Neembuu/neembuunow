@@ -167,7 +167,8 @@ final class DefaultFileStorageManager implements FileStorageManager{
                 handlers.add(regionStorageManager);
             }
         }catch(Exception any){
-            readQMThLogger.log(Level.INFO,"",any);
+            Logger.getGlobal().log(Level.INFO,"",any);
+            //readQMThLogger.log(Level.INFO,"",any);
             return null;
         }
         return handlers;

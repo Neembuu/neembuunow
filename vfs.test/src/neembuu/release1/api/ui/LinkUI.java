@@ -4,9 +4,10 @@
  * and open the template in the editor.
  */
 
-package neembuu.release1.api;
+package neembuu.release1.api.ui;
 
 import javax.swing.JComponent;
+import neembuu.release1.api.VirtualFile;
 
 /**
  *
@@ -22,7 +23,7 @@ public interface LinkUI {
     int getH(double f);
     int getMinH();
     
-    void deactivateOpenButton(boolean deactivate);
+    //void deactivateOpenButton(boolean deactivate);
     
     void setContraintComponent(JComponent contraint);
     JComponent getContraintComponent();

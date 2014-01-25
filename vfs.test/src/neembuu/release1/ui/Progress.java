@@ -22,6 +22,7 @@ import neembuu.rangearray.UIRangeArrayAccess;
 import neembuu.rangearray.UnsyncRangeArrayCopy;
 import neembuu.release1.Main;
 import neembuu.release1.api.VirtualFile;
+import neembuu.release1.api.ui.ExpansionState;
 import neembuu.swing.RangeArrayComponent;
 import neembuu.swing.RangeArrayComponentBuilder;
 import neembuu.swing.RangeArrayElementColorProvider;
@@ -141,7 +142,7 @@ public class Progress {
                     Main.getLOGGER().info("LinkPanel for "+this+ " was garbage collected");
                     ((Timer)e.getSource()).stop();
                 }
-                if(lp.getExpansionState()==LinkPanel.ExpansionState.Contracted){
+                if(lp.expandAction.getExpansionState()==ExpansionState.Contracted){
                     // no point in painting
                     return;
                 }
@@ -157,15 +158,11 @@ public class Progress {
     }
     
     
-    public long totalDownloaded(){
-        return total_Downloaded;
-    }
-    
     public void repaint(){
         progress.repaint();
     }
     
-    void handleChange(){        
+    private void handleChange(){        
         downloadedRegionHandlers = vf.getConnectionFile().getRegionHandlers();
 
         long totalDownloaded = 0;
@@ -199,7 +196,7 @@ public class Progress {
         total_Downloaded = newTotal;
         long left = vf.getConnectionFile().getFileSize() - total_Downloaded;
         if(left == 0){
-            lp.rightControlsPanel.saveBtn.setVisible(true);
+            lp.rightControlsPanel.getSaveBtn().setVisible(true);
         }else if(total_Downloaded > vf.getConnectionFile().getFileSize()){
             throw new RuntimeException("Total download size of file greater than filesize");
         } 
@@ -252,7 +249,7 @@ public class Progress {
         }
         String region_start_end = element.starting()+","+
                 c(Colors.PROGRESS_BAR_FILL_ACTIVE)+element.ending()+c_();
-        if(lp.getExpansionState()!=LinkPanel.ExpansionState.FullyExpanded){
+        if(lp.expandAction.getExpansionState()!=ExpansionState.FullyExpanded){
             return "<html>"+region_start_end+totalSpeeds+"</html>";
         }
         

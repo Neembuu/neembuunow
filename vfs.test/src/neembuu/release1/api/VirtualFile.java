@@ -6,6 +6,7 @@
 
 package neembuu.release1.api;
 
+import neembuu.release1.api.ui.LinkUI;
 import neembuu.rangearray.UIRangeArrayAccess;
 import neembuu.vfs.file.SeekableConnectionFile;
 
@@ -18,4 +19,8 @@ public interface VirtualFile {
     SeekableConnectionFile getConnectionFile();
     VirtualFilesParams getVirtualFilesParams();
     boolean tryUpdating(String newUrl);
+    
+    void setUI(LinkUI linkUI) throws IllegalStateException;
+    
+    LinkUI getUI() throws IllegalStateException;
 }

@@ -8,8 +8,8 @@ package neembuu.release1.ui;
 
 import javax.swing.JComponent;
 import neembuu.release1.MountManager;
-import neembuu.release1.api.LinkUI;
-import neembuu.release1.api.LinkUIContainer;
+import neembuu.release1.api.ui.LinkUI;
+import neembuu.release1.api.ui.LinkUIContainer;
 import neembuu.release1.api.VirtualFile;
 
 /**
@@ -29,24 +29,28 @@ public final class SingleFileLinkUI implements LinkUI{
     
     private JComponent contraint;
 
+    
     public SingleFileLinkUI(NeembuuUI neembuuUI, MountManager mountManager) {
+        ///LinkActions la = new LinkActionsImpl();
+        
         lp = new LinkPanel(this);
         this.neembuuUI = neembuuUI;
         this.mountManager = mountManager;
         
     }
     
+    
     public void init(VirtualFile virtualFile){
         this.virtualFile = virtualFile;
         lp.setFile();
     }
 
-    @Override
-    public void deactivateOpenButton(boolean deactivate) {
+    
+    //public void deactivateOpenButton(boolean deactivate) {
         //lp.fileIconPanel.openButton.setEnabled(!deactivate);
         //lp.fileIconPanel.openButton.setClickable(!deactivate);
-        lp.fileIconPanel.openButton.setVisible(!deactivate);
-    }
+      //  lp.fileIconPanel.openButton.setVisible(!deactivate);
+    //}
 
     @Override
     public VirtualFile getVirtualFile() {
@@ -94,15 +98,15 @@ public final class SingleFileLinkUI implements LinkUI{
         return lp.getMinH();
     }
     
-    final LinkUIContainer getLinkUIContainer(){
+    public final LinkUIContainer getLinkUIContainer(){
         return luic;
     }
 
-    final NeembuuUI getNeembuuUI() {
+    public final NeembuuUI getNeembuuUI() {
         return neembuuUI;
     }
 
-    final MountManager getMountManager() {
+    public final MountManager getMountManager() {
         return mountManager;
     }
     

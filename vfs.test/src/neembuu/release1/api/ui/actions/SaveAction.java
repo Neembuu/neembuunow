@@ -4,16 +4,14 @@
  * and open the template in the editor.
  */
 
-package neembuu.release1.api;
+package neembuu.release1.api.ui.actions;
+
+import java.awt.event.ActionListener;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface LinkUIContainer {
-    void removeLinkUI(LinkUI uI);
+public interface SaveAction extends ActionListener{
     
-    void animateShrinkActionPerformed(LinkUI source);
-    
-    boolean contains(LinkUI uI);
 }

@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package neembuu.release1.ui;
+package neembuu.swing;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -23,7 +23,7 @@ import javax.swing.border.AbstractBorder;
  *
  * @author Shashank Tulsyan
  */
-final class TextBubbleBorder extends AbstractBorder {
+public final class TextBubbleBorder extends AbstractBorder {
 
     private Color color;
     private int thickness = 4;
@@ -36,12 +36,12 @@ final class TextBubbleBorder extends AbstractBorder {
     private boolean left = true;
     RenderingHints hints;
 
-    TextBubbleBorder(
+    public TextBubbleBorder(
             Color color) {
         new TextBubbleBorder(color, 4, 8, 7);
     }
 
-    TextBubbleBorder(
+    public TextBubbleBorder(
             Color color, int thickness, int radii, int pointerSize) {
         this.thickness = thickness;
         this.radii = radii;
@@ -60,7 +60,7 @@ final class TextBubbleBorder extends AbstractBorder {
         insets = new Insets(pad, pad, bottomPad, pad);
     }
 
-    TextBubbleBorder(
+    public TextBubbleBorder(
             Color color, int thickness, int radii, int pointerSize, boolean left) {
         this(color, thickness, radii, pointerSize);
         this.left = left;

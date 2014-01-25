@@ -10,6 +10,7 @@ import neembuu.rangearray.RangeArray;
 import neembuu.rangearray.RangeArrayFactory;
 import neembuu.rangearray.RangeArrayParams;
 import neembuu.rangearray.UIRangeArrayAccess;
+import neembuu.release1.api.ui.LinkUI;
 import neembuu.release1.api.VirtualFile;
 import neembuu.release1.api.VirtualFilesParams;
 import neembuu.vfs.connection.NewConnectionProvider;
@@ -30,6 +31,8 @@ final class OneToOneVirtualFile implements VirtualFile {
     private final SeekableConnectionFile file;
 
     private final RangeArray<Boolean> regions;
+    
+    private LinkUI linkUI = null;
 
     public OneToOneVirtualFile(VirtualFilesParams vfp) throws Exception {
         this.vfp = vfp;
@@ -91,6 +94,21 @@ final class OneToOneVirtualFile implements VirtualFile {
     public boolean tryUpdating(String newUrl) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }    
-    
+
+    @Override
+    public void setUI(LinkUI linkUI) throws IllegalStateException {
+        if(this.linkUI!=null){
+            throw new IllegalStateException("Already initialized");
+        }
+        this.linkUI = linkUI;
+    }
+
+    @Override
+    public LinkUI getUI() throws IllegalStateException {
+        if(linkUI==null){
+            throw new IllegalStateException("Not initialized");
+        }
+        return linkUI;
+    }
 
 }

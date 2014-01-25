@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 public class SplitsPanel extends javax.swing.JPanel {
 
     final FileIconPanel fileIconPanel = new FileIconPanel();
-    final RightControlsPanel rightControlsPanel = new RightControlsPanel();
+    final RightControlsPanel rightControlsPanel = null ; //new RightControlsPanel();
     
     /**
      * Creates new form SplitsPanel
@@ -203,7 +203,7 @@ public class SplitsPanel extends javax.swing.JPanel {
     }
     
     private JPanel getRightControlPanel(){
-        return rightControlsPanel.getRightControlPanel(new ActionListener() {
+        return rightControlsPanel.getPanel(); /*getRightControlPanel(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 expandContractPressed();
@@ -218,7 +218,7 @@ public class SplitsPanel extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) {
                 closeAction();
             }
-        });
+        });*/
     }
     
     void expandContractPressed(){
