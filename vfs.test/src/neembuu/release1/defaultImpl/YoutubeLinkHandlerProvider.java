@@ -4,6 +4,8 @@
  */
 package neembuu.release1.defaultImpl;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,10 +15,21 @@ import neembuu.release1.StringUtils;
 import neembuu.release1.api.File;
 import neembuu.release1.api.LinkHandler;
 import neembuu.release1.api.LinkHandlerProvider;
+import neembuu.release1.httpclient.NHttpClient;
 import neembuu.release1.log.LoggerUtil;
 import neembuu.release1.httpclient.utils.NHttpClientUtils;
 import neembuu.vfs.connection.NewConnectionProvider;
 import neembuu.vfs.connection.sampleImpl.DownloadManager;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.openide.util.Exceptions;
 
 /**
@@ -27,7 +40,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
     private static final Logger LOGGER = LoggerUtil.getLogger();
     
     private String filename = "";
-
+    
     static final class YoutubeLinkHandler implements LinkHandler{
         private final String fileName; 
         private final long fileSize;
@@ -203,14 +216,16 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
     
     private LinkHandler getYoutubeLinkHandler(String url) {
         try {
-            String responseString = NHttpClientUtils.getData(url);
-            ArrayList<String> urls= findTextData(responseString);
+            //String responseString = NHttpClientUtils.getData(url);
+            //ArrayList<String> urls= findTextData(responseString);
+            ArrayList<String> urls = clipConverterExtraction(url);
+            
             long length = -1;
             String url_direct = "";
             for (int i = 0; i < urls.size(); i++) {
                 url_direct = urls.get(i);
                 length = NHttpClientUtils.calculateLength(url_direct); //the first quality
-                if(length>-1){
+                if(length > -1){
                     break;
                 }
             }
@@ -223,7 +238,77 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
     }
     
     /**
-     * Print all the url (debug purpose):
+     * Use cliconverter.cc service to get the urls.
+     * @param url the youtube url.
+     * @return An ArrayList<String> with all the urls found for this video.
+     */
+    private ArrayList<String> clipConverterExtraction(String url){
+        ArrayList<String> urls = new ArrayList<String>();
+        boolean exception = false;
+        try {
+            DefaultHttpClient httpClient = NHttpClient.getInstance();
+            HttpPost httpPost = new HttpPost("http://www.clipconverter.cc/check.php");
+            
+            List<NameValuePair> formparams = new ArrayList<NameValuePair>();
+            formparams.add(new BasicNameValuePair("mediaurl", url));
+            
+            UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, "UTF-8");
+            httpPost.setEntity(entity);
+            HttpResponse httpResponse = httpClient.execute(httpPost);
+            
+            String responseString = EntityUtils.toString(httpResponse.getEntity());
+            
+            JSONObject jSonObject = new JSONObject(responseString);
+            JSONArray jSonArray = jSonObject.getJSONArray("url");
+            
+            //Set the filename
+            this.filename = jSonObject.getString("filename") + ".mp4";
+            
+            
+            for (int i = 0; i < jSonArray.length(); i++) {
+                jSonObject = (JSONObject) jSonArray.get(i);
+
+                if(jSonObject.getString("text").contains("720p")){
+                    System.out.print("720p = ");
+                }
+                
+                if(jSonObject.getString("text").contains("480p")){
+                    System.out.print("480p = ");
+                }
+                
+                if(jSonObject.getString("text").contains("360p")){
+                    System.out.print("360p = ");
+                }
+                
+                if(jSonObject.getString("text").contains("3GP")){
+                    System.out.print("3GP = ");
+                }
+                
+                String singleUrl = jSonObject.getString("url");
+                singleUrl = StringUtils.stringUntilString(singleUrl, "#");
+                
+                urls.add(singleUrl);
+                System.out.println(singleUrl);
+            }
+            
+        } catch (UnsupportedEncodingException ex) {
+            Exceptions.printStackTrace(ex);
+            exception = true;
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+            exception = true;
+        } catch (JSONException ex) {
+            Exceptions.printStackTrace(ex);
+            exception = true;
+        }
+        if(exception){
+            return clipConverterExtraction(url);
+        }
+        return urls;
+    }
+    
+    /**
+     * Print all the url (debug purpose).
      * @param urls ArrayList<String> with all the urls.
      */
     private void printUrls(ArrayList<String> urls) {
@@ -231,16 +316,6 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
         for (String url : urls) {
             System.out.println(url);
         }
-        
-//        http://r7---sn-nx5cvox-hpae.googlevideo.com/videoplayback?id=b7e6515fcf7ce2c7&upn=pE_LJRLbXHA&ms=au&sparams=gcr,id,ip,ipbits,itag,ratebypass,source,upn,expire&mt=1389635120&mv=m&sver=3&expire=1389658372&itag=18&ratebypass=yes&ipbits=0&fexp=935616,912301,906946,932275,914005,916623,938630,936910,936913,907231,907240,921090&key=yt5&ip=87.21.255.9&source=youtube&gcr=it&signature=BB1F40DD101C64D5BD561FD6B2435FFD62920671.3075BA0DAF7CFE73A35EBDFDDBDDDF2DC2DB03E4
-//        http://r7---sn-nx5cvox-hpae.googlevideo.com/videoplayback?ratebypass=yes&fexp=935621,921404,938625,943700,938630,936910,936913,907231,907240,921090&&key=yt5&ip=87.21.255.9&upn=T_H8pQ43vPE&gcr=it&mt=1389634410&id=b7e6515fcf7ce2c7&expire=1389658372&sver=3&ipbits=0&ms=au&mv=m&sparams=gcr,id,ip,ipbits,itag,ratebypass,source,upn,expire&source=youtube&signature=42648F98D3E266283C6288CFE628D3A42CF9FEF42.41FE549CD274FD6D17031A3531D9C203A49EB98EE&itag=22
-        
-        // Deleted &fallback_host=tc.v8.cache8.googlevideo.com
-        // Deleted &quality=hd720
-        // Deleted &type=video/mp4;+codecs=%22avc1.64001F,+mp4a.40.2%22&
-        
-        
-        
         System.out.println("***** END PRINTING YOUTUBE URLS *****\n");
     }
     
