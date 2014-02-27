@@ -4,12 +4,14 @@
  * and open the template in the editor.
  */
 
-package neembuu.release1.defaultImpl;
+package neembuu.release1.api.linkgroup;
+
+import neembuu.release1.api.TrialLinkHandler;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public class OneToManyVirtualFiles {
-    
+public interface LinkGroupMaker {
+    LinkGroup tryMaking(TrialLinkHandler tlh);
 }

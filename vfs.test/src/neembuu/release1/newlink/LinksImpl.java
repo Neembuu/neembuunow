@@ -7,13 +7,13 @@
 package neembuu.release1.newlink;
 
 import neembuu.release1.api.LinkHandler;
-import neembuu.release1.api.Link;
+import neembuu.release1.api.ReferenceLink;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public class LinksImpl implements Link{
+public class LinksImpl implements ReferenceLink{
 
     private final LinkHandler f;
     private final String link;
@@ -29,7 +29,7 @@ public class LinksImpl implements Link{
     }
 
     @Override
-    public String getLink() {
+    public String getReferenceLinkString() {
         return link;
     }
     

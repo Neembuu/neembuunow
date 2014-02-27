@@ -6,6 +6,9 @@
 
 package neembuu.release1;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import jpfm.FileAttributesProvider;
@@ -22,10 +25,16 @@ import jpfm.volume.CommonFileAttributesProvider;
 import jpfm.volume.vector.VectorRootDirectory;
 import neembuu.config.GlobalTestSettings;
 import neembuu.release1.api.IndefiniteTask;
+import neembuu.release1.api.RealFileProvider;
 import neembuu.release1.api.VirtualFile;
+import neembuu.release1.api.ui.IndefiniteTaskUI;
+import neembuu.release1.api.ui.MainComponent;
+import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
+import neembuu.release1.api.ui.access.MainUIA;
 import neembuu.release1.pismo.InstallerCallbackListener;
 import neembuu.release1.pismo.PismoInstaller;
 import neembuu.release1.ui.InstallPermissionAndProgress;
+import neembuu.release1.ui.NeembuuUI;
 
 /**
  *
@@ -37,12 +46,25 @@ public class MountManager {
     
     private final VectorRootDirectory volume = new VectorRootDirectory(10, 3,CommonFileAttributesProvider.DEFAULT);
     private final SimpleReadOnlyFileSystem fs = new SimpleReadOnlyFileSystem(volume);
+    
+    private final MainComponent mainComponent;
+    private final IndefiniteTaskUI indefiniteTaskUI;
+    private final MainUIA mainUIA;
+
+    MountManager(MainComponent mainComponent, IndefiniteTaskUI indefiniteTaskUI, MainUIA mainUIA) {
+        this.mainComponent = mainComponent;
+        this.indefiniteTaskUI = indefiniteTaskUI;
+        this.mainUIA = mainUIA;
+    }
 
     public Mount getMount() {
         return mount;
     }
     
     public String getSuitableFileName(String filename){
+        if(filename.length()>50){
+            filename = filename.substring(0,50);
+        }
         filename = UniversallyValidFileName.makeUniversallyValidFileName(filename);
         filename = checkConflict(filename);
         return filename;
@@ -59,29 +81,19 @@ public class MountManager {
     private String checkConflict(String filename){
         for(FileAttributesProvider fap : volume){
             if(fap.getName().equalsIgnoreCase(filename)){
-                filename+="1";
+                filename="2_"+filename;
                 return checkConflict(filename);
             }
         }
         return filename;
     }
     
-    public void addFile(VirtualFile v){
-        volume.add(v.getConnectionFile());
-        v.getConnectionFile().setParent(volume);
-    }
-    
-    public void removeFile(VirtualFile v){
-        volume.remove(v.getConnectionFile());
-        v.getConnectionFile().setParent(null);
-    }
-    
-    public void initialize(Main m){
+    public void initialize(){
         try{
             mount = mount(0, Application.getResource("NeembuuVirtualFolder").toString());
         }catch(Exception a){
             Main.getLOGGER().log(Level.SEVERE,"Could not create NeembuuVirtualFolder",a);
-            javax.swing.JOptionPane.showMessageDialog(m.getNui().getFrame(),
+            javax.swing.JOptionPane.showMessageDialog(mainComponent.getJFrame(),
                     "Could not initialize Java pismo file mount\n"+
                     "Pismo file mount might not be installed.\n"+
                     "Actual error message="+a.getMessage(),
@@ -102,8 +114,8 @@ public class MountManager {
                         .set(MountParams.ParamType.MOUNT_LOCATION, mntLoc)
                         .set(MountParams.ParamType.FILE_SYSTEM, fs)
                         .set(MountParams.ParamType.LISTENER, new MountListener() {
-                            public void eventOccurred(FormatterEvent event) {
-                                Main.get().getNui().successfullyMounted();
+                            @Override public void eventOccurred(FormatterEvent event) {
+                                successfullyMounted();
                             }
                         }).build());
             } catch (NullPointerException ne) {
@@ -129,6 +141,24 @@ public class MountManager {
         }
         throw new RuntimeException("Neither can use pismo file mount nor can install it. Retried " + attempt + " time(s)");
     }
+    
+    private void successfullyMounted(){
+        mainUIA.neembuuVirtualFolderButton().setEnabled(true);
+        
+        mainUIA.neembuuVirtualFolderButton().addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try{
+                    File f = getMount().getMountLocation().getAsFile();
+                    java.awt.Desktop.getDesktop().open(f);
+                }catch(Exception a){
+                    JOptionPane.showMessageDialog(null,a.getMessage(),"Could not open NeembuuFolder",JOptionPane.ERROR_MESSAGE);
+                    Main.getLOGGER().log(Level.SEVERE,"Could not open NeembuuFolder",a);
+                }
+            }
+        });
+    }
 
     private final class ICBL implements InstallerCallbackListener {
         private IndefiniteTask installationProgress = null;
@@ -136,8 +166,8 @@ public class MountManager {
         
         @Override
         public void informUserAboutInstallation() {
-            InstallPermissionAndProgress.showMessage(Main.get());
-            installationProgress = Main.get().getNui().showIndefiniteProgress("Installing PismoFileMount");
+            InstallPermissionAndProgress.showMessage(mainComponent);
+            installationProgress = indefiniteTaskUI.showIndefiniteProgress("Installing PismoFileMount");
         }
 
         @Override
@@ -146,14 +176,14 @@ public class MountManager {
                 if(installationTakingTooLong!=null){
                    installationTakingTooLong.done();
                 }
-                installationTakingTooLong = Main.get().getNui().showIndefiniteProgress("Installation is taking longer than usual : "+c+"seconds ellapsed");
+                installationTakingTooLong = indefiniteTaskUI.showIndefiniteProgress("Installation is taking longer than usual : "+c+"seconds ellapsed");
             }else if(c>60 && c<90){
                 if(installationTakingTooLong!=null){
                    installationTakingTooLong.done();
                 }
-                installationTakingTooLong = Main.get().getNui().showIndefiniteProgress("Neembuu will quitting if it takes longer than 2mins to install this");
+                installationTakingTooLong = indefiniteTaskUI.showIndefiniteProgress("Neembuu will quitting if it takes longer than 2mins to install this");
             }else if(c>90){
-                JOptionPane.showMessageDialog(Main.get().getNui().getFrame(), "Installation of Pismo failed or stuck.", "Application will exit", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(mainComponent.getJFrame(), "Installation of Pismo failed or stuck.", "Application will exit", JOptionPane.ERROR_MESSAGE);
                 System.exit(c);
             }
         }
@@ -177,7 +207,7 @@ public class MountManager {
             }catch(Exception a){
                 logfileText = logfileText+"\n"+logFilePath.getName();
             }
-            JOptionPane.showMessageDialog(Main.get().getNui().getFrame(), 
+            JOptionPane.showMessageDialog(mainComponent.getJFrame(), 
                     "Your sandboxing or antivirus environment \n"
                     + "might be preventing installation.\n"
                     + logfileText, 
@@ -185,4 +215,23 @@ public class MountManager {
             System.exit(-1);
         }
     }
+    
+    private final RealFileProvider realFileProvider =  new RealFileProvider() {
+            @Override public File getRealFile(VirtualFile vf) {
+                return new File(getMount().getMountLocation().getAsFile(),
+                        vf.getConnectionFile().getName());      } }; 
+
+    private final AddRemoveFromFileSystem addRemoveFromFileSystem = new AddRemoveFromFileSystem() {
+            @Override public void remove(VirtualFile v) {
+                volume.remove(v.getConnectionFile());
+                v.getConnectionFile().setParent(null);  
+            }
+            @Override  public void add(VirtualFile v) { 
+                volume.add(v.getConnectionFile());
+                v.getConnectionFile().setParent(volume); 
+            } }; 
+    
+    public final RealFileProvider getRealFileProvider() {  return realFileProvider; }
+    public final AddRemoveFromFileSystem getAddRemoveFromFileSystem() { return addRemoveFromFileSystem; }
+
 }

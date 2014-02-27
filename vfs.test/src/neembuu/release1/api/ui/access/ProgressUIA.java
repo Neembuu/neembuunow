@@ -7,6 +7,9 @@
 package neembuu.release1.api.ui.access;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import neembuu.release1.api.ui.ExpansionState;
 
 /**
  *
@@ -14,4 +17,9 @@ import javax.swing.JButton;
  */
 public interface ProgressUIA {
     JButton saveButton();
+    ExpansionState getExpansionState();
+    JLabel progressPercetLabel();
+    JButton killConnectionButton();
+    
+    JPanel progressBarPanel();
 }

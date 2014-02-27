@@ -15,7 +15,7 @@ import javax.swing.JPanel;
  *
  * @author Shashank Tulsyan
  */
-public class RightControlsPanel {
+final class RightControlsPanel {
     
     private final JButton saveBtn;
     private final JButton crossBtn;
@@ -48,11 +48,7 @@ public class RightControlsPanel {
     
     
     
-    static RightControlsPanel makeRightControlPanel(
-            ActionListener expandContractPressed, 
-            ActionListener saveFileClicked, 
-            ActionListener closeAction
-    ){
+    static RightControlsPanel makeRightControlPanel(){
         JPanel panel = new JPanel();
         JButton saveBtn;
         JButton crossBtn;
@@ -61,10 +57,6 @@ public class RightControlsPanel {
         saveBtn = HiddenBorderButton.make("images/save.png", "images/save_s.png",false);
         crossBtn = HiddenBorderButton.make("images/cross.png", "images/cross_s.png",false);
         downBtn = HiddenBorderButton.make("images/down.png", "images/down_s.png",false);
-        
-        downBtn.addActionListener(expandContractPressed);
-        saveBtn.addActionListener(saveFileClicked);
-        crossBtn.addActionListener(closeAction);
         
         saveBtn.setBounds(0, 8, 24, 24);
         crossBtn.setBounds(25, 8, 24, 24);
@@ -80,5 +72,15 @@ public class RightControlsPanel {
         downBtn.setToolTipText("Details");
         
         return new RightControlsPanel(saveBtn, crossBtn, downBtn, panel);
+    }
+    
+    
+    void initActions(
+            ActionListener expandContractPressed, 
+            ActionListener saveFileClicked, 
+            ActionListener closeAction){
+        downBtn.addActionListener(expandContractPressed);
+        saveBtn.addActionListener(saveFileClicked);
+        crossBtn.addActionListener(closeAction);
     }
 }

@@ -10,6 +10,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import neembuu.release1.Main;
+import neembuu.release1.api.ui.MainComponent;
 
 /**
  *
@@ -32,10 +33,10 @@ public class InstallPermissionAndProgress extends javax.swing.JPanel {
         knowMoreButton.setBackground(Colors.BUTTON_TINT);
     }
 
-    public static void showMessage(Main m){
+    public static void showMessage(MainComponent m){
         JFrame jf = null;
         try{
-            jf = m.getNui().getFrame();
+            jf = m.getJFrame();
         }catch(NullPointerException npe){
 
         }

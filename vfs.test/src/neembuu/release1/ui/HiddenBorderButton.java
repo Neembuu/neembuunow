@@ -24,75 +24,45 @@ import javax.swing.UIDefaults;
  */
 final class HiddenBorderButton extends JButton{
 
-    private boolean clickable = true;
+    private Icon icon_bw;
+    private Icon icon_clr;
+    private boolean fillOnHover;
     
-    private ActionListener[]actionListeners = new ActionListener[0];
-
-    public HiddenBorderButton(Icon icon) {
+    HiddenBorderButton(Icon icon) {
         super(icon);
     }
 
-    public HiddenBorderButton(String text) {
+    HiddenBorderButton(String text) {
         super(text);
     }
 
-    public JToolTip createToolTip_ignore() {
-        JToolTip tip = new JToolTip(){
-            /*@Override
-            protected void paintComponent(final Graphics g) {
-                JLabel jl = new JLabel(getToolTipText()){
-                    @Override
-                    public void setToolTipText(String text) {
-                        paintComponent(g);
-                    }
-                };
-                jl.setSize(100, 20);
-                jl.setToolTipText(null);
-            }*/
-        };/*super.createToolTip();*/
-        
-        UIDefaults defaults = new UIDefaults(); 
-        defaults.put("ToolTip[Enabled].backgroundPainter", new Painter() {
-
-            @Override
-            public void paint(Graphics2D g, Object object, int width, int height) {
-                g.setColor(new Color(255,255,255,50));
-                g.fillRect(0, 0, width, height);
-            }
-        }); 
-        tip.setFont(Fonts.MyriadPro.deriveFont(16f));
-        //tip.putClientProperty("Nimbus.Overrides", defaults);
-        
-        tip.setComponent(this);
-        //tip.setOpaque(false);
-        //tip.setBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 0));
-        return tip;
+    public Icon getIcon_bw() {
+        return icon_bw;
     }
 
-    /*public boolean isClickable() {
-        return clickable;
+    public void setIcon_bw(Icon icon_bw) {
+        this.icon_bw = icon_bw;
+        setIcon(icon_bw);
+    }
+
+    public Icon getIcon_clr() {
+        return icon_clr;
+    }
+
+    public void setIcon_clr(Icon icon_clr) {
+        this.icon_clr = icon_clr;
+    }
+
+    public boolean isFillOnHover() {
+        return fillOnHover;
+    }
+
+    public void setFillOnHover(boolean fillOnHover) {
+        this.fillOnHover = fillOnHover;
     }
     
-    public void setClickable(boolean b) {
-        if(b==this.clickable){
-            return;
-        }
-        this.clickable = b;
-        
-        if(!b){
-            actionListeners = (ActionListener[])this.listenerList.getListeners(ActionListener.class);
-            for (int i = 0; i < actionListeners.length; i++) {
-                this.removeActionListener(actionListeners[i]);
-            }
-        }else {
-            for (int i = 0; i < actionListeners.length; i++) {
-                this.addActionListener(actionListeners[i]);
-            }
-        }
-        
-        repaint();
-    }*/
     
+
     static JButton makeWithTinting(String imgLoc,Color tintingColor){
         final TintedGreyScaledImage icon;
         icon = TintedGreyScaledImage.make(imgLoc,true);
@@ -109,26 +79,29 @@ final class HiddenBorderButton extends JButton{
     static JButton make(final Icon icon_bw,final Icon icon_clr){
         return make(icon_bw, icon_clr, true);
     }
-    static HiddenBorderButton make(final Icon icon_bw,final Icon icon_clr,final boolean fillOnHover){
+    
+    static HiddenBorderButton make(Icon icon_bw,Icon icon_clr,boolean fillOnHover){
         final HiddenBorderButton button;
         button = new HiddenBorderButton(icon_bw);
+        
+        button.fillOnHover = fillOnHover;
+        button.icon_bw = icon_bw;
+        button.icon_clr = icon_clr;
+        
         button.setContentAreaFilled(false); //this is the piece of code you needed
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent event) {
-                if(!button.clickable)return;
-                JButton buton = (JButton) event.getSource();
-                buton.setIcon(icon_clr);
-                if(fillOnHover)
-                    buton.setContentAreaFilled(true);  //when hoovered it will show borders and fill area.
+                button.setIcon(button.icon_clr);
+                if(button.fillOnHover)
+                    button.setContentAreaFilled(true);  //when hoovered it will show borders and fill area.
             }
 
             @Override
             public void mouseExited(MouseEvent event) {
-                JButton buton = (JButton) event.getSource();
-                buton.setIcon(icon_bw);
-                if(fillOnHover)
-                    buton.setContentAreaFilled(false); //when mouse is not on button then it will look the same.
+                button.setIcon(button.icon_bw);
+                if(button.fillOnHover)
+                    button.setContentAreaFilled(false); //when mouse is not on button then it will look the same.
             }
         });
         button.setBackground(Color.WHITE);
@@ -141,7 +114,6 @@ final class HiddenBorderButton extends JButton{
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent event) {
-                if(!button.clickable)return;
                 JButton buton = (JButton) event.getSource();
                 buton.setContentAreaFilled(true);  //when hoovered it will show borders and fill area.
             }

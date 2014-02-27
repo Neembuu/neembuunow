@@ -69,12 +69,12 @@ public class YoutubeLinkHandlerProviderTest {
         
         //Valid
         for (String url : urls) {
-            assertTrue(instance.canHandle(url));
+            assertTrue(instance.tryHandling(url));
         }
         
         //Invalid
         for (String url : invalidUrls) {
-            assertFalse(instance.canHandle(url));
+            assertFalse(instance.tryHandling(url));
         }
     }
 

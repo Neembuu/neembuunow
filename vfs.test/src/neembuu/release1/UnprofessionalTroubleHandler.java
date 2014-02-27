@@ -11,7 +11,8 @@ import jpfm.JPfmError;
 import jpfm.operations.AlreadyCompleteException;
 import jpfm.operations.readwrite.ReadRequest;
 import neembuu.release1.api.IndefiniteTask;
-import neembuu.release1.ui.NeembuuUI;
+import neembuu.release1.api.ui.IndefiniteTaskUI;
+import neembuu.release1.api.ui.MainComponent;
 import neembuu.vfs.connection.NewConnectionParams;
 import neembuu.vfs.file.TroubleHandler;
 
@@ -21,15 +22,17 @@ import neembuu.vfs.file.TroubleHandler;
  */
 public final class UnprofessionalTroubleHandler implements TroubleHandler{
 
-    private final NeembuuUI nui;
+    private final MainComponent mainComponent;
+    private final IndefiniteTaskUI indefiniteTaskUI;
 
-    public UnprofessionalTroubleHandler(NeembuuUI nui) {
-        this.nui = nui;
+    public UnprofessionalTroubleHandler(MainComponent mainComponent, IndefiniteTaskUI indefiniteTaskUI) {
+        this.mainComponent = mainComponent;
+        this.indefiniteTaskUI = indefiniteTaskUI;
     }
     
     @Override
     public void cannotCreateANewConnection(NewConnectionParams ncp, int numberOfRetries) {
-        JOptionPane.showMessageDialog(nui.getFrame(), ncp.toString(), "Internet problem : retries "+numberOfRetries+" times",JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(mainComponent.getJFrame(), ncp.toString(), "Internet problem : retries "+numberOfRetries+" times",JOptionPane.ERROR_MESSAGE);
     }
 
     private IndefiniteTask buffering = null;
@@ -40,7 +43,7 @@ public final class UnprofessionalTroubleHandler implements TroubleHandler{
         
         if(!pendingSince.isEmpty()){
             if(buffering!=null){
-                buffering = nui.showIndefiniteProgress("Buffering");
+                buffering = indefiniteTaskUI.showIndefiniteProgress("Buffering");
             }
         }else {
             if(buffering!=null){

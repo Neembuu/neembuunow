@@ -13,7 +13,7 @@ import neembuu.release1.MountManager;
  *
  * @author Shashank Tulsyan
  */
-public interface LinkGroupProcessor {
+public interface PackageProcessor {
     List<VirtualFile> canHandle(List<VirtualFile> sessions);
 
     void handle(List<VirtualFile> sessions,MountManager mountManager);

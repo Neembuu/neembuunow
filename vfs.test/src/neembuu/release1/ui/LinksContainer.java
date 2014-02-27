@@ -10,21 +10,17 @@ import java.util.ArrayList;
 import javax.swing.GroupLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import neembuu.release1.api.ui.LinkUI;
-import neembuu.release1.api.ui.LinkUIContainer;
+import neembuu.release1.api.ui.ExpandableUI;
+import neembuu.release1.api.ui.HeightProperty;
+import neembuu.release1.api.ui.ExpandableUIContainer;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public final class LinksContainer implements LinkUIContainer {
+public final class LinksContainer implements ExpandableUIContainer {
     
-    private void animateShrinkActionPerformed() {
-        adjustHeightOfMainWindow(1);
-        adjustHeightOfLinksSection(1f);
-    }
-    
-    private final ArrayList<LinkUI> linkPanels = new ArrayList<LinkUI>();
+    private final ArrayList<ExpandableUI> expandableUIs = new ArrayList<ExpandableUI>();
     //private final ArrayList<Constraint> constraints = new ArrayList<Constraint>();
     private final MainPanel mp;
     private final JFrame mainFrame;
@@ -36,42 +32,26 @@ public final class LinksContainer implements LinkUIContainer {
         linksPanel = mp.linksPanel;
     }
     
-    public void addLinkUI(LinkUI lpI){
-        addLinkUI(lpI, -1);
-    }
-    
-    public void addLinkUI(LinkUI lpI, int index){
-        lpI.initLinkUIContainer(this);
+    public void addUI(ExpandableUI lpI, int index){
         if(index< 0){
-            linkPanels.add(lpI);
+            expandableUIs.add(lpI);
         }else {
-            linkPanels.add(index,lpI);
+            expandableUIs.add(index,lpI);
         }
+        lpI.heightProperty().addListener(listener);
         updateLayout();
-    }
-    
-    /*public void removeLinkPanel(LinkPanel lp){
-        lp.lc = null;
-        linkPanels.remove(lp);
-        linksPanel.remove(lp);
-        updateLayout();
-    }*/
-    
-    public void setToInitialHeight(){
-        adjustHeightOfLinksSection(1);
-        adjustHeightOfMainWindow(1);
     }
     
     public void updateLayout(){        
         //doing horizontal alignment
         GroupLayout linksPanelLayout = (GroupLayout)linksPanel.getLayout();
         GroupLayout.ParallelGroup parallelGroup = linksPanelLayout.createParallelGroup();
-        for (LinkUI l : linkPanels) {
+        for (ExpandableUI eui : expandableUIs) {
             parallelGroup.addComponent(
-                    l.getJComponent(), javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE);
-            if(l.getContraintComponent()!=null){
+                    eui.getJComponent(), javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE);
+            /*if(l.getContraintComponent()!=null){
                 parallelGroup.addComponent(l.getContraintComponent(),javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE);
-            }
+            }*/
         }
         linksPanelLayout.setHorizontalGroup(linksPanelLayout.createSequentialGroup()
                 .addGap(left, left, left)
@@ -92,12 +72,12 @@ public final class LinksContainer implements LinkUIContainer {
         if(mp.addLinksPanel.isVisible()){
             ht+=mp.addLinksPanel.getPreferredSize().height;
         }
-        if(linkPanels.isEmpty()){
+        if(expandableUIs.isEmpty()){
             mainFrame.setSize(mainFrame.getMinimumSize().width,ht);
         }
         else {
-            for (LinkUI l : linkPanels) {
-                ht+=l.getH(f);
+            for (ExpandableUI eui : expandableUIs) {
+                ht+=eui.heightProperty().getValue();
                 ht+=bottom;
             }
             
@@ -114,14 +94,14 @@ public final class LinksContainer implements LinkUIContainer {
         GroupLayout linksPanelLayout = (GroupLayout)linksPanel.getLayout();
         GroupLayout.SequentialGroup sequentialGroup = linksPanelLayout.createSequentialGroup();
         
-        for (LinkUI l : linkPanels) {
+        for (ExpandableUI eui : expandableUIs) {
             sequentialGroup
-                .addComponent(l.getJComponent(), javax.swing.GroupLayout.DEFAULT_SIZE, l.getMinH(), l.getH(f));
-            if(l.getContraintComponent()==null){
+                .addComponent(eui.getJComponent(), javax.swing.GroupLayout.DEFAULT_SIZE, eui.heightProperty().getValue(), eui.heightProperty().getValue());
+            /*if(l.getContraintComponent()==null){
                 sequentialGroup.addGap(bottom, bottom, bottom);
             }else {
                 sequentialGroup.addComponent(l.getContraintComponent(),javax.swing.GroupLayout.DEFAULT_SIZE,10,19);
-            }
+            }*/
 
         }
         linksPanelLayout.setVerticalGroup(linksPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -129,22 +109,15 @@ public final class LinksContainer implements LinkUIContainer {
     }
 
     @Override
-    public void removeLinkUI(LinkUI uI) {
-        uI.uninitLinkUIContainer(this);
-        linkPanels.remove(uI);
+    public void removeUI(ExpandableUI uI) {
+        expandableUIs.remove(uI);
         linksPanel.remove(uI.getJComponent());
         updateLayout();
     }
-
-    @Override
-    public void animateShrinkActionPerformed(LinkUI source) {
-        animateShrinkActionPerformed();
-    }
-
-    @Override
-    public boolean contains(LinkUI uI) {
-        return linkPanels.contains(uI);
-    }
     
+    private final HeightProperty.Listener listener = new HeightProperty.Listener() {
+            @Override public void changed(HeightProperty h, int oldValue, int newValue) {
+                updateLayout();         
+            } };
     
 }

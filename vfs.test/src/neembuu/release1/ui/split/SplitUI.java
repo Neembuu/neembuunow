@@ -7,7 +7,6 @@
 package neembuu.release1.ui.split;
 
 import neembuu.release1.api.VirtualFile;
-import neembuu.release1.ui.UIAccess;
 import neembuu.release1.ui.actions.LinkActionsImpl;
 
 /**
@@ -16,7 +15,7 @@ import neembuu.release1.ui.actions.LinkActionsImpl;
  */
 public class SplitUI {
     VirtualFile vf;
-    UIAccess uia;
+    //UIAccess uia;
     
     LinkActionsImpl la;
     

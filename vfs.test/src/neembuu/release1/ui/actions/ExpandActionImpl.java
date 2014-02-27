@@ -17,7 +17,11 @@ import neembuu.release1.api.ui.actions.ExpandAction;
  */
 public class ExpandActionImpl implements ExpandAction{
     private int state = 1;    
-    private ExpandActionUIA ui;
+    private final ExpandActionUIA ui;
+
+    public ExpandActionImpl(ExpandActionUIA ui) {
+        this.ui = ui;
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {

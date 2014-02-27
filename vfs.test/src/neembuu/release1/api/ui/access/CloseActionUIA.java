@@ -9,7 +9,6 @@ package neembuu.release1.api.ui.access;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import neembuu.release1.ui.RightControlsPanel;
 import neembuu.swing.TextBubbleBorder;
 
 /**
@@ -19,10 +18,10 @@ import neembuu.swing.TextBubbleBorder;
 public interface CloseActionUIA {
     JPanel overlay();
     TextBubbleBorder border();
-    RightControlsPanel rightControlsPanel();
+    JPanel rightControlsPanel();
     JLabel fileNameLabel();
     JButton openButton();
     
     void contract();
-    boolean repaint();
+    void repaint();
 }

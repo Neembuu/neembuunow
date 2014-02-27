@@ -6,16 +6,12 @@
 
 package neembuu.release1.api;
 
-import neembuu.release1.api.LinkHandler;
-
 /**
  *
  * @author Shashank Tulsyan
  */
 public interface LinkHandlerProvider {
-    boolean canHandle(String url);
+    TrialLinkHandler tryHandling(String url);
     
     LinkHandler getLinkHandler(String url);
-    
-    
 }

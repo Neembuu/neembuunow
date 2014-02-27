@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import neembuu.release1.api.TrialLinkHandler;
 import neembuu.release1.api.File;
 import neembuu.release1.api.LinkHandler;
 import neembuu.release1.log.LoggerUtil;
@@ -99,7 +100,7 @@ public class DirectLinkHandlerProvider implements LinkHandlerProvider {
         }
     }
     
-    public final DirectLinkHandler getDirectLinkHandler(String url){
+    private DirectLinkHandler getDirectLinkHandler(String url){
         
         String fileName = url.substring(url.lastIndexOf('/')+1);
         
@@ -163,8 +164,33 @@ public class DirectLinkHandlerProvider implements LinkHandlerProvider {
     }
 
     @Override
-    public boolean canHandle(String url) {
-        return url.startsWith("http://");
+    public TrialLinkHandler tryHandling(final String url) {
+        return new TrialLinkHandler() {
+
+            @Override public boolean canHandle() {
+                return url.startsWith("http://"); 
+            }
+
+            @Override public String getErrorMessage() {
+                return !canHandle()?"Only http/https links allowed.":null;
+            }
+
+            @Override public boolean containsMultipleLinks() {
+                return false;
+            }
+
+            @Override public String tempDisplayName(){
+                return url;//.substring(url.lastIndexOf('/')+1);
+            }
+
+            @Override public String getReferenceLinkString() {
+                return url;
+            }
+
+            /*@Override public LinkHandlerProvider getLinkHandlerProvider() {
+                return DirectLinkHandlerProvider.this;
+            }*/
+        };
     }
 
     @Override

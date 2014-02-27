@@ -85,9 +85,6 @@
               <Dimension value="[40, 40]"/>
             </Property>
           </Properties>
-          <AuxValues>
-            <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
-          </AuxValues>
 
           <Layout>
             <DimensionLayout dim="0">
@@ -338,9 +335,6 @@
                   <Dimension value="[300, 30]"/>
                 </Property>
               </Properties>
-              <AuxValues>
-                <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
-              </AuxValues>
 
               <Layout>
                 <DimensionLayout dim="0">
@@ -383,9 +377,6 @@
                   </Properties>
                 </Component>
                 <Container class="javax.swing.JPanel" name="progressBarPanel">
-                  <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
-                  </AuxValues>
 
                   <Layout>
                     <DimensionLayout dim="0">
@@ -409,9 +400,6 @@
                       <ResourceString bundle="neembuu/release1/ui/Bundle.properties" key="LinkPanel.progressPercetLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
-                  <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
-                  </AuxValues>
                 </Component>
               </SubComponents>
             </Container>
@@ -421,9 +409,6 @@
                   <Dimension value="[364, 100]"/>
                 </Property>
               </Properties>
-              <AuxValues>
-                <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
-              </AuxValues>
 
               <Layout>
                 <DimensionLayout dim="0">
@@ -474,9 +459,6 @@
                       <ResourceString bundle="neembuu/release1/ui/Bundle.properties" key="LinkPanel.selectedConnectionLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
-                  <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
-                  </AuxValues>
                 </Component>
               </SubComponents>
             </Container>
@@ -587,9 +569,6 @@
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="killConnectionButtonActionPerformed"/>
                   </Events>
-                  <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
-                  </AuxValues>
                 </Component>
                 <Component class="javax.swing.JToggleButton" name="changeDownloadModeButton">
                   <Properties>

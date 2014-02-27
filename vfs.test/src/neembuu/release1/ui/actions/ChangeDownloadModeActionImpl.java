@@ -17,8 +17,8 @@ import neembuu.vfs.file.SeekableConnectionFile;
  *
  * @author Shashank Tulsyan
  */
-public class DownloadModeChangeImpl implements ChangeDownloadModeAction {
-    private ChangeDownloadModeUIA ui;
+public class ChangeDownloadModeActionImpl implements ChangeDownloadModeAction {
+    private final ChangeDownloadModeUIA ui;
     
     private VirtualFile vf;
     
@@ -34,10 +34,14 @@ public class DownloadModeChangeImpl implements ChangeDownloadModeAction {
                 + "This mode is useful for people with limited internet<br/>"
                 + "usage plans."
                 + "</html>";
+
+    public ChangeDownloadModeActionImpl(ChangeDownloadModeUIA ui) {
+        this.ui = ui;
+    }
     
     @Override
     public boolean isAutoCompleteEnabled() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return vf.getConnectionFile().isAutoCompleteEnabled();
     }
 
     @Override

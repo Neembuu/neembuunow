@@ -4,14 +4,15 @@
  * and open the template in the editor.
  */
 
-package neembuu.release1.api;
+package neembuu.release1.api.ui.access;
 
+import neembuu.release1.api.VirtualFile;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface Link {
-    LinkHandler getLinkHandler();
-    String getLink();
+public interface AddRemoveFromFileSystem {
+    void remove(VirtualFile vf);
+    void add(VirtualFile vf);
 }

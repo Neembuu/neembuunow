@@ -93,7 +93,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
      * @return 
      */
     @Override
-    public boolean canHandle(String url) {
+    public boolean tryHandling(String url) {
         boolean result = url.matches("https?://(www.youtube.com/watch\\?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=]*)?");
         LOGGER.log(Level.INFO,"Youtube can handle this? ", result);
         

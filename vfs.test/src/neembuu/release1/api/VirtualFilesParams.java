@@ -14,28 +14,20 @@ import neembuu.vfs.file.TroubleHandler;
  * @author Shashank Tulsyan
  */
 public final class VirtualFilesParams {
-    private final Link link;
-    private final LinkHandler linkHandler;
+    private final ReferenceLink link;
     private final DiskManager diskManager;
     private final TroubleHandler troubleHandler;
     private final String fileName;
-    //private final LinkUI linkUI;
 
     public VirtualFilesParams(Builder b) {
         this.link = b.link;
-        this.linkHandler = b.linkHandler;
         this.diskManager = b.diskManager;
         this.troubleHandler = b.troubleHandler;
-        this.fileName = b.fileName;
-        //this.linkUI = b.linkUI;
+        this.fileName = b.fileName;;
     }
 
-    public Link getLink() {
+    public ReferenceLink getReferenceLink() {
         return link;
-    }
-
-    public LinkHandler getLinkHandler() {
-        return linkHandler;
     }
 
     public DiskManager getDiskManager() {
@@ -51,12 +43,10 @@ public final class VirtualFilesParams {
     }
 
     public static final class Builder {
-        private Link link;
-        private LinkHandler linkHandler;
+        private ReferenceLink link;
         private DiskManager diskManager;
         private TroubleHandler troubleHandler;
         private String fileName;
-        //private LinkUI linkUI;
         
         private Builder(){
             
@@ -75,18 +65,8 @@ public final class VirtualFilesParams {
             return this;
         }
         
-        public Builder setLink(Link link) {
+        public Builder setReferenceLink(ReferenceLink link) {
             this.link = link;
-            return this;
-        }
-
-        /*public Builder setLinkUI(LinkUI linkUI) {
-            this.linkUI = linkUI;
-            return this;
-        }*/
-
-        public Builder setLinkHandler(LinkHandler linkHandler) {
-            this.linkHandler = linkHandler;
             return this;
         }
 

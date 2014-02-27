@@ -9,6 +9,7 @@ package neembuu.release1.ui;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import neembuu.release1.Main;
+import neembuu.release1.api.ui.AddLinkUI;
 import neembuu.swing.TextBubbleBorder;
 
 /**
@@ -359,7 +360,7 @@ public class MainPanel extends javax.swing.JPanel {
             //java.awt.Desktop.getDesktop().browse(new java.net.URI("http://neembuu.com/now/"));
             throw new Exception();
         }catch(Exception a){
-            JOptionPane.showMessageDialog(nui.getFrame(), "Please visit\nhttp://neembuu.com/now/", "Could not automatically open link", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(nui.getMainComponent().getJFrame(), "Please visit\nhttp://neembuu.com/now/", "Could not automatically open link", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_aboutButtonActionPerformed
 
@@ -367,7 +368,7 @@ public class MainPanel extends javax.swing.JPanel {
         try{
             java.awt.Desktop.getDesktop().browse(new java.net.URI("http://neembuu.com/now/help/"));
         }catch(Exception a){
-            JOptionPane.showMessageDialog(nui.getFrame(), "Please visit\nhttp://neembuu.com/now/help/", "Could not automatically open link", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(nui.getMainComponent().getJFrame(), "Please visit\nhttp://neembuu.com/now/help/", "Could not automatically open link", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_helpButtonActionPerformed
 
@@ -375,11 +376,11 @@ public class MainPanel extends javax.swing.JPanel {
         Main.printPendingRequests();
     }//GEN-LAST:event_upperControlsPaneMouseClicked
 
-    public String getLinksText(){
+    private String getLinksText(){
         return listOfLinks.getText();
     }
     
-    public void setLinksText(String a){
+    private void setLinksText(String a){
         listOfLinks.setText(a);
     }
     
@@ -393,13 +394,13 @@ public class MainPanel extends javax.swing.JPanel {
         statusLabel.setText(message);
         statusLabel.setVisible(true);
     }
-    public void addLinkProgressSet(String a){
+    private void addLinkProgressSet(String a){
         linkAddStatusLabel.setText(a);
     }
-    public void addLinksPanelShow(boolean show){
+    private void addLinksPanelShow(boolean show){
         addLinksPanel.setVisible(show);
     }
-    public void addLinksPanelEnable(boolean enable){
+    private void addLinksPanelEnable(boolean enable){
         addLinksButton.setEnabled(enable);
         addOnlyFilesButton.setEnabled(enable);
         listOfLinks.setEditable(enable);
@@ -431,4 +432,17 @@ public class MainPanel extends javax.swing.JPanel {
     private javax.swing.JLabel title2;
     private javax.swing.JPanel upperControlsPane;
     // End of variables declaration//GEN-END:variables
+
+    private final AddLinkUI addLinkUI = new AddLinkUI() {
+        @Override public void addLinkProgressSet(String a) { MainPanel.this.addLinkProgressSet(a);  }
+        @Override public void addLinksPanelShow(boolean show) { MainPanel.this.addLinksPanelShow(show); }
+        @Override public void addLinksPanelEnable(boolean enable) { MainPanel.this.addLinksPanelEnable(enable); } 
+        @Override public String getLinksText() { return MainPanel.this.getLinksText(); }  
+        @Override public void setLinksText(String a) { MainPanel.this.setLinksText(a); }
+    };
+
+    public final AddLinkUI getAddLinkUI() {
+        return addLinkUI;
+    }
+
 }

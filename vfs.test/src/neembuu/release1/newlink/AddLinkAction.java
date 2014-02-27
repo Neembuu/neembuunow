@@ -5,8 +5,6 @@
  */
 package neembuu.release1.newlink;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,19 +14,29 @@ import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import neembuu.release1.Main;
 import neembuu.release1.api.IndefiniteTask;
-import neembuu.release1.api.LinkHandler;
-import neembuu.release1.api.Link;
-import neembuu.release1.api.LinkHandlerProvider;
-import neembuu.release1.api.LinkHandlerProviders;
+import neembuu.release1.api.ReferenceLink;
+import neembuu.release1.api.LinkPackage;
+import neembuu.release1.api.RealFileProvider;
+import neembuu.release1.api.TrialLinkHandler;
 import neembuu.release1.api.VirtualFile;
 import neembuu.release1.api.VirtualFilesParams;
+import neembuu.release1.api.linkgroup.LinkGroup;
+import neembuu.release1.api.linkgroup.LinkGrouperResults;
+import neembuu.release1.api.linkparser.LinkParserResult;
+import neembuu.release1.api.ui.AddLinkUI;
+import neembuu.release1.api.ui.IndefiniteTaskUI;
+import neembuu.release1.api.ui.ExpandableUIContainer;
+import neembuu.release1.api.ui.MainComponent;
+import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
+import neembuu.release1.defaultImpl.linkgroup.LinkGrouperImpl;
+import neembuu.release1.defaultImpl.LinkParserImpl;
 import neembuu.release1.defaultImpl.OneToOneVirtualFileProvider;
 import neembuu.release1.defaultImpl.SimplyOpenTheVideoFile;
 import neembuu.release1.defaultImpl.SplitGroupProcessor;
+import neembuu.release1.defaultImpl.single.SingleLinkPackage;
 import neembuu.release1.ui.Constraint;
 import neembuu.release1.ui.MainPanel;
 import neembuu.release1.ui.NeembuuUI;
-import neembuu.release1.ui.SingleFileLinkUI;
 
 /**
  *
@@ -39,16 +47,29 @@ public class AddLinkAction implements Runnable {
     private Main main;
     private final OneToOneVirtualFileProvider svfp
                 = new OneToOneVirtualFileProvider();
-    private final NeembuuUI nui; 
-    private final MainPanel mp;
+
+    private final IndefiniteTaskUI indefiniteTaskUI;
+    private final ExpandableUIContainer luic1;
+    private final MainComponent mainComponent;
+    private RealFileProvider realFileProvider;
+    private AddRemoveFromFileSystem addRemoveFromFileSystem;
+    private final AddLinkUI addLinkUI;
     
     public AddLinkAction(NeembuuUI nui,MainPanel mp) {
-        this.nui = nui;
-        this.mp = mp;
+        //this.mp = mp;
+        
+        addLinkUI = mp.getAddLinkUI();
+        
+        indefiniteTaskUI = nui.getIndefiniteTaskUI();
+        luic1 = nui.getLinksContainer();
+        mainComponent = nui.getMainComponent();
+        
     }
     
     public void setMain(Main m){
         this.main = m;
+        realFileProvider = m.getMountManager().getRealFileProvider();
+        addRemoveFromFileSystem = m.getMountManager().getAddRemoveFromFileSystem();
     }
     
     boolean open = false; 
@@ -59,114 +80,118 @@ public class AddLinkAction implements Runnable {
     
     @Override
     public void run() {
-        String[] lnks = {};
-        final LinkedList<Link> result = new LinkedList<Link>();
-        IndefiniteTask analyzingLinks = null;
-        IndefiniteTask lastErrorMessage = null;
-        try{
-            
-            String linksText = mp.getLinksText();
-            analyzingLinks = nui.showIndefiniteProgress("Analyzing links");
-            Main.getLOGGER().info("Splitting links\n" + linksText);
+        addLinkUI.addLinksPanelEnable(true);
+        LinkParserImpl linkParserImpl = new LinkParserImpl(addLinkUI, indefiniteTaskUI, main.getLOGGER());
+        
+        LinkParserResult linkParserResult = linkParserImpl.process(addLinkUI.getLinksText());
 
-            lnks = linksText.split("\n");
-            
-            LinkedList<String> a = new LinkedList<String>();
-            for (int i = 0; i < lnks.length; i++) {
-                lnks[i] = lnks[i].trim();
-                if(lnks[i].length()==0){
-                    continue;
-                }
-                a.add(lnks[i]);
-            }
-            lnks = a.toArray(new String[a.size()]);
-
-            
-            for (int i = 0; i < lnks.length; i++) {
-                Main.getLOGGER().info("link=" + lnks[i]);
-                try {
-                    URL url = new URL(lnks[i]);
-                    if (url.getProtocol().equals("http") || url.getProtocol().equals("https")) {
-                        LinkHandlerProvider fnasp = 
-                            LinkHandlerProviders.getWhichCanHandleOrDefault(lnks[i]);
-                        if(fnasp==null){
-                            if(lastErrorMessage!=null){
-                                lastErrorMessage.done();
-                            }
-                            lastErrorMessage = nui.showIndefiniteProgress("Could not use a link");
-                            Main.getLOGGER().log(Level.INFO, "Could not find handler for"+lnks[i]);
-                        }else {
-                            LinkHandler fnas = fnasp.getLinkHandler(lnks[i]);
-                            Main.getLOGGER().log(Level.INFO,"Added="+fnas.getGroupName()
-                                    +" "+fnas.getGroupSize()+" l="+lnks[i]);
-                            if(!fnas.foundSize()){
-                                Main.getLOGGER().log(Level.INFO, "Could not find link size "+lnks[i]);
-                            }else{
-                                result.add(new LinksImpl(fnas, lnks[i]));
-                                lnks[i] = null;
-                            }
-                        }
-                    } else {
-                        if(lastErrorMessage!=null){
-                            lastErrorMessage.done();
-                        }
-                        lastErrorMessage = nui.showIndefiniteProgress("Only http/https links allowed.");
-                    }
-                } catch (MalformedURLException any) {
-                    if(lastErrorMessage!=null){
-                        lastErrorMessage.done();
-                    }
-                    lastErrorMessage = nui.showIndefiniteProgress("Format of a link is incorrect");
-                    Main.getLOGGER().log(Level.INFO, "Problem in adding link "+lnks[i], any);
-                }
-            }
-            
-        }catch(Exception a){
-            Main.getLOGGER().log(Level.INFO, "Problem in adding link", a);
-        }
-        if(lastErrorMessage!=null){
-            lastErrorMessage.done();
-        }
-        analyzingLinks.done();
-        mp.addLinksPanelEnable(true);
+        LinkGrouperResults grouperResults = null;
         
-        
-        String c = "";
-        c = lnks[0]; int cnt = 0 ;
-        for (int i = 1; i < lnks.length; i++) {
-            if(lnks[i]!=null){
-                c+="\n"+lnks[i];
-                cnt++;
-            }
-        }
-        mp.setLinksText(c);
-        if(cnt==0){
-            mp.addLinksPanelShow(false);
-            mp.addLinkProgressSet("");
-        }else{
-            mp.addLinkProgressSet("There are links which could not be added due to some error");
-        }
-        
-        if(!result.isEmpty()){
-            IndefiniteTask makingFiles = nui.showIndefiniteProgress("Making files");
-            doLinks(result);
+        if(!linkParserResult.results().isEmpty()){
+            IndefiniteTask makingFiles = indefiniteTaskUI.showIndefiniteProgress("Making files");
+            grouperResults = groupLinks(linkParserResult);
             makingFiles.done();
+            
+            saveLinks(grouperResults);
+            
+            createUIFor(grouperResults);
         }
+        
     }
 
     
+    private LinkGrouperResults groupLinks(LinkParserResult linkParserResult){
+        LinkGrouperImpl linkGrouper = new LinkGrouperImpl();
+        
+        LinkGrouperResults results = linkGrouper.group(linkParserResult);
+        
+        addLinkUI.setLinksText(makeResidualParagraph(results,linkParserResult));
+        if(addLinkUI.getLinksText()!=null && addLinkUI.getLinksText().length()>0){
+            addLinkUI.addLinkProgressSet("There are links which could not be added due to some error");
+        }else{
+            addLinkUI.addLinksPanelShow(false);
+            addLinkUI.addLinkProgressSet("");
+        }
+        
+        return results;
+    }
     
-    private void doLinks(List<Link> l){
+    private void saveLinks(LinkGrouperResults results){
+        System.out.println("+++Saving feature yet to be implemented+++");
+        System.out.println("+++done+++");
+        for(LinkGroup lg : results.complete_linkPackages()){
+            System.out.println(lg);
+        }
+        System.out.println("+++incomplete+++");
+        for(LinkGroup lg : results.incomplete_linkPackages()){
+            System.out.println(lg);
+        }
+        System.out.println("+++unhandlable+++");
+        for(TrialLinkHandler trialLinkHandler : results.unhandleAbleLinks()){
+            System.out.println("Could not handle the link -> "+trialLinkHandler);
+        }
+    }
+    
+    private void createUIFor(LinkGrouperResults results){
+        for(LinkGroup linkGroup :  results.complete_linkPackages()){
+            int size = linkGroup.getLinks().size();
+            if(size > 1){
+                createUIForMultiple(linkGroup);
+            }else {
+                createUIForSingle(linkGroup);
+            }
+        }
+    }
+    
+    private void createUIForMultiple(LinkGroup linkGroup){
+        
+    }
+    
+    private void createUIForSingle(LinkGroup linkGroup){
+        SingleLinkPackage singleLinkPackage = new SingleLinkPackage();
+    }
+    
+    private String makeResidualParagraph(LinkGrouperResults grouperResults, LinkParserResult parserResult){
+        List<String> links = new LinkedList<String>();
+
+        for(TrialLinkHandler tlh : parserResult.getFailedLinks()){
+            links.add(tlh.getReferenceLinkString());
+        }
+        for (TrialLinkHandler tlh : grouperResults.unhandleAbleLinks()) {
+            links.add(tlh.getReferenceLinkString());
+        }
+        for(LinkGroup lg: grouperResults.incomplete_linkPackages()){
+            for (TrialLinkHandler tlh : lg.getLinks()) {
+                links.add(tlh.getReferenceLinkString());
+            }
+        }
+        
+        
+        String c = ""; int cnt=0;
+        for(String l : links){
+            if(cnt==0){
+                c=l;
+            }
+            c+="\n"+l; cnt++;
+        }
+        
+        return c;
+    }
+    
+    
+    
+    private void doLinks_old(List<ReferenceLink> l){
         SplitGroupProcessor splitGroupProcessor = new SplitGroupProcessor();
         SimplyOpenTheVideoFile simplyOpenTheVideoFile = new SimplyOpenTheVideoFile();
                 
         List<VirtualFile> virtualFiles = new ArrayList<VirtualFile>();
-        for(Link l1 : l){
+        List<LinkPackage> linkPackages = new ArrayList<LinkPackage>();
+        for(ReferenceLink l1 : l){
             try{
                 virtualFiles.add(makeVirtualFile(l1));
             }catch(Exception a){
-                JOptionPane.showMessageDialog(mp, a.getMessage(), "Could not create file for "+l1.getLink(), JOptionPane.ERROR_MESSAGE);
-                Main.getLOGGER().log(Level.INFO, "Problem in creating virtual file "+ l1.getLink(), a);
+                JOptionPane.showMessageDialog(mainComponent.getJFrame(), a.getMessage(), "Could not create file for "+l1.getReferenceLinkString(), JOptionPane.ERROR_MESSAGE);
+                Main.getLOGGER().log(Level.INFO, "Problem in creating virtual file "+ l1.getReferenceLinkString(), a);
             }
         }
         
@@ -184,7 +209,7 @@ public class AddLinkAction implements Runnable {
         initializeSingleUI(virtualFiles);
         
         for (VirtualFile virtualFile : virtualFiles) {
-            main.getNui().getLinksContainer().addLinkUI(virtualFile.getUI(),0);
+            main.getNui().getLinksContainer().addUI(virtualFile.getUI(),0);
         }
         if(this.open){
             simplyOpenTheVideoFile.openSuitableFile(virtualFiles, main.getMountManager() );
@@ -217,7 +242,7 @@ public class AddLinkAction implements Runnable {
             if(i<splits.size() -1 ){
                 virtualFile.getUI().setContraintComponent(new Constraint());
             }
-            main.getNui().getLinksContainer().addLinkUI(virtualFile.getUI(),i);
+            main.getNui().getLinksContainer().addUI(virtualFile.getUI(),i);
             i++;
         }
         
@@ -226,7 +251,7 @@ public class AddLinkAction implements Runnable {
         return true;
     }
     
-    private VirtualFile makeVirtualFile(Link l)throws Exception{
+    private VirtualFile makeVirtualFile(ReferenceLink l)throws Exception{
         // use virtual file providers
         String fileName = l.getLinkHandler().getGroupName();
         
@@ -238,9 +263,8 @@ public class AddLinkAction implements Runnable {
         
         VirtualFilesParams vfp = VirtualFilesParams.Builder.create()
                 .setDiskManager(main.getDiskManager())
-                .setLink(l)
+                .setReferenceLink(l)
                 .setFileName(fileName)
-                .setLinkHandler(l.getLinkHandler())
                 .setTroubleHandler(main.getTroubleHandler())
                 //.setLinkUI(singleFileLinkUI)
                 .build();
@@ -249,24 +273,6 @@ public class AddLinkAction implements Runnable {
         //singleFileLinkUI.init(vf);
         
         return vf;
-    }
-    
-    private void initializeSingleUI(List<VirtualFile> vfs){
-        for (VirtualFile virtualFile : vfs) {
-            initializeSingleUI(virtualFile);
-        }
-    }
-    
-    private void initializeSingleUI(VirtualFile vf){
-        SingleFileLinkUI singleFileLinkUI = new SingleFileLinkUI(main.getNui(), main.getMountManager());
-        singleFileLinkUI.init(vf);
-        
-        vf.setUI(singleFileLinkUI);
-    }
-    
-    
-    private void initializeSplitUI(VirtualFile vf){
-        
     }
     
 }

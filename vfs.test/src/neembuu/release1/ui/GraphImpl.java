@@ -22,7 +22,10 @@ import neembuu.rangearray.Range;
 import neembuu.rangearray.RangeUtils;
 import neembuu.rangearray.UnsyncRangeArrayCopy;
 import neembuu.release1.Main;
+import neembuu.release1.api.VirtualFile;
 import neembuu.release1.api.ui.ExpansionState;
+import neembuu.release1.api.ui.Graph;
+import neembuu.release1.api.ui.access.GraphUIA;
 import neembuu.vfs.file.SeekableConnectionFile;
 import neembuu.vfs.readmanager.RegionHandler;
 import neembuu.vfs.test.MonitoredSeekableHttpFilePanel;
@@ -32,13 +35,16 @@ import org.netbeans.lib.profiler.charts.ExposeChartsPackagePrivateAPI;
  *
  * @author Shashank Tulsyan
  */
-final class Graph {
+final class GraphImpl implements Graph{
     
-    private final LinkPanel linksPanel;
+    //private final LinkPanel linksPanel;
+    
+    private final GraphUIA ui;
+    private VirtualFile vf;
 
-    Graph(LinkPanel graphPanel) {
-        this.linksPanel = graphPanel;
-        linksPanel.graphPanel.setBackground(Color.WHITE);
+    GraphImpl(GraphUIA ui) {
+        this.ui = ui;
+        ui.graphPanel().setBackground(Color.WHITE);
     }
     
     
@@ -55,7 +61,7 @@ final class Graph {
     
     private void initValues(final Range arrayElement){  
         try {
-            file = linksPanel.singleFileLinkUI.getVirtualFile().getConnectionFile();
+            file = vf.getConnectionFile();
         } catch (NullPointerException noe) {
             Main.getLOGGER().log(Level.SEVERE, "", noe);
             return;
@@ -71,7 +77,7 @@ final class Graph {
         final Timer updateGraphTimer = new Timer(500, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(linksPanel.expandAction.getExpansionState()!=ExpansionState.FullyExpanded ||
+                if(ui.getExpansionState()!=ExpansionState.FullyExpanded ||
                         file.getParent()==null || 
                         currentlySelectedRegion==null){
                     ((Timer)e.getSource()).stop();
@@ -91,13 +97,14 @@ final class Graph {
         initGraph(arrayElement,false);
     }
     
-    void initGraph(Range arrayElement,boolean findFirst){
-        linksPanel.graphPanel.removeAll();
+    @Override
+    public void initGraph(Range arrayElement,boolean findFirst){
+        ui.graphPanel().removeAll();
         JComponent toAdd = null;
         if(arrayElement==null){
             if(findFirst){
                 try{
-                    UnsyncRangeArrayCopy copy = linksPanel.singleFileLinkUI.getVirtualFile().getConnectionFile().getRegionHandlers().tryToGetUnsynchronizedCopy();
+                    UnsyncRangeArrayCopy copy = vf.getConnectionFile().getRegionHandlers().tryToGetUnsynchronizedCopy();
                     for (int i = 0; i < copy.size(); i++) {
                         RegionHandler rh = (RegionHandler)copy.get(i).getProperty();
                         if(rh.isAlive()){
@@ -126,7 +133,7 @@ final class Graph {
         }
         
         
-        javax.swing.GroupLayout layout = (javax.swing.GroupLayout)linksPanel.graphPanel.getLayout();
+        javax.swing.GroupLayout layout = (javax.swing.GroupLayout)ui.graphPanel().getLayout();
 
         int right, left;
         int top, bottom; right = left = top = bottom = 0;

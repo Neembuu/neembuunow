@@ -16,7 +16,7 @@ import jpfm.fs.splitfs.CascadableSplitFS;
 import jpfm.mount.BasicCascadeMount;
 import neembuu.release1.Main;
 import neembuu.release1.MountManager;
-import neembuu.release1.api.LinkGroupProcessor;
+import neembuu.release1.api.PackageProcessor;
 import neembuu.release1.api.VirtualFile;
 import neembuu.vfs.file.ConstrainUtility;
 import neembuu.vfs.file.SeekableConnectionFile;
@@ -25,7 +25,7 @@ import neembuu.vfs.file.SeekableConnectionFile;
  *
  * @author Shashank Tulsyan
  */
-public class SplitGroupProcessor implements LinkGroupProcessor {
+public class SplitGroupProcessor implements PackageProcessor {
 
     @Override
     public List<VirtualFile> canHandle(List<VirtualFile> virtualFiles) {
@@ -96,7 +96,7 @@ public class SplitGroupProcessor implements LinkGroupProcessor {
                 vf.getConnectionFile().setParent((DirectoryStream)bcm.getFileSytem().getRootAttributes());
                 // the file does not exist, therefore the open button should be
                 // disabled
-                vf.getUI().deactivateOpenButton(true);
+                //vf.getUI().deactivateOpenButton(true);
             }
         }
     }

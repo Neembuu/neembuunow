@@ -5,38 +5,42 @@
  */
 package neembuu.release1.ui;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.logging.Level;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
-import neembuu.rangearray.Range;
-import neembuu.rangearray.UIRangeArrayAccess;
-import neembuu.rangearray.UnsyncRangeArrayCopy;
 import neembuu.release1.Main;
+import neembuu.release1.api.RealFileProvider;
+import neembuu.release1.api.VirtualFile;
 import neembuu.release1.api.ui.ExpansionState;
-import static neembuu.release1.api.ui.ExpansionState.Contracted;
-import static neembuu.release1.api.ui.ExpansionState.FullyExpanded;
-import static neembuu.release1.api.ui.ExpansionState.SemiExpanded;
+import neembuu.release1.api.ui.Graph;
+import neembuu.release1.api.ui.HeightProperty;
+import neembuu.release1.api.ui.Progress;
+import neembuu.release1.api.ui.access.ChangeDownloadModeUIA;
+import neembuu.release1.api.ui.access.CloseActionUIA;
+import neembuu.release1.api.ui.access.ExpandActionUIA;
+import neembuu.release1.api.ui.access.GraphUIA;
+import neembuu.release1.api.ui.access.LowerControlsUIA;
+import neembuu.release1.api.ui.access.ProgressUIA;
+import neembuu.release1.api.ui.actions.ChangeDownloadModeAction;
+import neembuu.release1.api.ui.actions.CloseAction;
+import neembuu.release1.api.ui.actions.DeleteAction;
 import neembuu.release1.api.ui.actions.ExpandAction;
+import neembuu.release1.api.ui.actions.ConnectionActions;
+import neembuu.release1.api.ui.actions.OpenAction;
+import neembuu.release1.api.ui.actions.ReAddAction;
+import neembuu.release1.api.ui.actions.SaveAction;
 import neembuu.swing.TextBubbleBorder;
-import neembuu.vfs.file.SeekableConnectionFile;
 
 /**
  *
@@ -44,88 +48,94 @@ import neembuu.vfs.file.SeekableConnectionFile;
  */
 final class LinkPanel extends javax.swing.JPanel {
 
-    private TextBubbleBorder border;
-    final Graph graph;
-    final Progress progress;
+    private final TextBubbleBorder border;
+    private final Graph graph;
+    private final Progress progress;
     
     private final int ht_smallest = 50;
     private final int ht_medium = 80;
     private final int ht_tallest = 300;
     
-    private int ht_old = 0;
-    private int ht_new = 0;
-    
-    private int state = 1;    
-    
-    final RightControlsPanel rightControlsPanel = makeRightControlPanel();
-    final FileIconPanel fileIconPanel = new FileIconPanel();
-    final SingleFileLinkUI singleFileLinkUI;
-    
-    ExpandAction expandAction;
-    
-    final UIA uia = new UIA();
+    private final RightControlsPanel rightControlsPanel = 
+            RightControlsPanel.makeRightControlPanel();
+    private final FileIconPanel fileIconPanel = new FileIconPanel();
+
+    private ExpandAction expandAction;
+    private DeleteAction deleteAction;
+    private ReAddAction reAddAction;
+    private ChangeDownloadModeAction  changeDownloadModeAction;
+    private ConnectionActions connectionActions;
+
+    private VirtualFile vf;
+    private RealFileProvider realFileProvider;
     
     private final String downloadFullFileToolTip = "<html>"
                 + "<b>Download entire file mode</b><br/>"
                 + "In this mode Neembuu tried to download<br/>"
                 + "the entire file without slowing the download speed.<br/>"
                 + "</html>";
-    
-    private final String downloadMinimumToolTip = "<html>"
-                + "<b>Download Minimum Mode</b><br/>"
-                + "In this mode Neembuu limits the download speed.<br/>"
-                + "This mode is useful for people with limited internet<br/>"
-                + "usage plans."
-                + "</html>";
 
+    final HeightProperty heightProperty =  new HeightPropertyImpl();
+    
     /**
      * Creates new form FilePanel
      */
     LinkPanel() {
-        this(null);
-    }
-        
-    LinkPanel(SingleFileLinkUI singleFileLinkUI) {
-        this.singleFileLinkUI = singleFileLinkUI;
         border = new TextBubbleBorder(Colors.BORDER , 4, 16, 0);
         border.getBorderInsets(null).bottom = 8;
         border.getBorderInsets(null).top = 8;
         border.getBorderInsets(null).right = 1;
         border.getBorderInsets(null).left = 1;
+        
         initComponents();
         initHeight();
         hiddenPaneInit();
         overlayInit();
-        graph = new Graph(this);
-        progress =  new Progress();
+        graph = new GraphImpl(graphUIA);
+        progress =  new ProgressImpl(progressUIA,graph);
         changeDownloadModeButton.setToolTipText(downloadFullFileToolTip);
         killConnectionButton.setEnabled(false);
     }
     
+    void initActions(
+            ExpandAction expandAction, OpenAction openAction, 
+            CloseAction closeAction, DeleteAction deleteAction, 
+            ReAddAction reAddAction, SaveAction saveAction, 
+            ConnectionActions connectionActions, ChangeDownloadModeAction  changeDownloadModeAction) {
+        this.expandAction = expandAction;
+        this.deleteAction = deleteAction;
+        this.reAddAction = reAddAction;
+        this.connectionActions = connectionActions;
+        this.changeDownloadModeAction = changeDownloadModeAction;
+        rightControlsPanel.initActions(expandAction, saveAction, closeAction);
+        fileIconPanel.getOpenButton().addActionListener(openAction);
+    }
+    
+    
+    void initializeName(String fileName){
+        fileNameLabel.setText(fileName);
+    }
+    
+    
     void setFile(){
-
-        fileNameLabel.setText(singleFileLinkUI.getVirtualFile().getConnectionFile().getName());
+        fileNameLabel.setText(vf.getConnectionFile().getName());
         updateFileSizeString();
-        progress.init(this,singleFileLinkUI.getVirtualFile());
+        ((ProgressImpl)progress).init(vf);
 
         try{
-            if(!getAsRealFile().exists()){
+            if(!realFileProvider.getRealFile(vf).exists()){
                 throw new IllegalStateException("File not created yet");
             }
             Icon clr = null, bw = null;
             try{
-                Image clri = sun.awt.shell.ShellFolder.getShellFolder( getAsRealFile() ).getIcon( true ) ;
+                Image clri = sun.awt.shell.ShellFolder.getShellFolder( realFileProvider.getRealFile(vf) ).getIcon( true ) ;
                 clr = new ImageIcon(clri);
             }catch(Exception a){
-                clr = javax.swing.filechooser.FileSystemView.getFileSystemView().getSystemIcon( getAsRealFile() );
+                clr = javax.swing.filechooser.FileSystemView.getFileSystemView().getSystemIcon( realFileProvider.getRealFile(vf) );
             }
             bw = TintedGreyScaledImage.getTintedImage(getBF(clr), Colors.TINTED_IMAGE, false);
-            fileIconPanel.makeOpenButton(vlcPane, bw, clr, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    openVirtualFile();
-                }
-            } );
+            fileIconPanel.getOpenButton().setIcon_bw(bw);
+            fileIconPanel.getOpenButton().setIcon_clr(clr);
         }catch(Exception a){
             Main.getLOGGER().log(Level.INFO, "Could not find icon, using default", a);
         }
@@ -152,63 +162,6 @@ final class LinkPanel extends javax.swing.JPanel {
         return bi;
     }
     
-    void closeAction(){
-        closeAction(true);
-    }
-        
-    void closeAction(boolean closeOrOpen){
-        rightCtrlPane.setVisible(!closeOrOpen);
-        overlay.setVisible(closeOrOpen);
-        if(closeOrOpen){
-            this.border.setColor(Color.WHITE);
-            fileNameLabel.setForeground(Colors.BORDER);
-            setExpansionState(ExpansionState.Contracted);
-            singleFileLinkUI.deactivateOpenButton(true);
-            closeActionProcess();
-        }else {
-            this.border.setColor(Colors.BORDER);
-            this.repaint();
-            fileNameLabel.setForeground(Color.BLACK);
-            fileNameLabel.setText(singleFileLinkUI.getVirtualFile().getConnectionFile().getName());
-            singleFileLinkUI.deactivateOpenButton(false);
-            singleFileLinkUI.getMountManager().addFile(singleFileLinkUI.getVirtualFile());
-            openVirtualFile();
-        }
-    }
-    
-    void closeActionProcess(){
-        singleFileLinkUI.getMountManager().removeFile(singleFileLinkUI.getVirtualFile());
-        try{
-            singleFileLinkUI.getVirtualFile().getConnectionFile().closeCompletely();
-        }catch(Exception a){
-            Main.getLOGGER().log(Level.SEVERE, "Erorr in completely closing file",a);
-        }
-    }
-    
-    void saveAction(File outputFilePath){
-        closeActionProcess();
-
-        try{
-            singleFileLinkUI.getVirtualFile().getConnectionFile().getFileStorageManager().completeSession(outputFilePath, singleFileLinkUI.getVirtualFile().getConnectionFile().getFileSize());
-        }catch(Exception a){
-            Main.getLOGGER().log(Level.SEVERE, "Could not save file",a);
-            JOptionPane.showMessageDialog(singleFileLinkUI.getNeembuuUI().getFrame(), a.getMessage(),"Could not save file", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    
-    void saveFileClicked(){
-        javax.swing.JFileChooser fileChooser = new javax.swing.JFileChooser();
-        fileChooser.setSelectedFile(new File(System.getProperty("java.home")+File.separator+
-                singleFileLinkUI.getVirtualFile().getConnectionFile().getName()));
-        fileChooser.setFileSelectionMode(javax.swing.JFileChooser.FILES_ONLY);
-        int retVal = fileChooser.showSaveDialog(singleFileLinkUI.getNeembuuUI().getFrame());
-        if(retVal == javax.swing.JFileChooser.APPROVE_OPTION){
-            saveAction(fileChooser.getSelectedFile().getAbsoluteFile());
-        }else {
-
-        }
-    }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -596,138 +549,35 @@ final class LinkPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void killConnectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_killConnectionButtonActionPerformed
-        // TODO add your handling code here:
-        Range selection =  progress.getSelectedRange();
-        if(selection == null){
-            throw new RuntimeException("Null connection was selected. The kill button should automatically disable if no connection is selected");
-        }
-        UIRangeArrayAccess regions = singleFileLinkUI.getVirtualFile().getConnectionFile().getRegionHandlers();
-        selection = regions.getUnsynchronized(selection.ending());
-        try{
-            ((neembuu.vfs.readmanager.impl.BasicRegionHandler)selection.getProperty()).
-                    getConnection().abort();
-        }catch(Exception any){
-            Main.getLOGGER().log(Level.SEVERE, "Connection killing exception", any);
-        }
+        connectionActions.kill(evt);
     }//GEN-LAST:event_killConnectionButtonActionPerformed
 
     private void nextConnectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextConnectionButtonActionPerformed
-        UIRangeArrayAccess regions = singleFileLinkUI.getVirtualFile().getConnectionFile().getRegionHandlers();
-        if(regions.isEmpty()){
-            return;
-        }
-        Range initial =  progress.getSelectedRange();
-        initial = getClosestRange(initial);        
-        Range next = regions.getNext(initial);
-        progress.switchToRegion(next);
+        connectionActions.next(evt);
     }//GEN-LAST:event_nextConnectionButtonActionPerformed
 
-    private Range getClosestRange(Range initial){        
-        UIRangeArrayAccess regions = singleFileLinkUI.getVirtualFile().getConnectionFile().getRegionHandlers();
-        UnsyncRangeArrayCopy unsyncFncCopy = regions.tryToGetUnsynchronizedCopy();
-        
-        if(initial == null){
-            return regions.getFirst();
-        }
-        long ending = initial.ending();
-        initial = regions.getUnsynchronized(initial.ending());
-        
-        if(initial!=null){
-            return initial;
-        }
-        if(unsyncFncCopy.size()==0){
-            return null;
-        }
-        Range closest = unsyncFncCopy.get(0);
-        long dmin = ending - closest.ending();
-        for (int i = 0; i < unsyncFncCopy.size(); i++) {
-            Range range = unsyncFncCopy.get(i);
-            long d = ending - range.ending();
-            if (d<0) {
-                break;
-            }
-            if(d<dmin){
-                dmin = d;
-                closest = range;
-            }
-        }
-        return closest;
-    }
-    
     private void changeDownloadModeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeDownloadModeButtonActionPerformed
-        if(changeDownloadModeButton.getModel().isSelected()){
-            changeDownloadModeButton.setBackground(Colors.TINTED_IMAGE);
-            changeDownloadModeButton.setText("Download Minimum");
-            changeDownloadModeButton.setToolTipText(downloadMinimumToolTip);
-        }else {
-            changeDownloadModeButton.setText("Download Full File");
-            changeDownloadModeButton.setBackground(Colors.PROGRESS_BAR_FILL_BUFFER);
-            changeDownloadModeButton.setToolTipText(downloadFullFileToolTip);
-        }
-    
-        SeekableConnectionFile file = singleFileLinkUI.getVirtualFile().getConnectionFile();
-        file.setAutoCompleteEnabled(!file.isAutoCompleteEnabled());
-        
-        progress.repaint(); // the color of progress bar change this needs to be notified.
+        changeDownloadModeAction.actionPerformed(evt);
     }//GEN-LAST:event_changeDownloadModeButtonActionPerformed
 
     private void previousConnectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousConnectionButtonActionPerformed
-        UIRangeArrayAccess regions = singleFileLinkUI.getVirtualFile().getConnectionFile().getRegionHandlers();
-        if(regions.isEmpty()){
-            return;
-        }
-        Range initial =  progress.getSelectedRange();
-        initial = getClosestRange(initial);        
-        Range previous = regions.getPrevious(initial);
-        progress.switchToRegion(previous);
+        connectionActions.previous(evt);
     }//GEN-LAST:event_previousConnectionButtonActionPerformed
 
     private void linkEditButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_linkEditButtonActionPerformed
-        // TODO add your handling code here:
-        //singleFileLinkUI.getVirtualFile().getRegions()
-                
+        throw new UnsupportedOperationException();
     }//GEN-LAST:event_linkEditButtonActionPerformed
 
     private void deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteActionPerformed
-        int x;
-        x = JOptionPane.showConfirmDialog(singleFileLinkUI.getNeembuuUI().getFrame(),"Are you sure you want to delete this file","Delete",JOptionPane.YES_NO_OPTION);
-        if(x == JOptionPane.YES_OPTION){
-            saveAction(null);
-        }
-        singleFileLinkUI.getLinkUIContainer().removeLinkUI(singleFileLinkUI);
+        deleteAction.actionPerformed(evt);
     }//GEN-LAST:event_deleteActionPerformed
 
     private void reEnableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reEnableButtonActionPerformed
-        closeAction(false);
+        reAddAction.actionPerformed(evt);
     }//GEN-LAST:event_reEnableButtonActionPerformed
 
-    
     private JPanel getFileIconPanelWithButton(){
-        return fileIconPanel.getFileIconPanelWithButton(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                openVirtualFile();
-            }
-        });
-    }
-    
-    private RightControlsPanel makeRightControlPanel(){
-        return RightControlsPanel.makeRightControlPanel(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                expandContractPressed();
-            }
-        }, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                saveFileClicked();
-            }
-        }, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                closeAction();
-            }
-        });
+        return fileIconPanel.getJPanel();
     }
 
     private void initHeight(){
@@ -736,85 +586,7 @@ final class LinkPanel extends javax.swing.JPanel {
         hiddenStatsPane.setVisible(false);
         connectionControlPane.setVisible(false);
 
-        ht_old = ht_new = ht_smallest;
-    }
-    
-    private void expandContractPressed(){        
-        if(state%3==0){
-            setToContracted();
-        }else if(state%3==1){
-            setToSemiExpanded();
-        }else {
-            setToFullyExpanded();
-        }//state++;
-        ht_old = ht_new;
-        singleFileLinkUI.getLinkUIContainer().animateShrinkActionPerformed(singleFileLinkUI);
-    }
-    
-    private void setToContracted(){
-        sizeAndProgressPane.setVisible(false);
-        graphPanel.setVisible(false);{
-            graph.initGraph(null);
-        }
-        hiddenStatsPane.setVisible(false);
-        connectionControlPane.setVisible(false);
-        ht_new = ht_smallest;
-        ht_old = ht_tallest;
-        
-        state = 1;
-    }
-    
-    private void setToSemiExpanded(){
-        sizeAndProgressPane.setVisible(true);
-        graphPanel.setVisible(false);{
-            graph.initGraph(null);
-        }
-        hiddenStatsPane.setVisible(false);
-        connectionControlPane.setVisible(false);
-        ht_new = ht_medium;
-        ht_old = ht_smallest;
-        
-        state = 2;
-    }
-    
-    private void setToFullyExpanded(){
-        sizeAndProgressPane.setVisible(true);
-        graph.initGraph(null,true);
-        graphPanel.setVisible(true);
-        hiddenStatsPane.setVisible(true);
-        connectionControlPane.setVisible(true);
-        ht_new = ht_tallest;
-        ht_old = ht_medium;
-        
-        state = 3;
-    }
-    
-    public void openVirtualFile(){
-        try{
-            File f = getAsRealFile();
-            java.awt.Desktop.getDesktop().open(f);
-
-        }catch(Exception a){
-            JOptionPane.showMessageDialog(null,a.getMessage(),"Could not open file",JOptionPane.ERROR_MESSAGE);
-            Main.getLOGGER().log(Level.SEVERE,"Could not open file",a);
-        }
-    }
-    
-    private File getAsRealFile(){
-        return new File(singleFileLinkUI.getMountManager().getMount().getMountLocation().getAsFile(),
-                    singleFileLinkUI.getVirtualFile().getConnectionFile().getName());
-    }
-    
-    int getH(double f){
-        if(ht_old>ht_new){ // compressing
-            return (int)(ht_new - (ht_old-ht_new)*f);
-        }
-        //expanding
-        return (int)(ht_old + (ht_new-ht_old)*f);
-    }
-    
-    int getMinH(){
-        return Math.min(ht_old, ht_new);
+        heightProperty.setValue(ht_smallest);
     }
 
     private void overlayInit(){
@@ -873,10 +645,9 @@ final class LinkPanel extends javax.swing.JPanel {
         hiddenStatsPane.addMouseListener(ma);
         ma.mouseExited(null);
     }
-    
-    
+
     private void updateFileSizeString(){
-        double sz = singleFileLinkUI.getVirtualFile().getConnectionFile().getFileSize();
+        double sz = vf.getConnectionFile().getFileSize();
         String suffix;
         if(sz < 1000){
             suffix = " B";
@@ -900,53 +671,6 @@ final class LinkPanel extends javax.swing.JPanel {
         }
         fileSizeLabel.setText(sz+ " "+suffix);
     }
-
-
-    
-    private static class TranslucentJPanel extends JPanel {
-
-        @Override
-        public void paintComponent(Graphics g) {
-            ((Graphics2D) g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.0f)); // draw transparent background
-            super.paintComponent(g);
-            ((Graphics2D) g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f)); // turn on opacity
-            //g.setColor(new Color(255,0,0,100));
-            g.setColor(Colors.OVERLAY);
-            g.fillRect(0,0,getWidth(),getHeight());
-            //super.paintComponent(g);
-        }
-
-    }
-    
-    private class UIA implements UIAccess {
-        @Override public JPanel actualContentsPanel(){ return actualContentsPanel; }
-        @Override public JToggleButton changeDownloadModeButton(){ return changeDownloadModeButton; }
-        @Override public JButton delete(){ return delete; }
-        @Override public JLabel fileNameLabel(){ return fileNameLabel; }
-        @Override public JPanel fileNamePane(){ return fileNamePane; }
-        @Override public JLabel fileSizeLabel(){ return fileSizeLabel; }
-        @Override public JPanel graphPanel(){ return graphPanel; }
-        @Override public JPanel hiddenStatsPane(){ return hiddenStatsPane; }
-        @Override public JButton killConnectionButton(){ return killConnectionButton; }
-        @Override public JLayeredPane layeredPane(){ return layeredPane; }
-        @Override public JButton linkEditButton(){ return linkEditButton; }
-        @Override public JButton nextConnectionButton(){ return nextConnectionButton; }
-        @Override public JPanel overlay(){ return overlay; }
-        @Override public JButton previousConnectionButton(){ return previousConnectionButton; }
-        @Override public JPanel progressBarPanel(){ return progressBarPanel; }
-        @Override public JLabel progressPercetLabel(){ return progressPercetLabel; }
-        @Override public JButton reEnableButton(){ return reEnableButton; }
-        @Override public RightControlsPanel rightControlsPanel(){ return rightControlsPanel; }
-        @Override public JLabel selectedConnectionLabel(){ return selectedConnectionLabel; }
-        @Override public JPanel sizeAndProgressPane(){ return sizeAndProgressPane; }
-        @Override public JPanel vlcPane(){ return vlcPane; }
-        @Override public TextBubbleBorder border() {return border; }
-        
-        //@Override public void setExpansionState(ExpansionState es){ LinkPanel.this.setExpansionState(es); }
-        
-        @Override public void repaintUI(){repaint(); } 
-    }
-    
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel actualContentsPanel;
@@ -956,20 +680,58 @@ final class LinkPanel extends javax.swing.JPanel {
     private javax.swing.JLabel fileNameLabel;
     private javax.swing.JPanel fileNamePane;
     private javax.swing.JLabel fileSizeLabel;
-    javax.swing.JPanel graphPanel;
+    private javax.swing.JPanel graphPanel;
     private javax.swing.JPanel hiddenStatsPane;
-    javax.swing.JButton killConnectionButton;
+    private javax.swing.JButton killConnectionButton;
     private javax.swing.JLayeredPane layeredPane;
     private javax.swing.JButton linkEditButton;
     private javax.swing.JButton nextConnectionButton;
-    javax.swing.JPanel overlay;
+    private javax.swing.JPanel overlay;
     private javax.swing.JButton previousConnectionButton;
-    javax.swing.JPanel progressBarPanel;
-    javax.swing.JLabel progressPercetLabel;
+    private javax.swing.JPanel progressBarPanel;
+    private javax.swing.JLabel progressPercetLabel;
     private javax.swing.JButton reEnableButton;
     private javax.swing.JPanel rightCtrlPane;
-    javax.swing.JLabel selectedConnectionLabel;
-    javax.swing.JPanel sizeAndProgressPane;
+    private javax.swing.JLabel selectedConnectionLabel;
+    private javax.swing.JPanel sizeAndProgressPane;
     private javax.swing.JPanel vlcPane;
     // End of variables declaration//GEN-END:variables
+
+    private final ProgressUIA progressUIA = new ProgressUIA() {
+        @Override public JButton saveButton() { return rightControlsPanel.getSaveBtn(); }
+        @Override public ExpansionState getExpansionState() {return expandAction.getExpansionState(); }
+        @Override public JLabel progressPercetLabel() { return progressPercetLabel;}
+        @Override public JButton killConnectionButton() { return killConnectionButton;}
+        @Override public JPanel progressBarPanel() { return progressBarPanel;} };
+    
+    private final GraphUIA graphUIA = new GraphUIA() {
+        @Override public JPanel graphPanel() {return graphPanel;}
+        @Override public ExpansionState getExpansionState() {return expandAction.getExpansionState();}  };
+    
+    final LowerControlsUIA lowerControlsUIA = new LowerControlsUIA(){
+        @Override public Progress progress() { return progress; } };
+
+    final ChangeDownloadModeUIA changeDownloadModeUIA = new ChangeDownloadModeUIA() {
+        @Override public JToggleButton changeDownloadModeButton() { return changeDownloadModeButton; }
+        @Override public void repaintProgressBar() {progress.repaint();} };
+    
+    final CloseActionUIA closeActionUIA = new CloseActionUIA() {
+        @Override public JPanel overlay() { return overlay; }
+        @Override public TextBubbleBorder border() { return border; }
+        @Override public JPanel rightControlsPanel() { return rightCtrlPane; }
+        @Override public JLabel fileNameLabel() { return fileNameLabel; }
+        @Override public JButton openButton() { return fileIconPanel.getOpenButton(); }
+        @Override public void contract() { expandAction.setExpansionState(ExpansionState.Contracted); }
+        @Override public void repaint() { LinkPanel.this.repaint(); } };
+    
+    final ExpandActionUIA expandActionUIA = new ExpandActionUIA() {
+        @Override public JPanel connectionControlPane() { return connectionControlPane; }
+        @Override public JPanel graphPanel() { return graphPanel; }
+        @Override public JPanel sizeAndProgressPane() { return sizeAndProgressPane; }
+        @Override public JPanel hiddenStatsPane() { return hiddenStatsPane; }
+        @Override public void initGraph(boolean findFirst) { graph.initGraph(null, findFirst); }
+        @Override public short ht_smallest() { return ht_smallest; }
+        @Override public short ht_medium() { return ht_medium; }
+        @Override public short ht_tallest() { return ht_tallest; }
+        @Override public HeightProperty getHeight() { return heightProperty; } };
 }

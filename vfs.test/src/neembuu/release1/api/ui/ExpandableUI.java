@@ -4,14 +4,15 @@
  * and open the template in the editor.
  */
 
-package neembuu.release1.api;
+package neembuu.release1.api.ui;
 
-import java.util.List;
+import javax.swing.JComponent;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface Package {
-    List<VirtualFile> getVirtualFiles();
+public interface ExpandableUI {
+    JComponent getJComponent();
+    HeightProperty heightProperty();
 }

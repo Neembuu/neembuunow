@@ -16,29 +16,31 @@ import javax.swing.JPanel;
  *
  * @author Shashank Tulsyan
  */
-public class FileIconPanel {
+final class FileIconPanel {
     
-    
-    JPanel getFileIconPanelWithButton(ActionListener openVirtualFile) {
-        JPanel panel = new JPanel();
+    FileIconPanel(){
         final TintedGreyScaledImage image = TintedGreyScaledImage.make("/neembuu/release1/ui/images/vlc.png",false);
-        makeOpenButton(panel,image.getTintedImage(Colors.TINTED_IMAGE ), image.getBaseImage(), openVirtualFile);
-        return panel;
-    }
-    
-    HiddenBorderButton openButton = null;
-    
-    void makeOpenButton(JPanel panel, Icon bw, Icon clr, ActionListener openVirtualFile){
-        if(openButton!=null){
-            panel.remove(openButton);
-        }
+        
+        Icon bw = image.getTintedImage(Colors.TINTED_IMAGE );
+        Icon clr = image.getBaseImage();
+        
         openButton = HiddenBorderButton.make(bw,clr,false);
         openButton.setBounds(0, 0, 32, 32);
         openButton.setToolTipText("Click to Open/Watch");
-        panel.add(openButton);
-        if(openVirtualFile==null){
-            throw new NullPointerException();
-        }
-        openButton.addActionListener(openVirtualFile);        
+        jPanel.add(openButton);
+        
     }
+    
+    private HiddenBorderButton openButton = null;
+    
+    private final JPanel jPanel = new JPanel();
+
+    public HiddenBorderButton getOpenButton() {
+        return openButton;
+    }
+
+    public JPanel getJPanel() {
+        return jPanel;
+    }
+
 }

@@ -25,13 +25,13 @@ import jpfm.FileAttributesProvider;
 import jpfm.FileType;
 import neembuu.release1.Main;
 import neembuu.release1.MountManager;
-import neembuu.release1.api.LinkGroupProcessor;
+import neembuu.release1.api.PackageProcessor;
 import neembuu.release1.api.VirtualFile;
 /**
  * 
  * @author Shashank Tulsyan
  */
-public class SimplyOpenTheVideoFile implements LinkGroupProcessor {
+public class SimplyOpenTheVideoFile implements PackageProcessor {
 
     private static String[] knownExtension = { "avi", "mpg", "mpeg", "webm", "mp4", "mp3", "rmvb", "mkv", "flv", "wma", "wmv", "ogg", "ogm", "flac" };
 

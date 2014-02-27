@@ -36,9 +36,9 @@ public final class Main {
     
     public Main() {
         this.nui = new NeembuuUI();
-        troubleHandler = new UnprofessionalTroubleHandler(nui);
+        troubleHandler = new UnprofessionalTroubleHandler(nui.getMainComponent(),nui.getIndefiniteTaskUI());
 
-        mountManager = new MountManager();
+        mountManager = new MountManager(nui.getMainComponent(),nui.getIndefiniteTaskUI(),nui.getMainUIA());
         
         String basePath = null;
         try{
@@ -59,7 +59,7 @@ public final class Main {
     
     private void initialize(){
         nui.initialize(this);
-        mountManager.initialize(this);
+        mountManager.initialize();
         
         LinkHandlerProviders.registerProvider(new YoutubeLinkHandlerProvider());
         
@@ -93,7 +93,7 @@ public final class Main {
         return neembuu.util.logging.LoggerUtil.getLogger();
     }
     
-    static Main get() {
+    private static Main get() {
         return InstHolder.m;
     }
     

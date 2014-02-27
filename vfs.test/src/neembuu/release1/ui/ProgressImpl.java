@@ -23,6 +23,9 @@ import neembuu.rangearray.UnsyncRangeArrayCopy;
 import neembuu.release1.Main;
 import neembuu.release1.api.VirtualFile;
 import neembuu.release1.api.ui.ExpansionState;
+import neembuu.release1.api.ui.Graph;
+import neembuu.release1.api.ui.Progress;
+import neembuu.release1.api.ui.access.ProgressUIA;
 import neembuu.swing.RangeArrayComponent;
 import neembuu.swing.RangeArrayComponentBuilder;
 import neembuu.swing.RangeArrayElementColorProvider;
@@ -35,25 +38,28 @@ import neembuu.vfs.readmanager.RegionHandler;
  *
  * @author Shashank Tulsyan
  */
-public class Progress {
+public class ProgressImpl implements Progress {
+    private VirtualFile vf;
+    private final ProgressUIA ui;
+    private final Graph graph;
     
     private RangeArrayComponent progress;
-    private VirtualFile vf;
     private RangeArray<Boolean> overallProgress;
-    
-    private LinkPanel lp;
-    private long total_Downloaded = 0;
-    
     private UnsyncRangeArrayCopy regionHandlersUnsync;
     private UnsyncRangeArrayCopy overallProgressUnsync;
     private UIRangeArrayAccess downloadedRegionHandlers ;        
     private volatile long latestRequestStarting,latestRequestEnding;
     
     private Range selectedRange = null;
+    private long total_Downloaded = 0;
+
+    public ProgressImpl(ProgressUIA ui, Graph graph) {
+        this.ui = ui;
+        this.graph = graph;
+    }
     
-    void init(LinkPanel lp,final VirtualFile vf){
+    void init(final VirtualFile vf){
         this.vf = vf;
-        this.lp = lp;
         overallProgress = RangeArrayFactory.newDefaultRangeArray(new RangeArrayParams.Builder()
                                 //.setDoesCarryProperty()
                                 .addDissolvabilityRule(DissolvabilityRule.COMPARE_PROPERTY_OBJECT)
@@ -64,7 +70,7 @@ public class Progress {
                 .setToolTipTextProvider(new RangeArrayElementToolTipTextProvider() {
                         @Override
                         public String getToolTipText(Range element, long absolutePosition, long largestEntry, RangeArrayElementColorProvider.SelectionState selectionState) {
-                            return Progress.this.getToolTipText(element, absolutePosition, largestEntry, selectionState);
+                            return ProgressImpl.this.getToolTipText(element, absolutePosition, largestEntry, selectionState);
                         }
                     })
                 .setArrayElementColorProvider(new RangeArrayElementColorProvider() {
@@ -100,10 +106,10 @@ public class Progress {
         progress.addRangeSelectedListener(new RangeSelectedListener() {
             @Override
             public void rangeSelected(Range arrayElement) {
-                Progress.this.rangeSelected(arrayElement);
+                ProgressImpl.this.rangeSelected(arrayElement);
             }
         });
-        javax.swing.GroupLayout layout = (javax.swing.GroupLayout)lp.progressBarPanel.getLayout();
+        javax.swing.GroupLayout layout = (javax.swing.GroupLayout)ui.progressBarPanel().getLayout();
 
         int right, left;
         int top, bottom; right = left = top = bottom = 0;
@@ -132,17 +138,17 @@ public class Progress {
             }
         });
         
-        final WeakReference<LinkPanel> lpWeakReference = new WeakReference<LinkPanel>(lp);
+        final WeakReference<ProgressUIA> lpWeakReference = new WeakReference<ProgressUIA>(ui);
         
         Timer t = new Timer(300, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                LinkPanel lp = lpWeakReference.get();
+                ProgressUIA lp = lpWeakReference.get();
                 if(lp==null){
                     Main.getLOGGER().info("LinkPanel for "+this+ " was garbage collected");
                     ((Timer)e.getSource()).stop();
                 }
-                if(lp.expandAction.getExpansionState()==ExpansionState.Contracted){
+                if(ui.getExpansionState()==ExpansionState.Contracted){
                     // no point in painting
                     return;
                 }
@@ -158,6 +164,7 @@ public class Progress {
     }
     
     
+    @Override
     public void repaint(){
         progress.repaint();
     }
@@ -196,42 +203,43 @@ public class Progress {
         total_Downloaded = newTotal;
         long left = vf.getConnectionFile().getFileSize() - total_Downloaded;
         if(left == 0){
-            lp.rightControlsPanel.getSaveBtn().setVisible(true);
+            ui.saveButton().setVisible(true);
         }else if(total_Downloaded > vf.getConnectionFile().getFileSize()){
             throw new RuntimeException("Total download size of file greater than filesize");
         } 
         
-        if(lp.sizeAndProgressPane.isVisible()){
+        if(ui.getExpansionState() == ExpansionState.SemiExpanded ||  ui.getExpansionState() == ExpansionState.FullyExpanded){
             double perPro = total_Downloaded*100.0/vf.getConnectionFile().getFileSize();
-            lp.progressPercetLabel.setText(Math.round(perPro) + " %");
+            ui.progressPercetLabel().setText(Math.round(perPro) + " %");
             
         }
     }
     
     private void rangeSelected(Range arrayElement){
         this.selectedRange = arrayElement;
-        lp.graph.initGraph(arrayElement);
+        graph.initGraph(arrayElement,false);
         if(arrayElement!=null){
-            lp.killConnectionButton.setEnabled(true);
-            lp.selectedConnectionLabel.setText(">"+arrayElement.starting());
+            ui.killConnectionButton().setEnabled(true);
         }else {
-            lp.killConnectionButton.setEnabled(false);
+            ui.killConnectionButton().setEnabled(false);
         }
     }
     
+    @Override
     public void switchToRegion(Range arrayElement){
         if(arrayElement==null){
-            lp.selectedConnectionLabel.setText("No connection selected");
             return;
         }
         progress.selectRange(arrayElement);// this sends call to rangeSelected(Range arrayElemt)
     }
     
 
+    @Override
     public Range getSelectedRange() {
         return selectedRange;
     }
     
+    @Override
     public String getSelectedRangeTooltip(){
         String toRet = null;
         try{
@@ -249,7 +257,7 @@ public class Progress {
         }
         String region_start_end = element.starting()+","+
                 c(Colors.PROGRESS_BAR_FILL_ACTIVE)+element.ending()+c_();
-        if(lp.expandAction.getExpansionState()!=ExpansionState.FullyExpanded){
+        if(ui.getExpansionState()!=ExpansionState.FullyExpanded){
             return "<html>"+region_start_end+totalSpeeds+"</html>";
         }
         

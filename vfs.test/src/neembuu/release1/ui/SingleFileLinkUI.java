@@ -7,36 +7,60 @@
 package neembuu.release1.ui;
 
 import javax.swing.JComponent;
-import neembuu.release1.MountManager;
-import neembuu.release1.api.ui.LinkUI;
-import neembuu.release1.api.ui.LinkUIContainer;
+import neembuu.release1.api.RealFileProvider;
+import neembuu.release1.api.ui.VirtualFileUI;
+import neembuu.release1.api.ui.ExpandableUIContainer;
 import neembuu.release1.api.VirtualFile;
+import neembuu.release1.api.ui.HeightProperty;
+import neembuu.release1.api.ui.MainComponent;
+import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
+import neembuu.release1.api.ui.access.RemoveFromUI;
+import neembuu.release1.api.ui.actions.ChangeDownloadModeAction;
+import neembuu.release1.api.ui.actions.ConnectionActions;
+import neembuu.release1.api.ui.actions.ExpandAction;
+
+import neembuu.release1.ui.actions.ConnectionActionsImpl;
+import neembuu.release1.ui.actions.ChangeDownloadModeActionImpl;
+import neembuu.release1.ui.actions.ExpandActionImpl;
+import neembuu.release1.ui.actions.LinkActionsImpl;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public final class SingleFileLinkUI implements LinkUI{
+public final class SingleFileLinkUI implements VirtualFileUI{
     
     private final LinkPanel lp;
     
-    private LinkUIContainer luic;
-    
     private VirtualFile virtualFile;
-    
-    private final NeembuuUI neembuuUI;
-    private final MountManager mountManager;
-    
-    private JComponent contraint;
 
+    private JComponent contraint;
     
-    public SingleFileLinkUI(NeembuuUI neembuuUI, MountManager mountManager) {
-        ///LinkActions la = new LinkActionsImpl();
+    
+    public SingleFileLinkUI(
+            final ExpandableUIContainer luic1, 
+            final MainComponent mainComponent,
+            RealFileProvider realFileProvider,
+            AddRemoveFromFileSystem addRemoveFromFileSystem) {
+        lp = new LinkPanel();
+
         
-        lp = new LinkPanel(this);
-        this.neembuuUI = neembuuUI;
-        this.mountManager = mountManager;
+        ConnectionActions connectionActions = new ConnectionActionsImpl(lp.lowerControlsUIA);
+        ChangeDownloadModeAction changeDownloadModeAction = new ChangeDownloadModeActionImpl(lp.changeDownloadModeUIA);
+
+        final RemoveFromUI removeFromUI = new RemoveFromUI() {
+            @Override public void remove() { 
+                luic1.removeUI(SingleFileLinkUI.this); } };
         
+        LinkActionsImpl linkActionsImpl = new LinkActionsImpl(
+                lp.closeActionUIA, removeFromUI, realFileProvider, 
+                mainComponent, virtualFile, addRemoveFromFileSystem);
+        
+        ExpandAction expandAction = new ExpandActionImpl(lp.expandActionUIA);
+        
+        lp.initActions(expandAction, linkActionsImpl.getOpen(), linkActionsImpl.getClose(), 
+                linkActionsImpl.getDelete(), linkActionsImpl.getReAdd(), 
+                linkActionsImpl.getSave(), connectionActions, changeDownloadModeAction);
     }
     
     
@@ -45,17 +69,9 @@ public final class SingleFileLinkUI implements LinkUI{
         lp.setFile();
     }
 
-    
-    //public void deactivateOpenButton(boolean deactivate) {
-        //lp.fileIconPanel.openButton.setEnabled(!deactivate);
-        //lp.fileIconPanel.openButton.setClickable(!deactivate);
-      //  lp.fileIconPanel.openButton.setVisible(!deactivate);
-    //}
-
     @Override
     public VirtualFile getVirtualFile() {
         return virtualFile;
-        //return lp.vf;
     }
 
     @Override
@@ -74,40 +90,8 @@ public final class SingleFileLinkUI implements LinkUI{
     }
 
     @Override
-    public void initLinkUIContainer(LinkUIContainer luic) {
-        if(this.virtualFile == null){
-            throw new IllegalStateException("First call init() on SimpleFileLinkUI");
-        }
-        this.luic = luic;
-    }
-
-    @Override
-    public void uninitLinkUIContainer(LinkUIContainer luic) {
-        if(this.luic == luic){
-            this.luic = null;
-        }
-    }
-
-    @Override
-    public int getH(double f) {
-        return lp.getH(f);
-    }
-
-    @Override
-    public int getMinH() {
-        return lp.getMinH();
-    }
-    
-    public final LinkUIContainer getLinkUIContainer(){
-        return luic;
-    }
-
-    public final NeembuuUI getNeembuuUI() {
-        return neembuuUI;
-    }
-
-    public final MountManager getMountManager() {
-        return mountManager;
+    public HeightProperty heightProperty() {
+        return lp.heightProperty;
     }
     
 }

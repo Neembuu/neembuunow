@@ -4,16 +4,12 @@
  * and open the template in the editor.
  */
 
-package neembuu.release1.api.ui;
+package neembuu.release1.api;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface LinkUIContainer {
-    void removeLinkUI(LinkUI uI);
-    
-    void animateShrinkActionPerformed(LinkUI source);
-    
-    boolean contains(LinkUI uI);
+public interface PackageCreator {
+    LinkPackage create(VirtualFilesParams vfp)throws Exception;
 }

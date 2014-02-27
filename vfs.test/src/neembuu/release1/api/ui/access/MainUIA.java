@@ -4,14 +4,14 @@
  * and open the template in the editor.
  */
 
-package neembuu.release1.api;
+package neembuu.release1.api.ui.access;
 
-import java.util.List;
+import javax.swing.JButton;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface VirtualFilesProvider {
-    List<VirtualFile> create(VirtualFilesParams vfp)throws Exception;
+public interface MainUIA {
+    JButton neembuuVirtualFolderButton();
 }

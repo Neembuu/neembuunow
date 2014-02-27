@@ -6,28 +6,22 @@
 
 package neembuu.release1.ui;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.Painter;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.plaf.nimbus.ScrollBarThumbPainter_Modified;
 import neembuu.release1.Main;
 import neembuu.release1.api.IndefiniteTask;
+import neembuu.release1.api.ui.IndefiniteTaskUI;
+import neembuu.release1.api.ui.MainComponent;
+import neembuu.release1.api.ui.access.MainUIA;
 import neembuu.release1.newlink.AddLinkAction;
 
 /**
@@ -42,6 +36,17 @@ public final class NeembuuUI {
     
     private Main main;
     private final LinkedList<IndefiniteTask> indefiniteTasks = new LinkedList<IndefiniteTask>();
+    
+    private final MainComponent mainComponent = new MainComponent() {
+        @Override public JFrame getJFrame() { return jf; }};
+    
+    private final IndefiniteTaskUI indefiniteTaskUI = new IndefiniteTaskUI() {
+        @Override public IndefiniteTask showIndefiniteProgress(String message) {
+            return NeembuuUI.this.showIndefiniteProgress(message); }};
+    
+    private final MainUIA mainUIA = new MainUIA() {
+        @Override public JButton neembuuVirtualFolderButton() {
+            return mp.neembuuVirtualFolderButton; }};
     
     public NeembuuUI() {
         this.jf = makeJFrame();
@@ -62,11 +67,19 @@ public final class NeembuuUI {
         return lc;
     }
 
-    public JFrame getFrame() {
-        return jf;
+    public MainUIA getMainUIA() {
+        return mainUIA;
     }
     
-    public IndefiniteTask showIndefiniteProgress(String message){
+    public MainComponent getMainComponent(){
+        return mainComponent;
+    }
+
+    public IndefiniteTaskUI getIndefiniteTaskUI() {
+        return indefiniteTaskUI;
+    }
+    
+    private IndefiniteTask showIndefiniteProgress(String message){
         IndefTask it = new IndefTask(message);
         indefiniteTasks.add(it);
         updateIndefTasks();
@@ -86,7 +99,7 @@ public final class NeembuuUI {
     }
     
     void addLinks(boolean open) {
-        mp.addLinksPanelEnable(false);// no chance of race condition
+        mp.getAddLinkUI().addLinksPanelEnable(false);// no chance of race condition
         ala.open(open);
         new Thread(ala,"Add links thread").start();
     }
@@ -140,25 +153,6 @@ public final class NeembuuUI {
         }
 
     }
-    
-    public void successfullyMounted(){
-        mp.neembuuVirtualFolderButton.setEnabled(true);
-        
-        mp.neembuuVirtualFolderButton.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try{
-                    File f = main.getMountManager().getMount().getMountLocation().getAsFile();
-                    java.awt.Desktop.getDesktop().open(f);
-                }catch(Exception a){
-                    JOptionPane.showMessageDialog(null,a.getMessage(),"Could not open NeembuuFolder",JOptionPane.ERROR_MESSAGE);
-                    Main.getLOGGER().log(Level.SEVERE,"Could not open NeembuuFolder",a);
-                }
-            }
-        });
-    }
-    
     
     private final class IndefTask implements IndefiniteTask{
         private final String message;
