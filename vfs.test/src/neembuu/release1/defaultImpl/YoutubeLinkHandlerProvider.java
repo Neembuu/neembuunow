@@ -13,8 +13,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import neembuu.release1.StringUtils;
 import neembuu.release1.api.File;
-import neembuu.release1.api.LinkHandler;
-import neembuu.release1.api.LinkHandlerProvider;
+import neembuu.release1.api.linkhandler.LinkHandler;
+import neembuu.release1.api.linkhandler.LinkHandlerProvider;
+import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.httpclient.NHttpClient;
 import neembuu.release1.log.LoggerUtil;
 import neembuu.release1.httpclient.utils.NHttpClientUtils;
@@ -106,11 +107,34 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
      * @return 
      */
     @Override
-    public boolean canHandle(String url) {
-        boolean result = url.matches("https?://(www.youtube.com/watch\\?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=]*)?");
-        LOGGER.log(Level.INFO,"Youtube can handle this? ", result);
-        
-        return result;
+    public TrialLinkHandler tryHandling(final String url) {
+        return /*result*/ new TrialLinkHandler() {
+            @Override
+            public boolean canHandle() {
+                boolean result = url.matches("https?://(www.youtube.com/watch\\?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=]*)?");
+                LOGGER.log(Level.INFO,"Youtube can handle this? ", result);
+            }
+
+            @Override
+            public String getErrorMessage() {
+                return canHandle()?null:"Cannot handle";
+            }
+
+            @Override
+            public boolean containsMultipleLinks() {
+                return true;
+            }
+
+            @Override
+            public String tempDisplayName() {
+                return url;
+            }
+
+            @Override
+            public String getReferenceLinkString() {
+                return url;
+            }
+        };
     }
 
     @Override
