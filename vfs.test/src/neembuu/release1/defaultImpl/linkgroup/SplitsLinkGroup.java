@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import neembuu.release1.api.TrialLinkHandler;
+import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.linkgroup.LinkGroup;
 
 /**

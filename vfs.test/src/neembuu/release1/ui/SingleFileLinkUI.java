@@ -8,9 +8,11 @@ package neembuu.release1.ui;
 
 import javax.swing.JComponent;
 import neembuu.release1.api.RealFileProvider;
+import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.ui.VirtualFileUI;
 import neembuu.release1.api.ui.ExpandableUIContainer;
 import neembuu.release1.api.VirtualFile;
+import neembuu.release1.api.linkgroup.LinkGroup;
 import neembuu.release1.api.ui.HeightProperty;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
@@ -32,16 +34,18 @@ public final class SingleFileLinkUI implements VirtualFileUI{
     
     private final LinkPanel lp;
     
-    private VirtualFile virtualFile;
+    //private VirtualFile virtualFile;
 
     private JComponent contraint;
     
+    private TrialLinkHandler trialLinkHandler;
     
     public SingleFileLinkUI(
             final ExpandableUIContainer luic1, 
             final MainComponent mainComponent,
             RealFileProvider realFileProvider,
-            AddRemoveFromFileSystem addRemoveFromFileSystem) {
+            AddRemoveFromFileSystem addRemoveFromFileSystem,
+            TrialLinkHandler trialLinkHandler) {
         lp = new LinkPanel();
 
         
@@ -54,13 +58,16 @@ public final class SingleFileLinkUI implements VirtualFileUI{
         
         LinkActionsImpl linkActionsImpl = new LinkActionsImpl(
                 lp.closeActionUIA, removeFromUI, realFileProvider, 
-                mainComponent, virtualFile, addRemoveFromFileSystem);
+                mainComponent, addRemoveFromFileSystem, trialLinkHandler);
         
         ExpandAction expandAction = new ExpandActionImpl(lp.expandActionUIA);
         
         lp.initActions(expandAction, linkActionsImpl.getOpen(), linkActionsImpl.getClose(), 
                 linkActionsImpl.getDelete(), linkActionsImpl.getReAdd(), 
                 linkActionsImpl.getSave(), connectionActions, changeDownloadModeAction);
+        
+        lp.closeActionUIA.fileNameLabel().setText(trialLinkHandler.tempDisplayName());
+        
     }
     
     

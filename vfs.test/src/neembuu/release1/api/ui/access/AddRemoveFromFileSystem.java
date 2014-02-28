@@ -6,6 +6,7 @@
 
 package neembuu.release1.api.ui.access;
 
+import neembuu.release1.api.File;
 import neembuu.release1.api.VirtualFile;
 
 /**
@@ -15,4 +16,6 @@ import neembuu.release1.api.VirtualFile;
 public interface AddRemoveFromFileSystem {
     void remove(VirtualFile vf);
     void add(VirtualFile vf);
+    
+    VirtualFile create(File f);
 }

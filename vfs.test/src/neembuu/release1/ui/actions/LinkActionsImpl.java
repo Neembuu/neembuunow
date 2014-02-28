@@ -8,12 +8,14 @@ package neembuu.release1.ui.actions;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import neembuu.release1.Main;
+import neembuu.release1.api.File;
+import neembuu.release1.api.linkhandler.LinkHandler;
+import neembuu.release1.api.linkhandler.LinkHandlerProviders;
 import neembuu.release1.api.RealFileProvider;
+import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.VirtualFile;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
@@ -35,8 +37,10 @@ public class LinkActionsImpl {
     private final RemoveFromUI removeFromUI;
     private final RealFileProvider realFileProvider;
     private final MainComponent mainComponent;
-    private final VirtualFile vf;
+    private final TrialLinkHandler trialLinkHandler;
+    //private final VirtualFile vf;
     private final AddRemoveFromFileSystem addRemoveFromFileSystem;
+
 
     private final DeleteAction delete = new DeleteAction() {@Override public void actionPerformed(ActionEvent e) {
                 delete();
@@ -54,13 +58,13 @@ public class LinkActionsImpl {
                 closeAction(false);
         }};;
 
-    public LinkActionsImpl(CloseActionUIA ui, RemoveFromUI removeFromUI, RealFileProvider realFileProvider, MainComponent mainComponent, VirtualFile vf, AddRemoveFromFileSystem addRemoveFromFileSystem) {
+    public LinkActionsImpl(CloseActionUIA ui, RemoveFromUI removeFromUI, RealFileProvider realFileProvider, MainComponent mainComponent,AddRemoveFromFileSystem addRemoveFromFileSystem, TrialLinkHandler trialLinkHandler) {
         this.ui = ui;
         this.removeFromUI = removeFromUI;
         this.realFileProvider = realFileProvider;
         this.mainComponent = mainComponent;
-        this.vf = vf;
         this.addRemoveFromFileSystem = addRemoveFromFileSystem;
+        this.trialLinkHandler = trialLinkHandler;
     }
     
     public DeleteAction getDelete() {
@@ -107,7 +111,8 @@ public class LinkActionsImpl {
             ui.contract();
             ui.openButton().setVisible(false);
             closeActionProcess();
-        }else {
+        }else /*open*/{
+            createNew();
             ui.border().setColor(Colors.BORDER);
             ui.repaint();
             ui.fileNameLabel().setForeground(Color.BLACK);
@@ -179,7 +184,24 @@ public class LinkActionsImpl {
     }
     
     
-    private void create(){
+    private void createNew(){
+        LinkHandler linkHandler = 
+            LinkHandlerProviders.getHandler(trialLinkHandler.getReferenceLinkString());
+        if(linkHandler==null){
+            JOptionPane.showMessageDialog(mainComponent.getJFrame(), 
+                    "It seems this website is not\n"
+                    + "supported anymore by Neembuu now.", 
+                    "Could not handle this link", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         
+        if(linkHandler.getFiles().size() > 1) {
+            Main.getLOGGER().info("LinkHandler "+linkHandler+" has more than one file when"
+                    + " it was expected to have only one. Using only first file.");
+        }
+        
+        File f = linkHandler.getFiles().get(0);
+        
+        VirtualFile vf 
     }
 }

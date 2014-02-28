@@ -15,7 +15,7 @@ import jpfm.fs.FSUtils;
 import neembuu.diskmanager.DiskManager;
 import neembuu.diskmanager.DiskManagerParams;
 import neembuu.diskmanager.DiskManagers;
-import neembuu.release1.api.LinkHandlerProviders;
+import neembuu.release1.api.linkhandler.LinkHandlerProviders;
 import neembuu.release1.defaultImpl.YoutubeLinkHandlerProvider;
 import neembuu.release1.defaultImpl.DirectLinkHandlerProvider;
 import neembuu.release1.ui.InitLookAndFeel;

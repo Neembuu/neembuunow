@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package neembuu.release1.api;
+package neembuu.release1.api.linkhandler;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -65,6 +65,29 @@ public final class LinkHandlerProviders {
         }
     }
     
+    
+    public static LinkHandler getHandler(String url){
+//        printProviders();
+        TrialLinkHandler trialLinkHandler;
+        synchronized (providers){
+            for(LinkHandlerProvider fnasp : providers){
+                trialLinkHandler = fnasp.tryHandling(url);
+                if(trialLinkHandler.canHandle()){
+                    System.out.println(fnasp.getClass().getSimpleName() + " is handling " + url);
+                    LOGGER.log(Level.INFO, "{0} is handling {1}", new Object[]{fnasp.getClass().getSimpleName(), url});
+                    return fnasp.getLinkHandler(url);
+                }
+            }
+            
+            //Check if the default provider can handle this link
+            trialLinkHandler = defaultLinkProvider.tryHandling(url);
+            if(trialLinkHandler.canHandle()){
+                return defaultLinkProvider.getLinkHandler(url);
+            }
+            
+            return null;
+        }
+    }
     /**
      * To check the order.
      */

@@ -9,7 +9,7 @@ package neembuu.release1.api.linkgroup;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
-import neembuu.release1.api.TrialLinkHandler;
+import neembuu.release1.api.linkhandler.TrialLinkHandler;
 
 /**
  *

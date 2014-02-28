@@ -6,7 +6,7 @@
 
 package neembuu.release1.newlink;
 
-import neembuu.release1.api.LinkHandler;
+import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.ReferenceLink;
 
 /**

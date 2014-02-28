@@ -4,12 +4,14 @@
  * and open the template in the editor.
  */
 
-package neembuu.release1.api;
+package neembuu.release1.api.linkhandler;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface PackageCreator {
-    LinkPackage create(VirtualFilesParams vfp)throws Exception;
+public interface LinkHandlerProvider {
+    TrialLinkHandler tryHandling(String url);
+    
+    LinkHandler getLinkHandler(String url);
 }

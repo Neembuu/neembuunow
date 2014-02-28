@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import neembuu.release1.api.linkgroup.LinkGroup;
-import neembuu.release1.api.TrialLinkHandler;
+import neembuu.release1.api.linkhandler.TrialLinkHandler;
 
 /**
  *

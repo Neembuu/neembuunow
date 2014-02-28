@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.logging.Level;
 import javax.swing.JOptionPane;
+import jpfm.DirectoryStream;
 import jpfm.FileAttributesProvider;
 import jpfm.FormatterEvent;
 import jpfm.JPfm;
@@ -27,6 +28,7 @@ import neembuu.config.GlobalTestSettings;
 import neembuu.release1.api.IndefiniteTask;
 import neembuu.release1.api.RealFileProvider;
 import neembuu.release1.api.VirtualFile;
+import neembuu.release1.api.VirtualFilesParams;
 import neembuu.release1.api.ui.IndefiniteTaskUI;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
@@ -34,7 +36,6 @@ import neembuu.release1.api.ui.access.MainUIA;
 import neembuu.release1.pismo.InstallerCallbackListener;
 import neembuu.release1.pismo.PismoInstaller;
 import neembuu.release1.ui.InstallPermissionAndProgress;
-import neembuu.release1.ui.NeembuuUI;
 
 /**
  *
@@ -61,12 +62,13 @@ public class MountManager {
         return mount;
     }
     
-    public String getSuitableFileName(String filename){
+    public String getSuitableFileName(String filename, DirectoryStream parent){
         if(filename.length()>50){
-            filename = filename.substring(0,50);
+            filename = filename.substring(0,50)
+                    + /*extension*/ filename.substring(filename.length()-4);
         }
         filename = UniversallyValidFileName.makeUniversallyValidFileName(filename);
-        filename = checkConflict(filename);
+        filename = checkConflict(filename,parent);
         return filename;
     }
 
@@ -78,11 +80,11 @@ public class MountManager {
         return volume;
     }
     
-    private String checkConflict(String filename){
-        for(FileAttributesProvider fap : volume){
+    private String checkConflict(String filename,DirectoryStream parent){
+        for(FileAttributesProvider fap : parent){
             if(fap.getName().equalsIgnoreCase(filename)){
                 filename="2_"+filename;
-                return checkConflict(filename);
+                return checkConflict(filename,parent);
             }
         }
         return filename;
@@ -222,16 +224,40 @@ public class MountManager {
                         vf.getConnectionFile().getName());      } }; 
 
     private final AddRemoveFromFileSystem addRemoveFromFileSystem = new AddRemoveFromFileSystem() {
-            @Override public void remove(VirtualFile v) {
-                volume.remove(v.getConnectionFile());
-                v.getConnectionFile().setParent(null);  
-            }
-            @Override  public void add(VirtualFile v) { 
-                volume.add(v.getConnectionFile());
-                v.getConnectionFile().setParent(volume); 
-            } }; 
+        @Override public VirtualFile create(neembuu.release1.api.File f){
+            return createImpl(f);
+        }
+        @Override public void remove(VirtualFile v) {
+            volume.remove(v.getConnectionFile());
+            v.getConnectionFile().setParent(null);  
+        }
+        @Override  public void add(VirtualFile v) { 
+            volume.add(v.getConnectionFile());
+            v.getConnectionFile().setParent(volume); 
+        } }; 
     
     public final RealFileProvider getRealFileProvider() {  return realFileProvider; }
     public final AddRemoveFromFileSystem getAddRemoveFromFileSystem() { return addRemoveFromFileSystem; }
 
+    
+    private VirtualFile createImpl(neembuu.release1.api.File f){
+        String fileName = getSuitableFileName(f.fileName(), volume);
+        
+        //SingleFileLinkUI singleFileLinkUI = new SingleFileLinkUI(main.getNui(), main.getMountManager());
+        
+        VirtualFilesParams vfp = VirtualFilesParams.Builder.create()
+                .setDiskManager(main.getDiskManager())
+                .setReferenceLink(l)
+                .setFileName(fileName)
+                .setTroubleHandler(main.getTroubleHandler())
+                .build();
+        
+        VirtualFile vf = svfp.create(vfp).get(0);
+        main.getMountManager().addFile(vf);
+        //singleFileLinkUI.init(vf);
+        
+        return vf;
+    }
+    
+    
 }

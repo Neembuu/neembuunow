@@ -6,7 +6,7 @@
 
 package neembuu.release1.defaultImpl.linkgroup;
 
-import neembuu.release1.api.TrialLinkHandler;
+import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.linkgroup.LinkGroup;
 import neembuu.release1.api.linkgroup.LinkGroupMaker;
 

@@ -15,9 +15,8 @@ import javax.swing.JOptionPane;
 import neembuu.release1.Main;
 import neembuu.release1.api.IndefiniteTask;
 import neembuu.release1.api.ReferenceLink;
-import neembuu.release1.api.LinkPackage;
 import neembuu.release1.api.RealFileProvider;
-import neembuu.release1.api.TrialLinkHandler;
+import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.VirtualFile;
 import neembuu.release1.api.VirtualFilesParams;
 import neembuu.release1.api.linkgroup.LinkGroup;
@@ -33,10 +32,11 @@ import neembuu.release1.defaultImpl.LinkParserImpl;
 import neembuu.release1.defaultImpl.OneToOneVirtualFileProvider;
 import neembuu.release1.defaultImpl.SimplyOpenTheVideoFile;
 import neembuu.release1.defaultImpl.SplitGroupProcessor;
-import neembuu.release1.defaultImpl.single.SingleLinkPackage;
 import neembuu.release1.ui.Constraint;
+import neembuu.release1.ui.LinksContainer;
 import neembuu.release1.ui.MainPanel;
 import neembuu.release1.ui.NeembuuUI;
+import neembuu.release1.ui.SingleFileLinkUI;
 
 /**
  *
@@ -148,7 +148,14 @@ public class AddLinkAction implements Runnable {
     }
     
     private void createUIForSingle(LinkGroup linkGroup){
-        SingleLinkPackage singleLinkPackage = new SingleLinkPackage();
+        SingleFileLinkUI singleFileLinkUI = new SingleFileLinkUI(
+                luic1, 
+                mainComponent, 
+                realFileProvider, 
+                addRemoveFromFileSystem, 
+                linkGroup.getLinks().get(0));
+        
+        ((LinksContainer)luic1).addUI(singleFileLinkUI, 0);
     }
     
     private String makeResidualParagraph(LinkGrouperResults grouperResults, LinkParserResult parserResult){
@@ -185,7 +192,7 @@ public class AddLinkAction implements Runnable {
         SimplyOpenTheVideoFile simplyOpenTheVideoFile = new SimplyOpenTheVideoFile();
                 
         List<VirtualFile> virtualFiles = new ArrayList<VirtualFile>();
-        List<LinkPackage> linkPackages = new ArrayList<LinkPackage>();
+
         for(ReferenceLink l1 : l){
             try{
                 virtualFiles.add(makeVirtualFile(l1));
