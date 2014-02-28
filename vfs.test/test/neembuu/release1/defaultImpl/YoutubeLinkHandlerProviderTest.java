@@ -8,7 +8,7 @@ package neembuu.release1.defaultImpl;
 
 import java.util.logging.Level;
 import neembuu.release1.Main;
-import neembuu.release1.api.LinkHandler;
+import neembuu.release1.api.linkhandler.LinkHandler;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -69,12 +69,12 @@ public class YoutubeLinkHandlerProviderTest {
         
         //Valid
         for (String url : urls) {
-            assertTrue(instance.tryHandling(url));
+            assertTrue(instance.tryHandling(url).canHandle());
         }
         
         //Invalid
         for (String url : invalidUrls) {
-            assertFalse(instance.tryHandling(url));
+            assertFalse(instance.tryHandling(url).canHandle());
         }
     }
 

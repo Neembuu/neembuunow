@@ -9,8 +9,7 @@ package neembuu.release1.defaultImpl;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
-import neembuu.release1.api.LinkHandlerProvider;
-import neembuu.release1.api.TrialLinkHandler;
+import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.linkparser.LinkParserResult;
 import org.junit.Test;
 
@@ -19,16 +18,6 @@ import org.junit.Test;
  * @author Shashank Tulsyan
  */
 public class LinkOrganizerImplTest {
-    
-    @Test
-    void test1(){
-        LinkParserResultDummy dummy = new LinkParserResultDummy();
-        dummy.results = makeList_TrialLinkHandler();
-        LinkOrganizerImpl impl = new LinkOrganizerImpl();
-        impl.logger = Logger.getGlobal();
-        
-        impl.organize(dummy);
-    }
     
     static LinkedList<TrialLinkHandler> makeList_TrialLinkHandler(){
         LinkedList<TrialLinkHandler> trialLinkHandlers = new LinkedList<TrialLinkHandler>();
