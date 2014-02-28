@@ -16,6 +16,8 @@
  */
 package neembuu.diskmanager;
 
+import java.util.LinkedList;
+
 /**
  * 1 global disk manager is required. It supplies a {@link FileStorageManager} for each
  * file being downloaded. Read the function of {@link FileStorageManager} to understand
@@ -27,4 +29,6 @@ public interface DiskManager {
     FileStorageManager makeNewFileStorageManager(FileStorageManagerParams fsmp);
     
     DiskManagerParams getDiskManagerParams();
+    
+    LinkedList<java.util.logging.LogRecord> deleteFileStorage(String fileName);
 }

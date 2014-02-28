@@ -17,6 +17,9 @@
 package neembuu.diskmanager;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 /**
  *
@@ -39,6 +42,22 @@ final class DefaultDiskManager implements DiskManager{
             throw new RuntimeException(ioe);
         }
         return fsm;
+    }
+
+    @Override
+    public LinkedList<java.util.logging.LogRecord> deleteFileStorage(String fileName) {
+        LinkedList<java.util.logging.LogRecord>
+               logLater = new LinkedList<LogRecord>();
+        try {
+            String store_path = DefaultFileStorageManager.fileStoragePath(this, fileName, false);
+        } catch (IOException e) {
+            LogRecord lr = new LogRecord(Level.INFO,"");
+            lr.setThrown(e);
+            logLater.add(lr);
+            return logLater;
+        }
+        DefaultFileStorageManager.emptyDirectory(fileName, logLater);
+        return logLater;
     }
 
     @Override

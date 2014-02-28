@@ -50,13 +50,8 @@ final class DefaultFileStorageManager implements FileStorageManager{
             throws IOException{
         this.defaultDiskManager = defaultDiskManager;
         this.fsmp = fsmp;
-        String store_path = defaultDiskManager.getDiskManagerParams().getBaseStoragePath() + File.separator +  fsmp.getFileName() + "_neembuu_download_data";
-        if(new File(store_path).exists()){
-            if(new java.io.File(store_path).isFile()){
-                throw new IOException("Storage location should be a directory. Given = "+store_path);
-            }
-        }else new File(store_path).mkdir();
-        store = store_path;
+        
+        store = fileStoragePath(defaultDiskManager, fsmp.getFileName(), true);
                  
         LinkedList<java.util.logging.LogRecord>
                logLater = new LinkedList<LogRecord>();
@@ -71,7 +66,7 @@ final class DefaultFileStorageManager implements FileStorageManager{
                         logLater.add(new LogRecord(Level.INFO, "(maincallback)going to delete "+rsm));
                         rsm.close();
                     }
-                    emptyDirectory(logLater);
+                    emptyDirectory(store,logLater);
                     l  = null;
                 }
             }
@@ -82,7 +77,7 @@ final class DefaultFileStorageManager implements FileStorageManager{
                     logLater.add(new LogRecord(Level.INFO, "(internalcallback)going to delete "+rsm));
                     rsm.close();
                 }
-                emptyDirectory(logLater);
+                emptyDirectory(store,logLater);
                 l  = null;
             }
         }
@@ -94,10 +89,20 @@ final class DefaultFileStorageManager implements FileStorageManager{
             }    
         }
         
-        readQMThLogger = LoggerUtil.getLightWeightHtmlLogger("ReadQueueManagerThread",store_path,defaultDiskManager.getDiskManagerParams().getMaxReadQueueManagerThreadLogSize());
+        readQMThLogger = LoggerUtil.getLightWeightHtmlLogger("ReadQueueManagerThread",store,defaultDiskManager.getDiskManagerParams().getMaxReadQueueManagerThreadLogSize());
         for(LogRecord lr : logLater){
             readQMThLogger.log(lr);
         }
+    }
+    
+    static String fileStoragePath(DiskManager defaultDiskManager, String fileName, boolean create)throws IOException{
+        String store_path = defaultDiskManager.getDiskManagerParams().getBaseStoragePath() + File.separator +  fileName + "_neembuu_download_data";
+        if(new File(store_path).exists()){
+            if(new java.io.File(store_path).isFile()){
+                throw new IOException("Storage location should be a directory. Given = "+store_path);
+            }
+        }else if(create) new File(store_path).mkdir();
+        return store_path;
     }
     
     @Override
@@ -105,7 +110,7 @@ final class DefaultFileStorageManager implements FileStorageManager{
         return readQMThLogger;
     }
     
-    private void emptyDirectory(LinkedList<java.util.logging.LogRecord> logLater){  
+    static void emptyDirectory(String store,LinkedList<java.util.logging.LogRecord> logLater){  
         try{
             File[]f=new File(store).listFiles();
             if(f==null)return;
