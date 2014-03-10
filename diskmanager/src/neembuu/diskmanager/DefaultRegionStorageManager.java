@@ -134,8 +134,15 @@ final class DefaultRegionStorageManager implements RegionStorageManager{
     }
 
     @Override
-    public void tranferTo(WritableByteChannel wbc)throws IOException {
-        fileChannel.transferTo(0, amountWritten, wbc);
+    public void transferToReOpenIfRequired(WritableByteChannel wbc)throws IOException {
+        FileChannel tempFileChannel;
+        if(fileChannel.isOpen()){
+            tempFileChannel = fileChannel;
+        }else {
+            tempFileChannel = new RandomAccessFile(regionStore, "r").getChannel();
+        }
+        tempFileChannel.transferTo(0, amountWritten, wbc);
+        tempFileChannel.close();
     }
     
     public static String generatePeekString(ByteBuffer byteBuffer){

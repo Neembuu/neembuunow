@@ -41,7 +41,7 @@ public interface RegionStorageManager extends Range,Channel {
     int write(ByteBuffer src,long absoulteFileOffset)throws IOException;
     int read(ByteBuffer src,long absoulteFileOffset)throws IOException;
     
-    void tranferTo(WritableByteChannel wbc)throws IOException;
+    void transferToReOpenIfRequired(WritableByteChannel wbc)throws IOException;
     
     public long endingByFileSize()throws IOException;
     

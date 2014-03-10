@@ -18,15 +18,12 @@ package neembuu.diskmanager;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.FileHandler;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -137,11 +134,12 @@ final class DefaultFileStorageManager implements FileStorageManager{
             LinkedList<File> files = new LinkedList();
             for (int i = 0; i < fs.length; i++) {
                 if(!fs[i].getName().endsWith(".partial")){
-                    try{
+                    // metadata file ignore
+                    /*try{
                         java.nio.file.Files.delete(fs[i].toPath());
                     }catch(Exception a){
                         a.printStackTrace(System.err);
-                    }
+                    }*/
                 }
                 else if(fs[i].getName().indexOf("_0x")<0){}
                 else {files.add(fs[i]);}
@@ -204,56 +202,18 @@ final class DefaultFileStorageManager implements FileStorageManager{
             });
             
             if(outputFile!=null){
-                long t = 0; long s=0,e=0;
-                for (int i = 0; i < drsms.size(); i++) {
-                    s = drsms.get(i).starting(); e = drsms.get(i).endingByFileSize();
-
-                    if(i+1 < drsms.size()){
-                        e = Math.min(e, drsms.get(i+1).starting()-1);
-                    }
-
-                    t+= e - s + 1 ;
-                }
-                if(t!=fileSize){
-                    Exception a = new IllegalStateException("Download incomplete or corrupt. Total downloaded="+t+" Expected filesize="+fileSize);
-                    //a.printStackTrace(System.err);// warning
-                    throw a;
-                }
-
-                
-                FileChannel fc = //new RandomAccessFile(outputFile, "w").getChannel();
-                        FileChannel.open(outputFile.toPath(),
-                            StandardOpenOption.WRITE,StandardOpenOption.CREATE
-                        );
-                for (RegionStorageManager rsm : drsms) {
-                    rsm.tranferTo(fc.position(rsm.starting()));
-                }
-                fc.force(true);
-                fc.close();
+                saveFileTo(outputFile,fileSize);
             }
             
             
             for (RegionStorageManager rsm : drsms) {
                 rsm.close();
             }
-
-            DefaultRegionStorageManager.closeLogger(readQMThLogger);
             
-            File[]f=new File(store).listFiles();
-            if(f==null)return;
+            File[]files=new File(store).listFiles();
+            if(files==null)return;
             
-            boolean canDeleteFolder = true;
-            for (int i = 0; i < f.length; i++) {
-                try{
-                    java.nio.file.Files.delete(f[i].toPath());
-                }catch(java.nio.file.FileSystemException fse){
-                    fse.printStackTrace(System.err);
-                    canDeleteFolder = false;
-                }
-            }
-            if(canDeleteFolder)
-                java.nio.file.Files.delete(new File(store).toPath());
-            
+            deleteFiles(files);
         }
     }
 
@@ -261,11 +221,53 @@ final class DefaultFileStorageManager implements FileStorageManager{
     public void close() throws Exception {
         synchronized (drsms){
             for (RegionStorageManager rsm : drsms) {
+                System.err.println("DefaultFileStorageManager line 263 closing : "+fsmp.getFileName()+" @ "+rsm);
                 rsm.close();
             }
         }
         DefaultRegionStorageManager.closeLogger(readQMThLogger);
     }
     
+    private void saveFileTo(File outputFile,long fileSize)throws Exception{
+        long t = 0; long s=0,e=0;
+        for (int i = 0; i < drsms.size(); i++) {
+            s = drsms.get(i).starting(); e = drsms.get(i).endingByFileSize();
+
+            if(i+1 < drsms.size()){
+                e = Math.min(e, drsms.get(i+1).starting()-1);
+            }
+
+            t+= e - s + 1 ;
+        }
+        if(t!=fileSize){
+            Exception a = new IllegalStateException("Download incomplete or corrupt. Total downloaded="+t+" Expected filesize="+fileSize);
+            //a.printStackTrace(System.err);// warning
+            throw a;
+        }
+
+
+        FileChannel fc = //new RandomAccessFile(outputFile, "w").getChannel();
+                FileChannel.open(outputFile.toPath(),
+                    StandardOpenOption.WRITE,StandardOpenOption.CREATE
+                );
+        for (RegionStorageManager rsm : drsms) {
+            rsm.transferToReOpenIfRequired(fc.position(rsm.starting()));
+        }
+        fc.force(true);
+        fc.close();
+    }
     
+    private void deleteFiles(File[]f)throws Exception{
+        boolean canDeleteFolder = true;
+        for (int i = 0; i < f.length; i++) {
+            try{
+                java.nio.file.Files.delete(f[i].toPath());
+            }catch(java.nio.file.FileSystemException fse){
+                fse.printStackTrace(System.err);
+                canDeleteFolder = false;
+            }
+        }
+        if(canDeleteFolder)
+            java.nio.file.Files.delete(new File(store).toPath());
+    }
 }
