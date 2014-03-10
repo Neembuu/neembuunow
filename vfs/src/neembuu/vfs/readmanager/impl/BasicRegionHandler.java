@@ -748,6 +748,9 @@ public final class BasicRegionHandler
             if(getConnection().isAlive())
                 getConnection().abort();
         }
+        // close diskmanager related resources
+        // is handled by DiskManager internals
+        // when invoked from ReadQueueManager
     }
     
     @Override

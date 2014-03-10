@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 admin
+ *  Copyright (C) 2010 Shashank Tulsyan
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import java.nio.channels.ReadableByteChannel;
 
 /**
  *
- * @author admin
+ * @author Shashank Tulsyan
  */
 public final class VIntUtils {
 

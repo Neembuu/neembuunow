@@ -38,7 +38,7 @@ package neembuu.rangearray;
 
 /**
  *
- * @author Admin
+ * @author Shashank Tulsyan
  */
 public interface RangeArrayElementFilter<P> {
     public boolean canBeAnElementOfThis(Range<P> element);

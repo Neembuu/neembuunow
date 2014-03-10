@@ -1,7 +1,18 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *  Copyright (C) 2014 Shashank Tulsyan
+ * 
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package neembuu.release1.ui;
@@ -20,13 +31,12 @@ import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import neembuu.rangearray.Range;
 import neembuu.rangearray.RangeUtils;
+import neembuu.rangearray.UIRangeArrayAccess;
 import neembuu.rangearray.UnsyncRangeArrayCopy;
 import neembuu.release1.Main;
-import neembuu.release1.api.VirtualFile;
 import neembuu.release1.api.ui.ExpansionState;
 import neembuu.release1.api.ui.Graph;
 import neembuu.release1.api.ui.access.GraphUIA;
-import neembuu.vfs.file.SeekableConnectionFile;
 import neembuu.vfs.readmanager.RegionHandler;
 import neembuu.vfs.test.MonitoredSeekableHttpFilePanel;
 import org.netbeans.lib.profiler.charts.ExposeChartsPackagePrivateAPI;
@@ -40,7 +50,6 @@ final class GraphImpl implements Graph{
     //private final LinkPanel linksPanel;
     
     private final GraphUIA ui;
-    private VirtualFile vf;
 
     GraphImpl(GraphUIA ui) {
         this.ui = ui;
@@ -57,16 +66,13 @@ final class GraphImpl implements Graph{
     
     private SimpleXYChartSupport support;
     RegionHandler currentlySelectedRegion = null;
-    SeekableConnectionFile file = null;
     
     private void initValues(final Range arrayElement){  
-        try {
-            file = vf.getConnectionFile();
-        } catch (NullPointerException noe) {
-            Main.getLOGGER().log(Level.SEVERE, "", noe);
+        if(regionHandlers == null){ 
+            Main.getLOGGER().log(Level.SEVERE, "Not initialized");
             return;
         }
-        UnsyncRangeArrayCopy ra = file.getRegionHandlers().tryToGetUnsynchronizedCopy();
+        UnsyncRangeArrayCopy ra = regionHandlers.tryToGetUnsynchronizedCopy();
         for (int i = 0; i < ra.size(); i++) {
             if(RangeUtils.contains(ra.get(i), arrayElement.ending(), arrayElement.ending())){
                 currentlySelectedRegion = (RegionHandler)ra.get(i).getProperty();
@@ -78,7 +84,7 @@ final class GraphImpl implements Graph{
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(ui.getExpansionState()!=ExpansionState.FullyExpanded ||
-                        file.getParent()==null || 
+                        /*file.getParent()==null || */
                         currentlySelectedRegion==null){
                     ((Timer)e.getSource()).stop();
                     return;
@@ -92,10 +98,13 @@ final class GraphImpl implements Graph{
         });
         updateGraphTimer.start();
     }
-    
-    void initGraph(Range arrayElement){
-        initGraph(arrayElement,false);
+
+    @Override
+    public void init(UIRangeArrayAccess regionHandlers) {
+        this.regionHandlers = regionHandlers;
     }
+    
+    private volatile UIRangeArrayAccess regionHandlers = null;
     
     @Override
     public void initGraph(Range arrayElement,boolean findFirst){
@@ -104,7 +113,7 @@ final class GraphImpl implements Graph{
         if(arrayElement==null){
             if(findFirst){
                 try{
-                    UnsyncRangeArrayCopy copy = vf.getConnectionFile().getRegionHandlers().tryToGetUnsynchronizedCopy();
+                    UnsyncRangeArrayCopy copy = regionHandlers.tryToGetUnsynchronizedCopy();
                     for (int i = 0; i < copy.size(); i++) {
                         RegionHandler rh = (RegionHandler)copy.get(i).getProperty();
                         if(rh.isAlive()){

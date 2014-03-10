@@ -1,9 +1,20 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *  Copyright (C) 2014 Shashank Tulsyan
+ * 
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package neembuu.release1.defaultImpl.single;
+package neembuu.release1.mountmanager;
 
 import jpfm.DirectoryStream;
 import neembuu.diskmanager.DiskManager;
@@ -22,13 +33,12 @@ import neembuu.vfs.readmanager.impl.SeekableConnectionFileImplBuilder;
  */
 public final class SeekableConnectionFile_1to1  {
     public static SeekableConnectionFile create(
-            ReferenceLink referenceLink, 
+            String fileName,
+            long fileSize,
+            final NewConnectionProvider newConnectionProvider, 
             DiskManager diskManager, 
             TroubleHandler troubleHandler, 
-            String fileName, DirectoryStream parent) throws Exception {
-
-        final NewConnectionProvider newConnectionProvider = referenceLink
-                .getLinkHandler().getFiles().get(0).getConnectionProvider();
+            DirectoryStream parent) throws Exception {
         
         final AskResume askResume = new AskResume() {
             public boolean resume() {
@@ -45,7 +55,7 @@ public final class SeekableConnectionFile_1to1  {
 
         SeekableConnectionFile file1
                 = SeekableConnectionFileImplBuilder.build(new SeekableConnectionFileParams.Builder()
-                        .setFileSize(referenceLink.getLinkHandler().getGroupSize())
+                        .setFileSize(fileSize)
                         .setDiskManager(diskManager)
                         .setParent(parent)
                         .setNewConnectionProvider(newConnectionProvider)

@@ -1,7 +1,18 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *  Copyright (C) 2014 Shashank Tulsyan
+ * 
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package neembuu.release1.ui;
 
@@ -12,16 +23,11 @@ import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.logging.Level;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
-import neembuu.release1.Main;
-import neembuu.release1.api.RealFileProvider;
-import neembuu.release1.api.VirtualFile;
 import neembuu.release1.api.ui.ExpansionState;
 import neembuu.release1.api.ui.Graph;
 import neembuu.release1.api.ui.HeightProperty;
@@ -65,9 +71,6 @@ final class LinkPanel extends javax.swing.JPanel {
     private ReAddAction reAddAction;
     private ChangeDownloadModeAction  changeDownloadModeAction;
     private ConnectionActions connectionActions;
-
-    private VirtualFile vf;
-    private RealFileProvider realFileProvider;
     
     private final String downloadFullFileToolTip = "<html>"
                 + "<b>Download entire file mode</b><br/>"
@@ -114,52 +117,6 @@ final class LinkPanel extends javax.swing.JPanel {
     
     void initializeName(String fileName){
         fileNameLabel.setText(fileName);
-    }
-    
-    
-    void setFile(){
-        fileNameLabel.setText(vf.getConnectionFile().getName());
-        updateFileSizeString();
-        ((ProgressImpl)progress).init(vf);
-
-        try{
-            if(!realFileProvider.getRealFile(vf).exists()){
-                throw new IllegalStateException("File not created yet");
-            }
-            Icon clr = null, bw = null;
-            try{
-                Image clri = sun.awt.shell.ShellFolder.getShellFolder( realFileProvider.getRealFile(vf) ).getIcon( true ) ;
-                clr = new ImageIcon(clri);
-            }catch(Exception a){
-                clr = javax.swing.filechooser.FileSystemView.getFileSystemView().getSystemIcon( realFileProvider.getRealFile(vf) );
-            }
-            bw = TintedGreyScaledImage.getTintedImage(getBF(clr), Colors.TINTED_IMAGE, false);
-            fileIconPanel.getOpenButton().setIcon_bw(bw);
-            fileIconPanel.getOpenButton().setIcon_clr(clr);
-        }catch(Exception a){
-            Main.getLOGGER().log(Level.INFO, "Could not find icon, using default", a);
-        }
-    }
-    
-    private static BufferedImage getBF(Icon icon){
-        BufferedImage bi = new BufferedImage(
-            icon.getIconWidth(),
-            icon.getIconHeight(),
-            BufferedImage.TYPE_INT_RGB);
-        Graphics g = bi.createGraphics();
-        g.setColor(Color.WHITE);
-        g.fillRect(0, 0, icon.getIconWidth(), icon.getIconHeight());
-        // paint the Icon to the BufferedImage.
-        icon.paintIcon(null, g, 0,0);
-        return bi;
-    }
-    
-    private static BufferedImage getBF(Image img){
-        BufferedImage bi = new BufferedImage(32,32,BufferedImage.TYPE_INT_RGB);
-        Graphics g = bi.createGraphics();
-        g.setColor(Color.WHITE);
-        bi.getGraphics().drawImage(img, 0, 0 , null);
-        return bi;
     }
     
     /**
@@ -646,31 +603,7 @@ final class LinkPanel extends javax.swing.JPanel {
         ma.mouseExited(null);
     }
 
-    private void updateFileSizeString(){
-        double sz = vf.getConnectionFile().getFileSize();
-        String suffix;
-        if(sz < 1000){
-            suffix = " B";
-        }else if(sz < 1000*1000){
-            suffix = " KB";
-            sz/=1024;
-        }else if(sz < 1000*1000*1000){
-            suffix = " MB";
-            sz/=1024*1024;
-        }else if(sz < 1000*1000*1000*1000){
-            suffix = " GB";
-            sz/=1024*1024*1024;
-        }else {
-            suffix = " TB";
-            sz/=1024*1024*1024*1024;
-        }
-        if(sz < 10){
-            sz = Math.round(sz * 100.0) / 100.0;
-        }else if(sz < 100){
-            sz = Math.round(sz * 10.0) / 10.0;
-        }
-        fileSizeLabel.setText(sz+ " "+suffix);
-    }
+    
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel actualContentsPanel;
@@ -720,9 +653,10 @@ final class LinkPanel extends javax.swing.JPanel {
         @Override public TextBubbleBorder border() { return border; }
         @Override public JPanel rightControlsPanel() { return rightCtrlPane; }
         @Override public JLabel fileNameLabel() { return fileNameLabel; }
-        @Override public JButton openButton() { return fileIconPanel.getOpenButton(); }
+        @Override public OpenButton openButton() { return openButton; }
         @Override public void contract() { expandAction.setExpansionState(ExpansionState.Contracted); }
-        @Override public void repaint() { LinkPanel.this.repaint(); } };
+        @Override public void repaint() { LinkPanel.this.repaint(); }
+        @Override public JLabel fileSizeLabel(){return fileSizeLabel;}  };
     
     final ExpandActionUIA expandActionUIA = new ExpandActionUIA() {
         @Override public JPanel connectionControlPane() { return connectionControlPane; }
@@ -734,4 +668,9 @@ final class LinkPanel extends javax.swing.JPanel {
         @Override public short ht_medium() { return ht_medium; }
         @Override public short ht_tallest() { return ht_tallest; }
         @Override public HeightProperty getHeight() { return heightProperty; } };
+    
+    final CloseActionUIA.OpenButton openButton = new CloseActionUIA.OpenButton() {
+        @Override public void setVisible(boolean v) { fileIconPanel.getOpenButton().setVisible(v); }
+        @Override public void setIcon_bw(Icon bw) { fileIconPanel.getOpenButton().setIcon_bw(bw);}
+        @Override public void setIcon_clr(Icon clr) {fileIconPanel.getOpenButton().setIcon_clr(clr);}};
 }

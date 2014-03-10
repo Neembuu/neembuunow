@@ -1,7 +1,18 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *  Copyright (C) 2014 Shashank Tulsyan
+ * 
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package neembuu.release1.ui;
@@ -31,6 +42,7 @@ import neembuu.swing.RangeArrayComponentBuilder;
 import neembuu.swing.RangeArrayElementColorProvider;
 import neembuu.swing.RangeArrayElementToolTipTextProvider;
 import neembuu.swing.RangeSelectedListener;
+import neembuu.vfs.file.FileBeingDownloaded;
 import neembuu.vfs.file.RequestPatternListener;
 import neembuu.vfs.readmanager.RegionHandler;
 
@@ -39,7 +51,7 @@ import neembuu.vfs.readmanager.RegionHandler;
  * @author Shashank Tulsyan
  */
 public class ProgressImpl implements Progress {
-    private VirtualFile vf;
+    //private VirtualFile vf;
     private final ProgressUIA ui;
     private final Graph graph;
     
@@ -58,12 +70,16 @@ public class ProgressImpl implements Progress {
         this.graph = graph;
     }
     
-    void init(final VirtualFile vf){
-        this.vf = vf;
+    private FileBeingDownloaded file;
+    
+    @Override
+    public void init(final FileBeingDownloaded fbd){
+        file = fbd;
+        graph.init(file.getRegionHandlers());
         overallProgress = RangeArrayFactory.newDefaultRangeArray(new RangeArrayParams.Builder()
                                 //.setDoesCarryProperty()
                                 .addDissolvabilityRule(DissolvabilityRule.COMPARE_PROPERTY_OBJECT)
-                                .setFileSize(vf.getConnectionFile().getFileSize())
+                                .setFileSize(file.getFileSize())
                                 .build());
         progress = RangeArrayComponentBuilder.create()
                 .setArray(overallProgress)
@@ -78,14 +94,14 @@ public class ProgressImpl implements Progress {
                     public Color getColor(Color defaultColor, Range element, RangeArrayElementColorProvider.SelectionState selectionState) {
                         Object p = element.getProperty();
                         Color base = Colors.PROGRESS_BAR_FILL_ACTIVE;
-                        if(!vf.getConnectionFile().isAutoCompleteEnabled()){
+                        if(!file.isAutoCompleteEnabled()){
                             base = Colors.PROGRESS_DOWNLOAD_LESS_MODE;
                         }
                         
                         if(p!=null){
                             if(p==Boolean.TRUE){
                                 base = Colors.PROGRESS_BAR_FILL_BUFFER;
-                                if(!vf.getConnectionFile().isAutoCompleteEnabled()){
+                                if(!file.isAutoCompleteEnabled()){
                                     base = Colors.TINTED_IMAGE;
                                 }
                                 switch (selectionState) {
@@ -129,7 +145,8 @@ public class ProgressImpl implements Progress {
                 .addGap(bottom, bottom, bottom))
         );
         
-        vf.getConnectionFile().addRequestPatternListener(new RequestPatternListener() {
+        // added but shouldn't we remove as well ??? OR WeakReference
+        file.addRequestPatternListener(new RequestPatternListener() {
 
             @Override
             public void requested(long requestStarting, long requestEnding) {
@@ -170,7 +187,7 @@ public class ProgressImpl implements Progress {
     }
     
     private void handleChange(){        
-        downloadedRegionHandlers = vf.getConnectionFile().getRegionHandlers();
+        downloadedRegionHandlers = file.getRegionHandlers();
 
         long totalDownloaded = 0;
 
@@ -201,15 +218,15 @@ public class ProgressImpl implements Progress {
     
     private void updateTotalDownloaded(long newTotal){
         total_Downloaded = newTotal;
-        long left = vf.getConnectionFile().getFileSize() - total_Downloaded;
+        long left = file.getFileSize() - total_Downloaded;
         if(left == 0){
             ui.saveButton().setVisible(true);
-        }else if(total_Downloaded > vf.getConnectionFile().getFileSize()){
+        }else if(total_Downloaded > file.getFileSize()){
             throw new RuntimeException("Total download size of file greater than filesize");
         } 
         
         if(ui.getExpansionState() == ExpansionState.SemiExpanded ||  ui.getExpansionState() == ExpansionState.FullyExpanded){
-            double perPro = total_Downloaded*100.0/vf.getConnectionFile().getFileSize();
+            double perPro = total_Downloaded*100.0/file.getFileSize();
             ui.progressPercetLabel().setText(Math.round(perPro) + " %");
             
         }
@@ -243,7 +260,7 @@ public class ProgressImpl implements Progress {
     public String getSelectedRangeTooltip(){
         String toRet = null;
         try{
-            toRet= getToolTipText(selectedRange, selectedRange.starting(), vf.getConnectionFile().getFileSize(), null);
+            toRet= getToolTipText(selectedRange, selectedRange.starting(), file.getFileSize(), null);
         }catch(Exception a){
             
         }
@@ -272,7 +289,7 @@ public class ProgressImpl implements Progress {
         RegionHandler r = (RegionHandler)element.getProperty();
         String region_start_end_auth = region_start_end;
         region_start_end_auth+=","+c(Colors.PROGRESS_DOWNLOAD_LESS_MODE)+r.authorityLimit()+c_()+"\n";
-        //vf.getConnectionFile().getDownloadConstrainHandler().isComplete()
+        //file.getDownloadConstrainHandler().isComplete()
         return "<html>"+region_start_end_auth + "("+downloadSpeed(r)+","+requestSpeed(r)+")KBps\n"+
                 isAlive(r)+","+isMain(r)+","+throttlingState()+"</html>";
     }
@@ -294,13 +311,13 @@ public class ProgressImpl implements Progress {
     }
     
     private String totalDownloadSpeed(){
-        return c(Colors.PROGRESS_DOWNLOAD_LESS_MODE)+Math.round(vf.getConnectionFile().getTotalFileReadStatistics()
+        return c(Colors.PROGRESS_DOWNLOAD_LESS_MODE)+Math.round(file.getTotalFileReadStatistics()
                     .getTotalAverageDownloadSpeedProvider().getDownloadSpeed_KiBps())+c_();
     }
     
     private String totalRequestSpeed(){
         return c(Colors.PROGRESS_BAR_FILL_ACTIVE)+Math.round(
-                vf.getConnectionFile().getTotalFileReadStatistics().getTotalAverageRequestSpeedProvider().getRequestSpeed_KiBps())
+                file.getTotalFileReadStatistics().getTotalAverageRequestSpeedProvider().getRequestSpeed_KiBps())
                 +c_();
     }
     

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 admin
+ * Copyright (C) 2011 Shashank Tulsyan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author admin
+ * @author Shashank Tulsyan
  */
 public class AddTestLinks extends javax.swing.JDialog {
 

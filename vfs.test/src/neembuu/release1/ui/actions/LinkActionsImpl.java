@@ -1,17 +1,28 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *  Copyright (C) 2014 Shashank Tulsyan
+ * 
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package neembuu.release1.ui.actions;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import neembuu.release1.Main;
-import neembuu.release1.api.File;
 import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProviders;
 import neembuu.release1.api.RealFileProvider;
@@ -38,26 +49,38 @@ public class LinkActionsImpl {
     private final RealFileProvider realFileProvider;
     private final MainComponent mainComponent;
     private final TrialLinkHandler trialLinkHandler;
-    //private final VirtualFile vf;
+    
+    private VirtualFile vf;
+    
     private final AddRemoveFromFileSystem addRemoveFromFileSystem;
 
 
     private final DeleteAction delete = new DeleteAction() {@Override public void actionPerformed(ActionEvent e) {
-                delete();
+            delete();
         }};;
     private final SaveAction save = new SaveAction() {@Override public void actionPerformed(ActionEvent e) {
-                saveFileClicked();
+            saveFileClicked();
         }};;
     private final OpenAction open = new OpenAction() {@Override public void actionPerformed(ActionEvent e) {
-                openVirtualFile();
+            openVirtualFile();
         }};;
-    private final CloseAction close = new CloseAction() {@Override public void actionPerformed(ActionEvent e) {
-                closeAction(true);
+    private final CloseAction close = new CloseAction() {
+        @Override public void actionPerformed(ActionEvent e) {
+            closeAction(true,false);}
+        @Override public void closeOnlyUI() {
+            closeAction(true,true);
         }};;
-    private final ReAddAction addAndPlay = new ReAddAction() {@Override public void actionPerformed(ActionEvent e) {
-                closeAction(false);
-        }};;
+    private final ReAddAction addAndPlay = new ReAddAction() {
+        @Override public void actionPerformed(ActionEvent e) {
+            closeAction(false,false);
+        }@Override public void setCallBack(ReAddAction.CallBack callBack) {
+            if(LinkActionsImpl.this.callBack==null)LinkActionsImpl.this.callBack = callBack;
+            else throw new IllegalStateException("Callback already set to "+LinkActionsImpl.this.callBack);
+        }
+    };
 
+    ReAddAction.CallBack callBack = null;
+    
     public LinkActionsImpl(CloseActionUIA ui, RemoveFromUI removeFromUI, RealFileProvider realFileProvider, MainComponent mainComponent,AddRemoveFromFileSystem addRemoveFromFileSystem, TrialLinkHandler trialLinkHandler) {
         this.ui = ui;
         this.removeFromUI = removeFromUI;
@@ -97,12 +120,12 @@ public class LinkActionsImpl {
         x = JOptionPane.showConfirmDialog(mainComponent.getJFrame(),"Are you sure you want to delete this file","Delete",JOptionPane.YES_NO_OPTION);
         if(x == JOptionPane.YES_OPTION){
             deleteAction();
+            removeFromUI.remove();
         }
-        removeFromUI.remove();
         //singleFileLinkUI.getLinkUIContainer().removeLinkUI(singleFileLinkUI);
     }
         
-    void closeAction(boolean closeOrOpen){
+    void closeAction(boolean closeOrOpen,boolean onlyUI){
         ui.rightControlsPanel().setVisible(!closeOrOpen);
         ui.overlay().setVisible(closeOrOpen);
         if(closeOrOpen){
@@ -110,9 +133,9 @@ public class LinkActionsImpl {
             ui.fileNameLabel().setForeground(Colors.BORDER);
             ui.contract();
             ui.openButton().setVisible(false);
-            closeActionProcess();
+            if(!onlyUI)closeActionProcess(false);
         }else /*open*/{
-            createNew();
+            createNewVirtualFile();
             ui.border().setColor(Colors.BORDER);
             ui.repaint();
             ui.fileNameLabel().setForeground(Color.BLACK);
@@ -121,20 +144,31 @@ public class LinkActionsImpl {
             
             addRemoveFromFileSystem.add(vf);
             openVirtualFile();
+            if(onlyUI){ throw new IllegalStateException("Will never happen"); }
         }
     }
     
-    void closeActionProcess(){
-        addRemoveFromFileSystem.remove(vf);
+    void closeActionProcess(boolean ignoreError){
+        if(vf==null){ // virtual file has not been created so it cannot be closed
+            return;
+        }
+        try{
+            addRemoveFromFileSystem.remove(vf);
+        }catch(Exception a){
+            if(!ignoreError)
+                Main.getLOGGER().log(Level.SEVERE, "Error in removing from filesystem, "
+                    + "file might have not been added in the FS so it cannot be removed",a);
+        }
         try{
             vf.getConnectionFile().closeCompletely();
+            //vf = null; file cannot be deleted if this is done.
         }catch(Exception a){
-            Main.getLOGGER().log(Level.SEVERE, "Erorr in completely closing file",a);
+            if(!ignoreError)Main.getLOGGER().log(Level.SEVERE, "Error in completely closing file",a);
         }
     }
     
-    void saveAction(File outputFilePath){
-        closeActionProcess();
+    void saveAction(java.io.File outputFilePath){
+        closeActionProcess(false);
 
         try{
             vf.getConnectionFile().getFileStorageManager().completeSession(outputFilePath, vf.getConnectionFile().getFileSize());
@@ -145,16 +179,17 @@ public class LinkActionsImpl {
     }
     
     void deleteAction(){
-        closeActionProcess();
+        VirtualFile v = vf; //closeActionProcess sets v = null, so making a copy
+        closeActionProcess(false);
         try{
-            if(vf==null){
-                throw new UnsupportedOperationException();
+            if(v==null){
+                throw new UnsupportedOperationException("File removed, but could not find and delete temporary data");
             }else {
-                vf.getConnectionFile().getFileStorageManager().completeSession(null, vf.getConnectionFile().getFileSize());
+                v.getConnectionFile().getFileStorageManager().completeSession(null, v.getConnectionFile().getFileSize());
             }
         }catch(Exception a){
             Main.getLOGGER().log(Level.SEVERE, "Could not delete file",a);
-            JOptionPane.showMessageDialog(mainComponent.getJFrame(), a.getMessage(),"Could not save file", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(mainComponent.getJFrame(), a.getMessage(),"Could not delete file", JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -174,17 +209,21 @@ public class LinkActionsImpl {
     
     public void openVirtualFile(){
         try{
-            File f = realFileProvider.getRealFile(vf);
+            if(!vf.canGetRealFile()){
+                JOptionPane.showMessageDialog(mainComponent.getJFrame(),"This file is cannot be opened directly.","Cannot open file",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            java.io.File f = vf.getRealFile(); //File f = realFileProvider.getRealFile(vf);
             java.awt.Desktop.getDesktop().open(f);
 
         }catch(Exception a){
-            JOptionPane.showMessageDialog(null,a.getMessage(),"Could not open file",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(mainComponent.getJFrame(),a.getMessage(),"Could not open file",JOptionPane.ERROR_MESSAGE);
             Main.getLOGGER().log(Level.SEVERE,"Could not open file",a);
         }
     }
     
-    
-    private void createNew(){
+        
+    private void createNewVirtualFile(){
         LinkHandler linkHandler = 
             LinkHandlerProviders.getHandler(trialLinkHandler.getReferenceLinkString());
         if(linkHandler==null){
@@ -200,8 +239,28 @@ public class LinkActionsImpl {
                     + " it was expected to have only one. Using only first file.");
         }
         
-        File f = linkHandler.getFiles().get(0);
+        neembuu.release1.api.File f = linkHandler.getFiles().get(0);
         
-        VirtualFile vf 
+        if(vf!=null){
+            closeActionProcess(true);
+        }
+        
+        try{
+            vf = addRemoveFromFileSystem.create(f);
+        }catch(Exception a){
+            JOptionPane.showMessageDialog(mainComponent.getJFrame(), 
+                    "Sorry! There is nothing you \n"
+                    + "can do about it.\n"
+                    + "Reason : "+a.getMessage(), 
+                    "Could not make virtual file", JOptionPane.ERROR_MESSAGE);
+            a.printStackTrace();
+        }
+        
+        if(callBack==null){
+            throw new IllegalStateException("Creation call back not set");
+        }callBack.doneCreation(vf);
     }
+    
+    
+    
 }

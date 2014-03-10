@@ -1,24 +1,31 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *  Copyright (C) 2014 Shashank Tulsyan
+ * 
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package neembuu.release1.newlink;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
-import javax.swing.JOptionPane;
 import neembuu.release1.Main;
 import neembuu.release1.api.IndefiniteTask;
-import neembuu.release1.api.ReferenceLink;
 import neembuu.release1.api.RealFileProvider;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.VirtualFile;
-import neembuu.release1.api.VirtualFilesParams;
 import neembuu.release1.api.linkgroup.LinkGroup;
 import neembuu.release1.api.linkgroup.LinkGrouperResults;
 import neembuu.release1.api.linkparser.LinkParserResult;
@@ -29,10 +36,7 @@ import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
 import neembuu.release1.defaultImpl.linkgroup.LinkGrouperImpl;
 import neembuu.release1.defaultImpl.LinkParserImpl;
-import neembuu.release1.defaultImpl.OneToOneVirtualFileProvider;
-import neembuu.release1.defaultImpl.SimplyOpenTheVideoFile;
 import neembuu.release1.defaultImpl.SplitGroupProcessor;
-import neembuu.release1.ui.Constraint;
 import neembuu.release1.ui.LinksContainer;
 import neembuu.release1.ui.MainPanel;
 import neembuu.release1.ui.NeembuuUI;
@@ -45,9 +49,6 @@ import neembuu.release1.ui.SingleFileLinkUI;
 public class AddLinkAction implements Runnable {
     
     private Main main;
-    private final OneToOneVirtualFileProvider svfp
-                = new OneToOneVirtualFileProvider();
-
     private final IndefiniteTaskUI indefiniteTaskUI;
     private final ExpandableUIContainer luic1;
     private final MainComponent mainComponent;
@@ -135,27 +136,38 @@ public class AddLinkAction implements Runnable {
     private void createUIFor(LinkGrouperResults results){
         for(LinkGroup linkGroup :  results.complete_linkPackages()){
             int size = linkGroup.getLinks().size();
+            if(size==0)return;
             if(size > 1){
-                createUIForMultiple(linkGroup);
+                createUIFor001Type(linkGroup);
             }else {
-                createUIForSingle(linkGroup);
+                if(linkGroup.getLinks().get(0).containsMultipleLinks()){
+                    createUIForYoutubeType(linkGroup);
+                }else {
+                    createUIForSingleLink(linkGroup);
+                }
             }
         }
     }
     
-    private void createUIForMultiple(LinkGroup linkGroup){
+    private void createUIFor001Type(LinkGroup linkGroup){
         
     }
     
-    private void createUIForSingle(LinkGroup linkGroup){
+    private void createUIForYoutubeType(LinkGroup linkGroup){
+        
+    }
+    
+    private void createUIForSingleLink(LinkGroup linkGroup){
         SingleFileLinkUI singleFileLinkUI = new SingleFileLinkUI(
                 luic1, 
                 mainComponent, 
                 realFileProvider, 
                 addRemoveFromFileSystem, 
                 linkGroup.getLinks().get(0));
-        
         ((LinksContainer)luic1).addUI(singleFileLinkUI, 0);
+        if(open){
+            singleFileLinkUI.reAddOpen();
+        }
     }
     
     private String makeResidualParagraph(LinkGrouperResults grouperResults, LinkParserResult parserResult){
@@ -187,7 +199,7 @@ public class AddLinkAction implements Runnable {
     
     
     
-    private void doLinks_old(List<ReferenceLink> l){
+    /*private void doLinks_old(List<ReferenceLink> l){
         SplitGroupProcessor splitGroupProcessor = new SplitGroupProcessor();
         SimplyOpenTheVideoFile simplyOpenTheVideoFile = new SimplyOpenTheVideoFile();
                 
@@ -226,7 +238,7 @@ public class AddLinkAction implements Runnable {
         // this makes each file aware of existence of other filein the same virtual
         // directory. This way if user has added two files but is watching
         // only one, the other files will cease downloading
-    }
+    }*/
     
     private boolean handleSplits(SplitGroupProcessor splitGroupProcessor, List<VirtualFile> splits){
         try{
@@ -247,39 +259,16 @@ public class AddLinkAction implements Runnable {
         int i = 0;
         for (VirtualFile virtualFile : splits) {
             if(i<splits.size() -1 ){
-                virtualFile.getUI().setContraintComponent(new Constraint());
+                throw new IllegalStateException("could not constraint");
+                //virtualFile.getUI().setContraintComponent(new Constraint());
             }
-            main.getNui().getLinksContainer().addUI(virtualFile.getUI(),i);
+            //main.getNui().getLinksContainer().addUI(virtualFile.getUI(),i);
             i++;
         }
         
         
         
         return true;
-    }
-    
-    private VirtualFile makeVirtualFile(ReferenceLink l)throws Exception{
-        // use virtual file providers
-        String fileName = l.getLinkHandler().getGroupName();
-        
-        fileName = main.getMountManager().getSuitableFileName(fileName);
-        if(fileName.length()>50){
-            fileName = fileName.substring(0,50);
-        }
-        //SingleFileLinkUI singleFileLinkUI = new SingleFileLinkUI(main.getNui(), main.getMountManager());
-        
-        VirtualFilesParams vfp = VirtualFilesParams.Builder.create()
-                .setDiskManager(main.getDiskManager())
-                .setReferenceLink(l)
-                .setFileName(fileName)
-                .setTroubleHandler(main.getTroubleHandler())
-                //.setLinkUI(singleFileLinkUI)
-                .build();
-        VirtualFile vf = svfp.create(vfp).get(0);
-        main.getMountManager().addFile(vf);
-        //singleFileLinkUI.init(vf);
-        
-        return vf;
     }
     
 }

@@ -197,8 +197,25 @@ public final class ReadQueueManager
                 cce.printStackTrace(System.err);
             }
         }openTime = 0; totalDataRequested = 0;
-        
         mainDirectionThread.close();
+    }
+    
+    public final void closeCompletely()throws Exception {
+        try{
+            close();
+        }catch(Exception ignore){
+            //already closed
+        }
+        synchronized(handlers.getModLock()){
+            for(Range<RegionHandler> handler : handlers){
+                try{
+                    handler.getProperty().closeCompletely();
+                }catch(Exception a){
+                    a.printStackTrace(System.err);
+                }
+            }
+        }
+        provider.getFileStorageManager().close();
     }
 
     public void setDisabled(boolean disabled) {

@@ -22,7 +22,7 @@ package neembuu.rangearray;
 
 /**
  *
- * @author Admin
+ * @author Shashank Tulsyan
  */
 public class RangeArrayElementRejectedByFilterException extends RuntimeException{
 }

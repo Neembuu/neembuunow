@@ -1,7 +1,5 @@
-package neembuu.vfs.file;
-
 /*
- *  Copyright (C) 2010 Shashank Tulsyan
+ *  Copyright (C) 2014 Shashank Tulsyan
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,7 +14,7 @@ package neembuu.vfs.file;
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+package neembuu.vfs.file;
 
 
 /**
@@ -25,7 +23,6 @@ package neembuu.vfs.file;
  */
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
 import javax.swing.JPanel;
 import jpfm.AccessLevel;
 import jpfm.DirectoryStream;
@@ -170,7 +167,7 @@ public class MonitoredHttpFile
     }
 
     @Override
-    public void closeCompletely() {
+    public void closeCompletely() throws Exception{
         vfile.closeCompletely();
     }
 

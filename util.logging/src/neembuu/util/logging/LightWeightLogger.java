@@ -57,6 +57,10 @@ public final class LightWeightLogger extends Logger {
             this.lwl = lwl;
         }
     }
+
+    public void close() {
+        
+    }
     
     /*package private*/ LightWeightLogger(String name) {
         super(name,Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).getResourceBundleName());

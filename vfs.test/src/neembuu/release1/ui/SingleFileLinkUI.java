@@ -1,12 +1,24 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *  Copyright (C) 2014 Shashank Tulsyan
+ * 
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package neembuu.release1.ui;
 
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 import neembuu.release1.api.RealFileProvider;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.ui.VirtualFileUI;
@@ -20,11 +32,13 @@ import neembuu.release1.api.ui.access.RemoveFromUI;
 import neembuu.release1.api.ui.actions.ChangeDownloadModeAction;
 import neembuu.release1.api.ui.actions.ConnectionActions;
 import neembuu.release1.api.ui.actions.ExpandAction;
+import neembuu.release1.api.ui.actions.ReAddAction;
 
 import neembuu.release1.ui.actions.ConnectionActionsImpl;
 import neembuu.release1.ui.actions.ChangeDownloadModeActionImpl;
 import neembuu.release1.ui.actions.ExpandActionImpl;
 import neembuu.release1.ui.actions.LinkActionsImpl;
+import neembuu.release1.ui.actions.ReAddActionCallBackImpl;
 
 /**
  *
@@ -39,6 +53,8 @@ public final class SingleFileLinkUI implements VirtualFileUI{
     private JComponent contraint;
     
     private TrialLinkHandler trialLinkHandler;
+    
+    private final LinkActionsImpl linkActionsImpl;
     
     public SingleFileLinkUI(
             final ExpandableUIContainer luic1, 
@@ -56,9 +72,12 @@ public final class SingleFileLinkUI implements VirtualFileUI{
             @Override public void remove() { 
                 luic1.removeUI(SingleFileLinkUI.this); } };
         
-        LinkActionsImpl linkActionsImpl = new LinkActionsImpl(
+        linkActionsImpl = new LinkActionsImpl(
                 lp.closeActionUIA, removeFromUI, realFileProvider, 
                 mainComponent, addRemoveFromFileSystem, trialLinkHandler);
+        
+        
+        linkActionsImpl.getReAdd().setCallBack(new ReAddActionCallBackImpl(lp.closeActionUIA, lp.lowerControlsUIA));
         
         ExpandAction expandAction = new ExpandActionImpl(lp.expandActionUIA);
         
@@ -68,12 +87,23 @@ public final class SingleFileLinkUI implements VirtualFileUI{
         
         lp.closeActionUIA.fileNameLabel().setText(trialLinkHandler.tempDisplayName());
         
+        /*try{*/
+            linkActionsImpl.getClose().closeOnlyUI();
+        /*}catch(NullPointerException ignore){
+            //ignore.printStackTrace();
+        }*/
+    }
+
+    public void reAddOpen(){
+        linkActionsImpl.getReAdd().actionPerformed(null);
     }
     
+    private VirtualFile virtualFile = null;
     
-    public void init(VirtualFile virtualFile){
+    void init(VirtualFile virtualFile){
         this.virtualFile = virtualFile;
-        lp.setFile();
+
+        //lp.setFile(virtualFile);
     }
 
     @Override
@@ -86,7 +116,7 @@ public final class SingleFileLinkUI implements VirtualFileUI{
         return lp;
     }
 
-    @Override
+    /*@Override
     public void setContraintComponent(JComponent contraint) {
         this.contraint = contraint;
     }
@@ -94,7 +124,7 @@ public final class SingleFileLinkUI implements VirtualFileUI{
     @Override
     public JComponent getContraintComponent() {
         return contraint;
-    }
+    }*/
 
     @Override
     public HeightProperty heightProperty() {
