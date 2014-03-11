@@ -45,13 +45,13 @@ import org.netbeans.lib.profiler.charts.ExposeChartsPackagePrivateAPI;
  *
  * @author Shashank Tulsyan
  */
-final class GraphImpl implements Graph{
+public final class GraphImpl implements Graph{
     
     //private final LinkPanel linksPanel;
     
     private final GraphUIA ui;
 
-    GraphImpl(GraphUIA ui) {
+    public GraphImpl(GraphUIA ui) {
         this.ui = ui;
         ui.graphPanel().setBackground(Color.WHITE);
     }

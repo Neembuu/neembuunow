@@ -37,7 +37,7 @@ import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
 import neembuu.release1.defaultImpl.linkgroup.LinkGrouperImpl;
 import neembuu.release1.defaultImpl.LinkParserImpl;
 import neembuu.release1.defaultImpl.SplitGroupProcessor;
-import neembuu.release1.ui.LinksContainer;
+import neembuu.release1.ui.linkcontainer.LinksContainer;
 import neembuu.release1.ui.MainPanel;
 import neembuu.release1.ui.NeembuuUI;
 import neembuu.release1.ui.SingleFileLinkUI;
@@ -166,7 +166,7 @@ public class AddLinkAction implements Runnable {
                 linkGroup.getLinks().get(0));
         ((LinksContainer)luic1).addUI(singleFileLinkUI, 0);
         if(open){
-            singleFileLinkUI.reAddOpen();
+            singleFileLinkUI.open();
         }
     }
     

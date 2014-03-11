@@ -35,7 +35,7 @@ public final class Fonts {
     static java.awt.Font initFont(String fntName){
         try {
             //create the font to use. Specify the size!
-            java.awt.Font customFont = java.awt.Font.createFont(java.awt.Font.TRUETYPE_FONT, LinkPanel.class.getResourceAsStream("fonts/"+fntName)).deriveFont(10f);
+            java.awt.Font customFont = java.awt.Font.createFont(java.awt.Font.TRUETYPE_FONT, Fonts.class.getResourceAsStream("fonts/"+fntName)).deriveFont(10f);
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             //register the font
             ge.registerFont(customFont);

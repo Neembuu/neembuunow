@@ -991,8 +991,9 @@ public final class BasicRegionHandler
             Iterator<ReadRequest> it = myPendingReadRequests.iterator();
             while(it.hasNext()){
                 ReadRequest rrs = it.next();
-                if(!rrs.isCompleted())rrs.complete(JPfmError.SUCCESS);
-                rrs.complete(JPfmError.SUCCESS);
+                if(!rrs.isCompleted()){
+                    rrs.complete(JPfmError.SUCCESS);
+                }
                 it.remove();
             }
         }catch(Exception ace){

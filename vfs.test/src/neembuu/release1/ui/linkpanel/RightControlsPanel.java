@@ -15,7 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neembuu.release1.ui;
+package neembuu.release1.ui.linkpanel;
 
 import java.awt.event.ActionListener;
 import javax.swing.JButton;

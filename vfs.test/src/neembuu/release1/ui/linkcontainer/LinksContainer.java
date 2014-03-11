@@ -15,15 +15,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neembuu.release1.ui;
+package neembuu.release1.ui.linkcontainer;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import javax.swing.GroupLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import neembuu.release1.api.ui.ExpandableUI;
 import neembuu.release1.api.ui.HeightProperty;
 import neembuu.release1.api.ui.ExpandableUIContainer;
+import neembuu.release1.ui.MainPanel;
 
 /**
  *
@@ -31,16 +34,26 @@ import neembuu.release1.api.ui.ExpandableUIContainer;
  */
 public final class LinksContainer implements ExpandableUIContainer {
     
-    private final ArrayList<ExpandableUI> expandableUIs = new ArrayList<ExpandableUI>();
-    //private final ArrayList<Constraint> constraints = new ArrayList<Constraint>();
+    final ArrayList<ExpandableUI> expandableUIs = new ArrayList<ExpandableUI>(){
+        @Override public boolean add(ExpandableUI e) {
+            linkContainerHeightProperty.notifyChange();
+            return super.add(e);}
+        @Override public boolean addAll(int index, Collection<? extends ExpandableUI> c) {
+            linkContainerHeightProperty.notifyChange();
+            return super.addAll(index, c);}
+        @Override public boolean remove(Object o) {
+            linkContainerHeightProperty.notifyChange();
+            return super.remove(o); }
+    };
+    
     private final MainPanel mp;
-    private final JFrame mainFrame;
     private final JPanel linksPanel;
     
-    LinksContainer(MainPanel mp, JFrame mainFrame) {
+    private final LCHeightProperty linkContainerHeightProperty = new LCHeightProperty(this);
+    
+    public LinksContainer(MainPanel mp, JPanel linksPanel) {
         this.mp = mp;
-        this.mainFrame = mainFrame;
-        linksPanel = mp.linksPanel;
+        this.linksPanel = linksPanel;
     }
     
     public void addUI(ExpandableUI lpI, int index){
@@ -49,57 +62,30 @@ public final class LinksContainer implements ExpandableUIContainer {
         }else {
             expandableUIs.add(index,lpI);
         }
-        lpI.heightProperty().addListener(listener);
+        lpI.heightProperty().addListener(listener_of_height_of_individual_linkuis);
         updateLayout();
     }
     
-    public void updateLayout(){        
+    private void updateLayout(){        
         //doing horizontal alignment
         GroupLayout linksPanelLayout = (GroupLayout)linksPanel.getLayout();
         GroupLayout.ParallelGroup parallelGroup = linksPanelLayout.createParallelGroup();
         for (ExpandableUI eui : expandableUIs) {
             parallelGroup.addComponent(
                     eui.getJComponent(), javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE);
-            /*if(l.getContraintComponent()!=null){
-                parallelGroup.addComponent(l.getContraintComponent(),javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE);
-            }*/
         }
         linksPanelLayout.setHorizontalGroup(linksPanelLayout.createSequentialGroup()
                 .addGap(left, left, left)
                 .addGroup(parallelGroup)
                 .addGap(right, right, right));
-        
-        //doing vertical alignment
         adjustHeightOfLinksSection(1);
-        adjustHeightOfMainWindow(1);
     }
+    
+    
     
     private final int left = 25;
     private final int right = 40;
-    private final int bottom = 20;
-    
-    private void adjustHeightOfMainWindow(double f){
-        int ht = mainFrame.getMinimumSize().height;
-        if(mp.addLinksPanel.isVisible()){
-            ht+=mp.addLinksPanel.getPreferredSize().height;
-        }
-        if(expandableUIs.isEmpty()){
-            mainFrame.setSize(mainFrame.getMinimumSize().width,ht);
-        }
-        else {
-            for (ExpandableUI eui : expandableUIs) {
-                ht+=eui.heightProperty().getValue();
-                ht+=bottom;
-            }
-            
-            ht = Math.min(ht,mainFrame.getMaximumSize().height);
-            if(ht < mainFrame.getSize().height){
-                return;
-            }
-            int w = mainFrame.getSize().width;
-            mainFrame.setSize(w,ht);
-        }
-    }
+    final int bottom = 20;
     
     private void adjustHeightOfLinksSection(double f){
         GroupLayout linksPanelLayout = (GroupLayout)linksPanel.getLayout();
@@ -107,13 +93,8 @@ public final class LinksContainer implements ExpandableUIContainer {
         
         for (ExpandableUI eui : expandableUIs) {
             sequentialGroup
-                .addComponent(eui.getJComponent(), javax.swing.GroupLayout.DEFAULT_SIZE, eui.heightProperty().getValue(), eui.heightProperty().getValue());
-            /*if(l.getContraintComponent()==null){
-                sequentialGroup.addGap(bottom, bottom, bottom);
-            }else {
-                sequentialGroup.addComponent(l.getContraintComponent(),javax.swing.GroupLayout.DEFAULT_SIZE,10,19);
-            }*/
-
+                .addComponent(eui.getJComponent(), javax.swing.GroupLayout.DEFAULT_SIZE, eui.heightProperty().getValue(), eui.heightProperty().getValue())
+                .addGap(bottom, bottom, bottom);
         }
         linksPanelLayout.setVerticalGroup(linksPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                 .addGroup(sequentialGroup));
@@ -122,13 +103,16 @@ public final class LinksContainer implements ExpandableUIContainer {
     @Override
     public void removeUI(ExpandableUI uI) {
         expandableUIs.remove(uI);
+        uI.heightProperty().removeListener(listener_of_height_of_individual_linkuis);
         linksPanel.remove(uI.getJComponent());
         updateLayout();
     }
+
+    @Override public HeightProperty heightProperty() { return linkContainerHeightProperty; }
     
-    private final HeightProperty.Listener listener = new HeightProperty.Listener() {
+    private final HeightProperty.Listener listener_of_height_of_individual_linkuis = new HeightProperty.Listener() {
             @Override public void changed(HeightProperty h, int oldValue, int newValue) {
-                updateLayout();         
-            } };
-    
+                updateLayout(); // to layout link container
+                linkContainerHeightProperty.notifyChange(); // to layout main frame
+            }};
 }

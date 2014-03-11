@@ -17,6 +17,7 @@
 
 package neembuu.release1.api.ui.actions;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import neembuu.release1.api.VirtualFile;
 
@@ -24,7 +25,9 @@ import neembuu.release1.api.VirtualFile;
  *
  * @author Shashank Tulsyan
  */
-public interface ReAddAction extends ActionListener{
+public interface ReAddAction {
+    
+    void actionPerformed(ActionEvent e,boolean newThread);
     
     void setCallBack(CallBack callBack);
     

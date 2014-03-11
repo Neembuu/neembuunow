@@ -23,4 +23,5 @@ package neembuu.release1.api.ui;
  */
 public interface ExpandableUIContainer {
     void removeUI(ExpandableUI uI);
+    HeightProperty heightProperty();
 }

@@ -14,19 +14,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package neembuu.release1.ui;
+package neembuu.release1.ui.linkpanel;
 
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
+import neembuu.release1.api.ui.ExpandableUI;
 import neembuu.release1.api.ui.ExpansionState;
 import neembuu.release1.api.ui.Graph;
 import neembuu.release1.api.ui.HeightProperty;
+import neembuu.release1.api.ui.OpenableEUI;
 import neembuu.release1.api.ui.Progress;
 import neembuu.release1.api.ui.access.ChangeDownloadModeUIA;
 import neembuu.release1.api.ui.access.CloseActionUIA;
@@ -34,6 +38,7 @@ import neembuu.release1.api.ui.access.ExpandActionUIA;
 import neembuu.release1.api.ui.access.GraphUIA;
 import neembuu.release1.api.ui.access.LowerControlsUIA;
 import neembuu.release1.api.ui.access.ProgressUIA;
+import neembuu.release1.api.ui.access.split.MultiLinkProgressUI;
 import neembuu.release1.api.ui.actions.ChangeDownloadModeAction;
 import neembuu.release1.api.ui.actions.CloseAction;
 import neembuu.release1.api.ui.actions.DeleteAction;
@@ -42,13 +47,18 @@ import neembuu.release1.api.ui.actions.ConnectionActions;
 import neembuu.release1.api.ui.actions.OpenAction;
 import neembuu.release1.api.ui.actions.ReAddAction;
 import neembuu.release1.api.ui.actions.SaveAction;
+import neembuu.release1.ui.Colors;
+import neembuu.release1.ui.Fonts;
+import neembuu.release1.ui.GraphImpl;
+import neembuu.release1.ui.HeightPropertyImpl;
+import neembuu.release1.ui.ProgressImpl;
 import neembuu.swing.TextBubbleBorder;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-final class LinkPanel extends javax.swing.JPanel {
+final class GenericLinkPanel extends javax.swing.JPanel {
 
     private final TextBubbleBorder border;
     private final Graph graph;
@@ -68,6 +78,7 @@ final class LinkPanel extends javax.swing.JPanel {
     private ChangeDownloadModeAction  changeDownloadModeAction;
     private ConnectionActions connectionActions;
     
+    
     private final String downloadFullFileToolTip = "<html>"
                 + "<b>Download entire file mode</b><br/>"
                 + "In this mode Neembuu tried to download<br/>"
@@ -77,9 +88,9 @@ final class LinkPanel extends javax.swing.JPanel {
     final HeightProperty heightProperty =  new HeightPropertyImpl();
     
     /**
-     * Creates new form FilePanel
+     * Creates new form 
      */
-    LinkPanel() {
+    GenericLinkPanel() {
         border = new TextBubbleBorder(Colors.BORDER , 4, 16, 0);
         border.getBorderInsets(null).bottom = 8;
         border.getBorderInsets(null).top = 8;
@@ -125,9 +136,6 @@ final class LinkPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         layeredPane = new javax.swing.JLayeredPane();
-        overlay = new javax.swing.JPanel();
-        reEnableButton = HiddenBorderButton.make("images/small+.png", "images/small+_s.png", false);
-        delete = HiddenBorderButton.make("images/delete.png", "images/delete_s.png", false);
         actualContentsPanel = new javax.swing.JPanel();
         vlcPane = getFileIconPanelWithButton();
         fileNamePane = new javax.swing.JPanel();
@@ -137,6 +145,10 @@ final class LinkPanel extends javax.swing.JPanel {
         fileSizeLabel = new javax.swing.JLabel();
         progressBarPanel = new javax.swing.JPanel();
         progressPercetLabel = new javax.swing.JLabel();
+        sizeAndProgressPane_ofSplit = new javax.swing.JPanel();
+        progressBarPanel_ofSplit = new javax.swing.JPanel();
+        progressPercetLabel_ofSplit = new javax.swing.JLabel();
+        splitNumberComboBox = new javax.swing.JComboBox();
         graphPanel = new javax.swing.JPanel();
         hiddenStatsPane = new javax.swing.JPanel();
         selectedConnectionLabel = new javax.swing.JLabel();
@@ -146,59 +158,17 @@ final class LinkPanel extends javax.swing.JPanel {
         killConnectionButton = new javax.swing.JButton();
         changeDownloadModeButton = new javax.swing.JToggleButton();
         linkEditButton = new javax.swing.JButton();
+        overlay = new javax.swing.JPanel();
+        reEnableButton = HiddenBorderButton.make("images/small+.png", "images/small+_s.png", false);
+        delete = HiddenBorderButton.make("images/delete.png", "images/delete_s.png", false);
 
         setBackground(new java.awt.Color(255, 255, 255));
         setBorder(border);
 
-        overlay.setBackground(Colors.OVERLAY);
-        overlay.setOpaque(false);
-        overlay.setPreferredSize(new java.awt.Dimension(40, 40));
-
-        reEnableButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/small+.png"))); // NOI18N
-        reEnableButton.setText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.reEnableButton.text")); // NOI18N
-        reEnableButton.setToolTipText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.reEnableButton.toolTipText")); // NOI18N
-        reEnableButton.setContentAreaFilled(false);
-        reEnableButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                reEnableButtonActionPerformed(evt);
-            }
-        });
-
-        delete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/delete.png"))); // NOI18N
-        delete.setText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.delete.text")); // NOI18N
-        delete.setToolTipText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.delete.toolTipText")); // NOI18N
-        delete.setContentAreaFilled(false);
-        delete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deleteActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout overlayLayout = new javax.swing.GroupLayout(overlay);
-        overlay.setLayout(overlayLayout);
-        overlayLayout.setHorizontalGroup(
-            overlayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, overlayLayout.createSequentialGroup()
-                .addContainerGap(298, Short.MAX_VALUE)
-                .addComponent(delete, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(reEnableButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(10, 10, 10))
-        );
-        overlayLayout.setVerticalGroup(
-            overlayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(overlayLayout.createSequentialGroup()
-                .addGap(2, 2, 2)
-                .addGroup(overlayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(reEnableButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(delete, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 119, Short.MAX_VALUE))
-        );
-
         actualContentsPanel.setBackground(new java.awt.Color(255, 255, 255));
 
         vlcPane.setBackground(new java.awt.Color(255, 255, 255));
-        vlcPane.setToolTipText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.vlcPane.toolTipText")); // NOI18N
+        vlcPane.setToolTipText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.vlcPane.toolTipText")); // NOI18N
         vlcPane.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         vlcPane.setPreferredSize(new java.awt.Dimension(32, 32));
 
@@ -219,7 +189,7 @@ final class LinkPanel extends javax.swing.JPanel {
 
         fileNameLabel.setBackground(new java.awt.Color(255, 255, 255));
         fileNameLabel.setFont(Fonts.MyriadPro.deriveFont(17f));
-        fileNameLabel.setText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.fileNameLabel.text")); // NOI18N
+        fileNameLabel.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.fileNameLabel.text")); // NOI18N
         fileNameLabel.setMaximumSize(new java.awt.Dimension(152, 32));
         fileNameLabel.setMinimumSize(new java.awt.Dimension(152, 32));
         fileNameLabel.setPreferredSize(new java.awt.Dimension(152, 32));
@@ -253,7 +223,7 @@ final class LinkPanel extends javax.swing.JPanel {
 
         fileSizeLabel.setBackground(new java.awt.Color(255, 255, 255));
         fileSizeLabel.setFont(Fonts.MyriadPro.deriveFont(15f));
-        fileSizeLabel.setText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.fileSizeLabel.text")); // NOI18N
+        fileSizeLabel.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.fileSizeLabel.text")); // NOI18N
 
         javax.swing.GroupLayout progressBarPanelLayout = new javax.swing.GroupLayout(progressBarPanel);
         progressBarPanel.setLayout(progressBarPanelLayout);
@@ -268,7 +238,7 @@ final class LinkPanel extends javax.swing.JPanel {
 
         progressPercetLabel.setFont(Fonts.MyriadPro.deriveFont(18f)
         );
-        progressPercetLabel.setText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.progressPercetLabel.text")); // NOI18N
+        progressPercetLabel.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.progressPercetLabel.text")); // NOI18N
 
         javax.swing.GroupLayout sizeAndProgressPaneLayout = new javax.swing.GroupLayout(sizeAndProgressPane);
         sizeAndProgressPane.setLayout(sizeAndProgressPaneLayout);
@@ -277,7 +247,7 @@ final class LinkPanel extends javax.swing.JPanel {
             .addGroup(sizeAndProgressPaneLayout.createSequentialGroup()
                 .addGap(4, 4, 4)
                 .addComponent(fileSizeLabel)
-                .addGap(20, 20, 20)
+                .addGap(25, 25, 25)
                 .addComponent(progressBarPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(progressPercetLabel)
@@ -293,6 +263,55 @@ final class LinkPanel extends javax.swing.JPanel {
             .addComponent(progressPercetLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
+        sizeAndProgressPane_ofSplit.setBackground(new java.awt.Color(255, 255, 255));
+        sizeAndProgressPane_ofSplit.setMinimumSize(new java.awt.Dimension(100, 30));
+        sizeAndProgressPane_ofSplit.setPreferredSize(new java.awt.Dimension(300, 30));
+
+        javax.swing.GroupLayout progressBarPanel_ofSplitLayout = new javax.swing.GroupLayout(progressBarPanel_ofSplit);
+        progressBarPanel_ofSplit.setLayout(progressBarPanel_ofSplitLayout);
+        progressBarPanel_ofSplitLayout.setHorizontalGroup(
+            progressBarPanel_ofSplitLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        progressBarPanel_ofSplitLayout.setVerticalGroup(
+            progressBarPanel_ofSplitLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        progressPercetLabel_ofSplit.setFont(Fonts.MyriadPro.deriveFont(18f)
+        );
+        progressPercetLabel_ofSplit.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.progressPercetLabel_ofSplit.text")); // NOI18N
+
+        splitNumberComboBox.setFont(Fonts.MyriadPro.deriveFont(11f));
+        splitNumberComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "001", "001/100MB", "700MB/420p", "1080p/700MB", "1080p/.7GB", "0.7GB/1080p", "70.0MB", "420p/500MB" }));
+        splitNumberComboBox.setMinimumSize(new java.awt.Dimension(30, 16));
+        splitNumberComboBox.setPreferredSize(new java.awt.Dimension(45, 16));
+
+        javax.swing.GroupLayout sizeAndProgressPane_ofSplitLayout = new javax.swing.GroupLayout(sizeAndProgressPane_ofSplit);
+        sizeAndProgressPane_ofSplit.setLayout(sizeAndProgressPane_ofSplitLayout);
+        sizeAndProgressPane_ofSplitLayout.setHorizontalGroup(
+            sizeAndProgressPane_ofSplitLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sizeAndProgressPane_ofSplitLayout.createSequentialGroup()
+                .addGap(0, 0, 0)
+                .addComponent(splitNumberComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addComponent(progressBarPanel_ofSplit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(progressPercetLabel_ofSplit)
+                .addGap(10, 10, 10))
+        );
+        sizeAndProgressPane_ofSplitLayout.setVerticalGroup(
+            sizeAndProgressPane_ofSplitLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sizeAndProgressPane_ofSplitLayout.createSequentialGroup()
+                .addGap(2, 2, 2)
+                .addComponent(progressBarPanel_ofSplit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(2, 2, 2))
+            .addComponent(progressPercetLabel_ofSplit, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sizeAndProgressPane_ofSplitLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(splitNumberComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
         graphPanel.setPreferredSize(new java.awt.Dimension(364, 100));
 
         javax.swing.GroupLayout graphPanelLayout = new javax.swing.GroupLayout(graphPanel);
@@ -303,13 +322,13 @@ final class LinkPanel extends javax.swing.JPanel {
         );
         graphPanelLayout.setVerticalGroup(
             graphPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
+            .addGap(0, 37, Short.MAX_VALUE)
         );
 
         hiddenStatsPane.setBackground(new java.awt.Color(255, 255, 255));
         hiddenStatsPane.setMaximumSize(new java.awt.Dimension(32767, 16));
 
-        selectedConnectionLabel.setText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.selectedConnectionLabel.text")); // NOI18N
+        selectedConnectionLabel.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.selectedConnectionLabel.text")); // NOI18N
 
         javax.swing.GroupLayout hiddenStatsPaneLayout = new javax.swing.GroupLayout(hiddenStatsPane);
         hiddenStatsPane.setLayout(hiddenStatsPaneLayout);
@@ -331,8 +350,8 @@ final class LinkPanel extends javax.swing.JPanel {
 
         previousConnectionButton.setFont(Fonts.MyriadPro.deriveFont(10f).deriveFont(Font.BOLD)
         );
-        previousConnectionButton.setText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.previousConnectionButton.text")); // NOI18N
-        previousConnectionButton.setToolTipText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.previousConnectionButton.toolTipText")); // NOI18N
+        previousConnectionButton.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.previousConnectionButton.text")); // NOI18N
+        previousConnectionButton.setToolTipText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.previousConnectionButton.toolTipText")); // NOI18N
         previousConnectionButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
         previousConnectionButton.setPreferredSize(new java.awt.Dimension(79, 18));
         previousConnectionButton.addActionListener(new java.awt.event.ActionListener() {
@@ -343,8 +362,8 @@ final class LinkPanel extends javax.swing.JPanel {
 
         nextConnectionButton.setFont(Fonts.MyriadPro.deriveFont(10f).deriveFont(Font.BOLD)
         );
-        nextConnectionButton.setText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.nextConnectionButton.text")); // NOI18N
-        nextConnectionButton.setToolTipText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.nextConnectionButton.toolTipText")); // NOI18N
+        nextConnectionButton.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.nextConnectionButton.text")); // NOI18N
+        nextConnectionButton.setToolTipText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.nextConnectionButton.toolTipText")); // NOI18N
         nextConnectionButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
         nextConnectionButton.setPreferredSize(new java.awt.Dimension(79, 18));
         nextConnectionButton.addActionListener(new java.awt.event.ActionListener() {
@@ -354,8 +373,8 @@ final class LinkPanel extends javax.swing.JPanel {
         });
 
         killConnectionButton.setFont(Fonts.MyriadPro.deriveFont(10f));
-        killConnectionButton.setText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.killConnectionButton.text")); // NOI18N
-        killConnectionButton.setToolTipText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.killConnectionButton.toolTipText")); // NOI18N
+        killConnectionButton.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.killConnectionButton.text")); // NOI18N
+        killConnectionButton.setToolTipText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.killConnectionButton.toolTipText")); // NOI18N
         killConnectionButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
         killConnectionButton.setPreferredSize(new java.awt.Dimension(79, 18));
         killConnectionButton.addActionListener(new java.awt.event.ActionListener() {
@@ -366,7 +385,7 @@ final class LinkPanel extends javax.swing.JPanel {
 
         changeDownloadModeButton.setBackground(Colors.PROGRESS_BAR_FILL_BUFFER);
         changeDownloadModeButton.setFont(Fonts.MyriadPro.deriveFont(10f));
-        changeDownloadModeButton.setText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.changeDownloadModeButton.text")); // NOI18N
+        changeDownloadModeButton.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.changeDownloadModeButton.text")); // NOI18N
         changeDownloadModeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 changeDownloadModeButtonActionPerformed(evt);
@@ -375,8 +394,8 @@ final class LinkPanel extends javax.swing.JPanel {
 
         linkEditButton.setFont(Fonts.MyriadPro.deriveFont(10f)
         );
-        linkEditButton.setText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.linkEditButton.text")); // NOI18N
-        linkEditButton.setToolTipText(org.openide.util.NbBundle.getMessage(LinkPanel.class, "LinkPanel.linkEditButton.toolTipText")); // NOI18N
+        linkEditButton.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.linkEditButton.text")); // NOI18N
+        linkEditButton.setToolTipText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.linkEditButton.toolTipText")); // NOI18N
         linkEditButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
         linkEditButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -434,7 +453,8 @@ final class LinkPanel extends javax.swing.JPanel {
                                 .addGap(10, 10, 10)
                                 .addComponent(rightCtrlPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 2, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(sizeAndProgressPane, javax.swing.GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE))))
+                            .addComponent(sizeAndProgressPane, javax.swing.GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE)
+                            .addComponent(sizeAndProgressPane_ofSplit, javax.swing.GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         actualContentsPanelLayout.setVerticalGroup(
@@ -449,12 +469,59 @@ final class LinkPanel extends javax.swing.JPanel {
                 .addGap(0, 0, 0)
                 .addComponent(sizeAndProgressPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(graphPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
+                .addComponent(sizeAndProgressPane_ofSplit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(graphPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
                 .addComponent(hiddenStatsPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
                 .addComponent(connectionControlPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0))
+        );
+
+        overlay.setBackground(Colors.OVERLAY);
+        overlay.setOpaque(false);
+        overlay.setPreferredSize(new java.awt.Dimension(40, 40));
+
+        reEnableButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/small+.png"))); // NOI18N
+        reEnableButton.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.reEnableButton.text")); // NOI18N
+        reEnableButton.setToolTipText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.reEnableButton.toolTipText")); // NOI18N
+        reEnableButton.setContentAreaFilled(false);
+        reEnableButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reEnableButtonActionPerformed(evt);
+            }
+        });
+
+        delete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/delete.png"))); // NOI18N
+        delete.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.delete.text")); // NOI18N
+        delete.setToolTipText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.delete.toolTipText")); // NOI18N
+        delete.setContentAreaFilled(false);
+        delete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout overlayLayout = new javax.swing.GroupLayout(overlay);
+        overlay.setLayout(overlayLayout);
+        overlayLayout.setHorizontalGroup(
+            overlayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, overlayLayout.createSequentialGroup()
+                .addContainerGap(298, Short.MAX_VALUE)
+                .addComponent(delete, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(reEnableButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10))
+        );
+        overlayLayout.setVerticalGroup(
+            overlayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(overlayLayout.createSequentialGroup()
+                .addGap(2, 2, 2)
+                .addGroup(overlayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(reEnableButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(delete, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 119, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layeredPaneLayout = new javax.swing.GroupLayout(layeredPane);
@@ -480,11 +547,11 @@ final class LinkPanel extends javax.swing.JPanel {
             .addGroup(layeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layeredPaneLayout.createSequentialGroup()
                     .addGap(0, 0, 0)
-                    .addComponent(overlay, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                    .addComponent(overlay, javax.swing.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE)
                     .addGap(0, 0, 0)))
         );
-        layeredPane.setLayer(overlay, javax.swing.JLayeredPane.DEFAULT_LAYER);
         layeredPane.setLayer(actualContentsPanel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        layeredPane.setLayer(overlay, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -618,11 +685,15 @@ final class LinkPanel extends javax.swing.JPanel {
     private javax.swing.JPanel overlay;
     private javax.swing.JButton previousConnectionButton;
     private javax.swing.JPanel progressBarPanel;
+    private javax.swing.JPanel progressBarPanel_ofSplit;
     private javax.swing.JLabel progressPercetLabel;
+    private javax.swing.JLabel progressPercetLabel_ofSplit;
     private javax.swing.JButton reEnableButton;
     private javax.swing.JPanel rightCtrlPane;
     private javax.swing.JLabel selectedConnectionLabel;
     private javax.swing.JPanel sizeAndProgressPane;
+    private javax.swing.JPanel sizeAndProgressPane_ofSplit;
+    private javax.swing.JComboBox splitNumberComboBox;
     private javax.swing.JPanel vlcPane;
     // End of variables declaration//GEN-END:variables
 
@@ -651,7 +722,7 @@ final class LinkPanel extends javax.swing.JPanel {
         @Override public JLabel fileNameLabel() { return fileNameLabel; }
         @Override public OpenButton openButton() { return openButton; }
         @Override public void contract() { expandAction.setExpansionState(ExpansionState.Contracted); }
-        @Override public void repaint() { LinkPanel.this.repaint(); }
+        @Override public void repaint() { GenericLinkPanel.this.repaint(); }
         @Override public JLabel fileSizeLabel(){return fileSizeLabel;}  };
     
     final ExpandActionUIA expandActionUIA = new ExpandActionUIA() {
@@ -669,7 +740,17 @@ final class LinkPanel extends javax.swing.JPanel {
         @Override public void setVisible(boolean v) { fileIconPanel.getOpenButton().setVisible(v); }
         @Override public void setIcon_bw(Icon bw) { fileIconPanel.getOpenButton().setIcon_bw(bw);}
         @Override public void setIcon_clr(Icon clr) {fileIconPanel.getOpenButton().setIcon_clr(clr);}
-        @Override public void setCaption(String caption) { throw new UnsupportedOperationException("Not supported yet.");  }
-        @Override public String getCaption() { throw new UnsupportedOperationException("Not supported yet.");  }
+        @Override public String getCaption() { return fileIconPanel.getCaption(); }
+        @Override public void setCaption(String caption) { fileIconPanel.setCaption(caption); } };
+    
+    final MultiLinkProgressUI multiLinkProgressUI = new MultiLinkProgressUI() {
+        @Override public JLabel progressPercetLabel() {return progressPercetLabel_ofSplit; }
+        @Override public JPanel progressBarPanel() { return progressBarPanel_ofSplit;}
+        @Override public JComboBox linksComboBox() { return splitNumberComboBox;}};
+    
+    final OpenableEUI expandableUI = new OpenableEUI() {
+        @Override public JComponent getJComponent() { return GenericLinkPanel.this; }
+        @Override public HeightProperty heightProperty() { return heightProperty; }
+        @Override public void open(){ reAddAction.actionPerformed(null, false); }
     };
 }

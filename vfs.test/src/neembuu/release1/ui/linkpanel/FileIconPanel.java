@@ -15,9 +15,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neembuu.release1.ui;
+package neembuu.release1.ui.linkpanel;
 
+import neembuu.release1.ui.*;
 import javax.swing.Icon;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
@@ -42,6 +44,8 @@ final class FileIconPanel {
     private HiddenBorderButton openButton = null;
     
     private final JPanel jPanel = new JPanel();
+    
+    private final JLabel captionLabel = new JLabel("1080p");
 
     public HiddenBorderButton getOpenButton() {
         return openButton;
@@ -49,6 +53,14 @@ final class FileIconPanel {
 
     public JPanel getJPanel() {
         return jPanel;
+    }
+    
+    public String getCaption() {
+        return captionLabel.getText();
+    }
+
+    public void setCaption(String caption) {
+        captionLabel.setText(caption);
     }
 
 }

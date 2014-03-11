@@ -18,9 +18,13 @@
 package neembuu.release1.ui;
 
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import neembuu.release1.Main;
 import neembuu.release1.api.ui.AddLinkUI;
+import neembuu.release1.api.ui.HeightProperty;
+import neembuu.release1.api.ui.MainComponent;
+import neembuu.release1.api.ui.actions.AddLinksAction;
 import neembuu.swing.TextBubbleBorder;
 
 /**
@@ -29,13 +33,16 @@ import neembuu.swing.TextBubbleBorder;
  */
 public class MainPanel extends javax.swing.JPanel {
 
-    private final NeembuuUI nui;
-
+    private final AddLinksAction addLinksAction;
+    private final HeightProperty.Listener listener;
+    private final MainComponent mainComponent;
     /**
      * Creates new form MainPanel
      */
-    MainPanel(NeembuuUI nui) {
-        this.nui = nui;
+    MainPanel(AddLinksAction addLinksAction,MainComponent mainComponent, HeightProperty.Listener listener) {
+        this.addLinksAction = addLinksAction;
+        this.listener = listener;
+        this.mainComponent = mainComponent;
         initComponents();
         progressAnimated.setVisible(false);
         statusLabel.setVisible(false);
@@ -341,7 +348,7 @@ public class MainPanel extends javax.swing.JPanel {
 
     private void showAddLinkUIButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showAddLinkUIButtonActionPerformed
         addLinksPanel.setVisible(!addLinksPanel.isVisible());
-        nui.updateHeight();
+        listener.changed(null, -1, -1);//nui.updateHeight();
     }//GEN-LAST:event_showAddLinkUIButtonActionPerformed
 
     private void neembuuVirtualFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_neembuuVirtualFolderButtonActionPerformed
@@ -357,12 +364,12 @@ public class MainPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_neembuuVirtualFolderButtonMouseEntered
 
     private void addLinksButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLinksButtonActionPerformed
-        nui.addLinks(true);
+        addLinksAction.addLinks(true);
     }//GEN-LAST:event_addLinksButtonActionPerformed
 
     private void addOnlyFilesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addOnlyFilesButtonActionPerformed
         // TODO add your handling code here:
-        nui.addLinks(false);
+        addLinksAction.addLinks(false);
     }//GEN-LAST:event_addOnlyFilesButtonActionPerformed
 
     private void aboutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutButtonActionPerformed
@@ -371,7 +378,7 @@ public class MainPanel extends javax.swing.JPanel {
             //java.awt.Desktop.getDesktop().browse(new java.net.URI("http://neembuu.com/now/"));
             throw new Exception();
         }catch(Exception a){
-            JOptionPane.showMessageDialog(nui.getMainComponent().getJFrame(), "Please visit\nhttp://neembuu.com/now/", "Could not automatically open link", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(mainComponent.getJFrame(), "Please visit\nhttp://neembuu.com/now/", "Could not automatically open link", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_aboutButtonActionPerformed
 
@@ -379,7 +386,7 @@ public class MainPanel extends javax.swing.JPanel {
         try{
             java.awt.Desktop.getDesktop().browse(new java.net.URI("http://neembuu.com/now/help/"));
         }catch(Exception a){
-            JOptionPane.showMessageDialog(nui.getMainComponent().getJFrame(), "Please visit\nhttp://neembuu.com/now/help/", "Could not automatically open link", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(mainComponent.getJFrame(), "Please visit\nhttp://neembuu.com/now/help/", "Could not automatically open link", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_helpButtonActionPerformed
 
@@ -456,4 +463,7 @@ public class MainPanel extends javax.swing.JPanel {
         return addLinkUI;
     }
 
+    public JPanel getLinksPanel() {
+        return linksPanel;
+    }
 }

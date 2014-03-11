@@ -71,8 +71,8 @@ public class LinkActionsImpl {
             closeAction(true,true);
         }};;
     private final ReAddAction addAndPlay = new ReAddAction() {
-        @Override public void actionPerformed(ActionEvent e) {
-            closeAction(false,false);
+        @Override public void actionPerformed(ActionEvent e,boolean anotherThread) {
+            reAddAction(anotherThread);
         }@Override public void setCallBack(ReAddAction.CallBack callBack) {
             if(LinkActionsImpl.this.callBack==null)LinkActionsImpl.this.callBack = callBack;
             else throw new IllegalStateException("Callback already set to "+LinkActionsImpl.this.callBack);
@@ -125,6 +125,16 @@ public class LinkActionsImpl {
         //singleFileLinkUI.getLinkUIContainer().removeLinkUI(singleFileLinkUI);
     }
         
+    void reAddAction(boolean anotherThread){
+        if(!anotherThread)closeAction(false, false);
+        else {
+            ui.overlay().setVisible(false); // to prevent clicks on re-add 2 twice
+            new Thread("ReAddAction{"+ui.fileNameLabel().getText()+"}"){
+                @Override public void run() { closeAction(false, false);  }
+            }.start();
+        }
+    }
+    
     void closeAction(boolean closeOrOpen,boolean onlyUI){
         ui.rightControlsPanel().setVisible(!closeOrOpen);
         ui.overlay().setVisible(closeOrOpen);

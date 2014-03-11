@@ -17,6 +17,7 @@
 
 package neembuu.release1.ui;
 
+import neembuu.release1.ui.linkcontainer.LinksContainer;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -30,9 +31,11 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import neembuu.release1.Main;
 import neembuu.release1.api.IndefiniteTask;
+import neembuu.release1.api.ui.HeightProperty;
 import neembuu.release1.api.ui.IndefiniteTaskUI;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.access.MainUIA;
+import neembuu.release1.api.ui.actions.AddLinksAction;
 import neembuu.release1.newlink.AddLinkAction;
 
 /**
@@ -61,8 +64,9 @@ public final class NeembuuUI {
     
     public NeembuuUI() {
         this.jf = makeJFrame();
-        this.mp = new MainPanel(this);
-        this.lc = new LinksContainer(mp,jf);
+        this.mp = new MainPanel(addLinksAction,mainComponent,listener);
+        this.lc = new LinksContainer(mp,mp.linksPanel);
+        lc.heightProperty().addListener(listener);
         ala = new AddLinkAction(this,mp);
         mp.neembuuVirtualFolderButton.setEnabled(false);
     }
@@ -147,9 +151,9 @@ public final class NeembuuUI {
         };
     }
     
-    void updateHeight(){
+    /*void updateHeight(){
         lc.updateLayout();
-    }
+    }*/
     
     class CloseHandler extends WindowAdapter {
         @Override
@@ -206,5 +210,34 @@ public final class NeembuuUI {
             return finishedOn.get() > 0;
         }
         
+    }
+    
+    private final HeightProperty.Listener listener = new HeightProperty.Listener() {
+            @Override public void changed(HeightProperty h, int oldValue, int newValue) {
+                adjustHeightOfMainWindow(0);
+            } };
+    
+    private final AddLinksAction addLinksAction = new AddLinksAction() {
+        @Override public void addLinks(boolean open) { NeembuuUI.this.addLinks(open); }};
+    
+    private void adjustHeightOfMainWindow(double f){
+        int ht = jf.getMinimumSize().height;
+        if(mp.addLinksPanel.isVisible()){
+            ht+=mp.addLinksPanel.getPreferredSize().height;
+        }
+        int linkContainerHeight = lc.heightProperty().getValue();
+        if(linkContainerHeight == 0){ // isEmpty
+            jf.setSize(jf.getMinimumSize().width,ht);
+        }
+        else {
+            ht += linkContainerHeight;
+            
+            ht = Math.min(ht,jf.getMaximumSize().height);
+            if(ht < jf.getSize().height){
+                return;
+            }
+            int w = jf.getSize().width;
+            jf.setSize(w,ht);
+        }
     }
 }

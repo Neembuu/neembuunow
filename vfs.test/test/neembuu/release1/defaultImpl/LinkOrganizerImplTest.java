@@ -19,10 +19,8 @@ package neembuu.release1.defaultImpl;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.linkparser.LinkParserResult;
-import org.junit.Test;
 
 /**
  *
@@ -58,7 +56,7 @@ public class LinkOrganizerImplTest {
         return trialLinkHandlers;
     }
     
-    static TrialLinkHandlerDummy make(String name){
+    public static TrialLinkHandlerDummy make(String name){
         TrialLinkHandlerDummy dummy = new TrialLinkHandlerDummy();
         dummy.displayName = name;
         return dummy;
@@ -71,7 +69,7 @@ public class LinkOrganizerImplTest {
         @Override public List<TrialLinkHandler> getFailedLinks() {return null; }
     };
     
-    private static final class TrialLinkHandlerDummy implements TrialLinkHandler{
+    public static final class TrialLinkHandlerDummy implements TrialLinkHandler{
         boolean canHandle;
         boolean multi = false;
         String displayName, url;

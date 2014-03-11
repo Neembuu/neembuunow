@@ -42,5 +42,7 @@ public interface CloseActionUIA {
         void setVisible(boolean v);
         void setIcon_bw(Icon bw);
         void setIcon_clr(Icon clr);
+        void setCaption(String caption);
+        String getCaption();
     }
 }

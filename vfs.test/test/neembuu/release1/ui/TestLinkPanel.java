@@ -17,27 +17,50 @@
 
 package neembuu.release1.ui;
 
-import java.util.logging.Level;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
-import neembuu.release1.ui.LinkPanel;
+import neembuu.release1.api.ui.MainComponent;
+import neembuu.release1.ui.linkcontainer.LinksContainer;
+import neembuu.release1.ui.linkpanel.TestGenericLinkPanel;
 
 /**
  *
  * @author Shashank Tulsyan
  */
 public class TestLinkPanel {
-    public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-        } catch (Exception lookandfeelexception) {
-            //LOGGER.log(Level.INFO," ",lookandfeelexception);
-        }
-        JFrame frame = new JFrame();
+    LinksContainer lc;
+    final MainComponent mainComponent = new MainComponent() {
+            @Override public JFrame getJFrame() { return frame; }
+        };
+    
+    public TestLinkPanel() {
+        MainPanel mp = new MainPanel(null,mainComponent, null);
+
+        lc = new LinksContainer(mp, mp.getLinksPanel());
+        
+        frame.getContentPane().add(mp);
+        
+        TestGenericLinkPanel genericLinkPanel
+                = new TestGenericLinkPanel(mp,lc,mainComponent);
+        
+        lc.addUI(genericLinkPanel.singleLink(), 0);
+        
+    }
+    
+    public static void main(String[] args) {        
+        InitLookAndFeel.init();
+        
+        frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 500);
         
-        frame.getContentPane().add(new LinkPanel());
+        
+        TestLinkPanel linkPanel = new TestLinkPanel();
+        
         frame.setVisible(true);
+        
+        
     }
+    
+    static JFrame frame;
 }
