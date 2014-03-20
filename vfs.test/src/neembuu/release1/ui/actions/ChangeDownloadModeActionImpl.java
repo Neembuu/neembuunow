@@ -17,12 +17,10 @@
 
 package neembuu.release1.ui.actions;
 
-import java.awt.event.ActionEvent;
-import neembuu.release1.api.VirtualFile;
 import neembuu.release1.api.ui.access.ChangeDownloadModeUIA;
 import neembuu.release1.api.ui.actions.ChangeDownloadModeAction;
 import neembuu.release1.ui.Colors;
-import neembuu.vfs.file.SeekableConnectionFile;
+import neembuu.vfs.file.AutoCompleteControls;
 
 /**
  *
@@ -31,7 +29,7 @@ import neembuu.vfs.file.SeekableConnectionFile;
 public class ChangeDownloadModeActionImpl implements ChangeDownloadModeAction {
     private final ChangeDownloadModeUIA ui;
     
-    private VirtualFile vf;
+    private AutoCompleteControls autoCompleteControls;
     
     private final String downloadFullFileToolTip = "<html>"
                 + "<b>Download entire file mode</b><br/>"
@@ -50,13 +48,17 @@ public class ChangeDownloadModeActionImpl implements ChangeDownloadModeAction {
         this.ui = ui;
     }
     
+    @Override public void init(AutoCompleteControls autoCompleteControls){
+        this.autoCompleteControls = autoCompleteControls;
+    }
+    
     @Override
     public boolean isAutoCompleteEnabled() {
-        return vf.getConnectionFile().isAutoCompleteEnabled();
+        return autoCompleteControls.isAutoCompleteEnabled();
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed() {
         if(ui.changeDownloadModeButton().getModel().isSelected()){
             ui.changeDownloadModeButton().setBackground(Colors.TINTED_IMAGE);
             ui.changeDownloadModeButton().setText("Download Minimum");
@@ -66,9 +68,8 @@ public class ChangeDownloadModeActionImpl implements ChangeDownloadModeAction {
             ui.changeDownloadModeButton().setBackground(Colors.PROGRESS_BAR_FILL_BUFFER);
             ui.changeDownloadModeButton().setToolTipText(downloadFullFileToolTip);
         }
-    
-        SeekableConnectionFile file = vf.getConnectionFile();
-        file.setAutoCompleteEnabled(!file.isAutoCompleteEnabled());
+            
+        autoCompleteControls.setAutoCompleteEnabled(!autoCompleteControls.isAutoCompleteEnabled());
         
         ui.repaintProgressBar();// the color of progress bar change this needs to be notified.
     }

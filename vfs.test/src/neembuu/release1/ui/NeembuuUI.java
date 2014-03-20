@@ -36,7 +36,7 @@ import neembuu.release1.api.ui.IndefiniteTaskUI;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.access.MainUIA;
 import neembuu.release1.api.ui.actions.AddLinksAction;
-import neembuu.release1.newlink.AddLinkAction;
+import neembuu.release1.ui.actions.AddLinkAction;
 
 /**
  *

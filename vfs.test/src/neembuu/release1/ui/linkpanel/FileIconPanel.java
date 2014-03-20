@@ -17,10 +17,19 @@
 
 package neembuu.release1.ui.linkpanel;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.Action;
+import javax.swing.BoxLayout;
 import neembuu.release1.ui.*;
 import javax.swing.Icon;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import neembuu.release1.api.ui.actions.OpenAction;
 
 /**
  *
@@ -37,15 +46,38 @@ final class FileIconPanel {
         openButton = HiddenBorderButton.make(bw,clr,false);
         openButton.setBounds(0, 0, 32, 32);
         openButton.setToolTipText("Click to Open/Watch");
-        jPanel.add(openButton);
         
+        relayout();
     }
     
-    private HiddenBorderButton openButton = null;
+    private void relayout(){
+        JLayeredPane jlp = new JLayeredPane();
+        jlp.setBounds(0, 0, 32, 32);
+        
+        if(captionLabel.getText()==null || captionLabel.getText().length()==0){
+            jlp.add(openButton);
+            jPanel.add(jlp);
+            return;
+        }
+
+        JPanel lbbg = new JPanel(new BorderLayout());
+        lbbg.setBackground(new Color(1,1,1,0.9f));
+        lbbg.add(captionLabel,BorderLayout.CENTER);
+        lbbg.setBounds(0, 10, 32, 12);
+        jlp.add(lbbg);
+        
+        jlp.add(openButton);
+        jPanel.add(jlp);
+        
+        jPanel.setVisible(false);
+        jPanel.setVisible(true);
+    }
+    
+    private final HiddenBorderButton openButton;
     
     private final JPanel jPanel = new JPanel();
     
-    private final JLabel captionLabel = new JLabel("1080p");
+    private JLabel captionLabel = new JLabel((String)null,SwingConstants.CENTER);
 
     public HiddenBorderButton getOpenButton() {
         return openButton;
@@ -58,9 +90,18 @@ final class FileIconPanel {
     public String getCaption() {
         return captionLabel.getText();
     }
-
+    
     public void setCaption(String caption) {
-        captionLabel.setText(caption);
+        jPanel.removeAll();
+        captionLabel = new JLabel(caption,SwingConstants.CENTER);
+        relayout();
+    }
+    
+    public void setOpenAction(final OpenAction oa){
+        openButton.addActionListener(new ActionListener() {
+            @Override public void actionPerformed(ActionEvent e) {
+                oa.actionPerformed();
+            } });
     }
 
 }

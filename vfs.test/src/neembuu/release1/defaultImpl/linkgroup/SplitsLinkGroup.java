@@ -21,13 +21,13 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
-import neembuu.release1.api.linkgroup.LinkGroup;
+import neembuu.release1.api.linkgroup.TrialLinkGroup;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public class SplitsLinkGroup implements LinkGroup {
+public class SplitsLinkGroup implements TrialLinkGroup {
 
     String name;
     final List<SplitPart> splitParts = new LinkedList<SplitPart>();
@@ -54,7 +54,8 @@ public class SplitsLinkGroup implements LinkGroup {
         return false;
     }
 
-    public String getName() {
+    @Override
+    public String tempDisplayName() {
         return name;
     }
 
@@ -88,7 +89,16 @@ public class SplitsLinkGroup implements LinkGroup {
     }
 
     @Override
-    public List<TrialLinkHandler> getLinks() {
+    public List<TrialLinkHandler> getAbsorbedLinks() {
+        final List<TrialLinkHandler> abs = new LinkedList<TrialLinkHandler>();
+        for(SplitPart sp : splitParts ){
+            abs.add(sp.getTrialLinkHandler());
+        }
+        return abs;
+    }
+    
+    @Override
+    public List<TrialLinkHandler> getFailedLinks() {
         if(complete()){
             return Collections.emptyList();
         }

@@ -162,6 +162,8 @@ final class SeekableConnectionFileImpl // package private
         synchronized (openCloseListeners){
             if(requestPatternListener!=null){
                 requestPatternListener.requested(read.getFileOffset(), read.getFileOffset()+read.getByteBuffer().capacity()-1);
+            }if(requestPatternListener2!=null){
+                requestPatternListener2.requested(read.getFileOffset(), read.getFileOffset()+read.getByteBuffer().capacity()-1);
             }
         }
     }
@@ -214,7 +216,7 @@ final class SeekableConnectionFileImpl // package private
     private final List<OpenCloseListener> openCloseListeners
             = new LinkedList<OpenCloseListener>();
     
-    private RequestPatternListener requestPatternListener = null;
+    private RequestPatternListener requestPatternListener = null, requestPatternListener2 = null;;
 
     @Override
     public TotalFileReadStatistics getTotalFileReadStatistics() {
@@ -245,7 +247,14 @@ final class SeekableConnectionFileImpl // package private
             if(requestPatternListener==null){
                 requestPatternListener = rpl;
             }else {
-                throw new UnsupportedOperationException("Only one supported for now "+requestPatternListener);
+                if(requestPatternListener2==null){
+                    requestPatternListener2 = rpl;
+                }else { 
+                    Exception k =
+                    new UnsupportedOperationException("Only 2 supported for now "+requestPatternListener);
+                    k.printStackTrace();
+                    requestPatternListener2 = rpl;
+                }
             }
         }
     }
@@ -254,7 +263,9 @@ final class SeekableConnectionFileImpl // package private
     public void removeRequestPatternListener(RequestPatternListener rpl) {
         synchronized (openCloseListeners){
             if(requestPatternListener==rpl){
-                requestPatternListener = null;
+                requestPatternListener = requestPatternListener2;
+            }else if(requestPatternListener2==rpl){
+                requestPatternListener2 = null;
             }
         }
     }

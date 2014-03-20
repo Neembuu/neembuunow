@@ -20,7 +20,7 @@ package neembuu.release1.defaultImpl.linkgroup;
 import java.util.LinkedList;
 import java.util.List;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
-import neembuu.release1.api.linkgroup.LinkGroup;
+import neembuu.release1.api.linkgroup.TrialLinkGroup;
 import neembuu.release1.api.linkgroup.LinkGrouperResults;
 import neembuu.release1.api.linkparser.LinkParserResult;
 
@@ -29,17 +29,17 @@ import neembuu.release1.api.linkparser.LinkParserResult;
  * @author Shashank Tulsyan
  */
 public class LinkGrouperResultsImpl implements LinkGrouperResults{
-    final List<LinkGroup> incomplete_linkPackages = new LinkedList<LinkGroup>();
-    final List<LinkGroup> complete_linkPackages = new LinkedList<LinkGroup>();
+    final List<TrialLinkGroup> incomplete_linkPackages = new LinkedList<TrialLinkGroup>();
+    final List<TrialLinkGroup> complete_linkPackages = new LinkedList<TrialLinkGroup>();
     final List<TrialLinkHandler> unhandleAbleLinks = new LinkedList<TrialLinkHandler>();
     
     @Override
-    public List<LinkGroup> incomplete_linkPackages() {
+    public List<TrialLinkGroup> incomplete_linkPackages() {
         return incomplete_linkPackages;
     }
 
     @Override
-    public List<LinkGroup> complete_linkPackages() {
+    public List<TrialLinkGroup> complete_linkPackages() {
         return complete_linkPackages;
     }
 

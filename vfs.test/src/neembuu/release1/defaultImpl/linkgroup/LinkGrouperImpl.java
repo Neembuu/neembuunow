@@ -19,7 +19,7 @@ package neembuu.release1.defaultImpl.linkgroup;
 
 import java.util.List;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
-import neembuu.release1.api.linkgroup.LinkGroup;
+import neembuu.release1.api.linkgroup.TrialLinkGroup;
 import neembuu.release1.api.linkgroup.LinkGroupMakers;
 import neembuu.release1.api.linkgroup.LinkGrouperResults;
 import neembuu.release1.api.linkparser.LinkParserResult;
@@ -41,12 +41,12 @@ public class LinkGrouperImpl {
         for (TrialLinkHandler trialLinkHandler : linkParserResult.results()) {
             System.out.println("handling="+trialLinkHandler.tempDisplayName());
             Inner_loop:
-            for (LinkGroup linkPackage : results.complete_linkPackages) {
+            for (TrialLinkGroup linkPackage : results.complete_linkPackages) {
                 if(linkPackage.absorb(trialLinkHandler)){
                     continue Outer_loop;
                 }
             }
-            LinkGroup res = LinkGroupMakers.tryMaking(trialLinkHandler);
+            TrialLinkGroup res = LinkGroupMakers.tryMaking(trialLinkHandler);
             
             if(res==null){
                 results.unhandleAbleLinks.add(trialLinkHandler);
@@ -62,7 +62,7 @@ public class LinkGrouperImpl {
     
     private void checkFailure(LinkGrouperResultsImpl results,LinkParserResult linkParserResult){
         Outer_loop:
-        for(LinkGroup lp : results.complete_linkPackages){
+        for(TrialLinkGroup lp : results.complete_linkPackages){
             if(!lp.complete()){
                 results.incomplete_linkPackages.add(lp);
             }

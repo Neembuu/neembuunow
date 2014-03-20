@@ -18,16 +18,14 @@
 package neembuu.release1.api.linkhandler;
 
 import java.util.List;
-import neembuu.release1.api.File;
+import neembuu.release1.api.file.OnlineFile;
 
 /**
  *
  * @author Shashank Tulsyan
  */
 public interface LinkHandler {
-    List<File> getFiles();
+    List<OnlineFile> getFiles();
     String getGroupName();
-    long getGroupSize();
     boolean foundName();
-    boolean foundSize();
 }

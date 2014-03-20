@@ -17,9 +17,7 @@
 
 package neembuu.release1.api.ui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import neembuu.release1.api.VirtualFile;
+import neembuu.release1.api.file.NeembuuFile;
 
 /**
  *
@@ -27,11 +25,12 @@ import neembuu.release1.api.VirtualFile;
  */
 public interface ReAddAction {
     
-    void actionPerformed(ActionEvent e,boolean newThread);
+    void actionPerformed(boolean newThread);
     
-    void setCallBack(CallBack callBack);
+    void addCallBack(CallBack callBack);
+    void removeCallBack(CallBack callBack);
     
     public interface CallBack {
-        void doneCreation(VirtualFile vf);
+        void doneCreation(NeembuuFile neembuuFile);
     }
 }

@@ -24,5 +24,16 @@ package neembuu.release1.api.linkhandler;
 public interface LinkHandlerProvider {
     TrialLinkHandler tryHandling(String url);
     
-    LinkHandler getLinkHandler(String url);
+    /**
+     * @param trialLinkHandler the same that was obtained from {@link #tryHandling(java.lang.String) }.
+     * Sometimes TrialLinkHandlers normalize a link. For example youtu.be/?aaaa type url changed to
+     * youtube.com/watch?aaaa type.
+     * @return null if this handler is not suited to handle this trialLink.
+     * Otherwise a working LinkHandler instance is returned.
+     * @throws Exception if this LinkHandlerProvider is the correct LinkHandlerProvider, but 
+     * due to some problem in Internet connection or something similar, has failed.
+     * If this LinkHandlerProvider thinks that this TrialLink should be checked 
+     * by some other LinkHandlerProvider is should return null.
+     */
+    LinkHandler getLinkHandler(TrialLinkHandler trialLinkHandler)throws Exception;
 }

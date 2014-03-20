@@ -22,32 +22,34 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import neembuu.util.weaklisteners.WeakListeners;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public class UIRangeArraySeriesAccess<P> implements UIRangeArrayAccess<P> {
+final class UIRangeArraySeriesAccess<P> implements UIRangeArrayAccess<P> {
     private final UIRangeArrayAccess<P>[]r;
     private final List<RangeArrayListener> rangeArrayListeners = new LinkedList<RangeArrayListener>();
     private final AtomicInteger atomicModCount = new AtomicInteger(0);
+    private final PropertyRescaler<P> propertyRescaler;
     
-    public UIRangeArraySeriesAccess(UIRangeArrayAccess<P>[] r) {
-        this.r = r; 
+    public UIRangeArraySeriesAccess(UIRangeArrayAccess<P>[] r,PropertyRescaler<P> propertyRescaler) {
+        this.r = r; this.propertyRescaler = propertyRescaler;
         for (int i = 0; i < r.length; i++) {
+            System.out.println("r[i]="+r[i]);
             r[i].addRangeArrayListener(new I_th_RAListener(this, i));
         }
     }
     
-    public UIRangeArraySeriesAccess(List<UIRangeArrayAccess<P>> rangeArrays) {
-        this(rangeArrays.toArray(new UIRangeArrayAccess[rangeArrays.size()]));
+    public UIRangeArraySeriesAccess(List<UIRangeArrayAccess<P>> rangeArrays,PropertyRescaler<P> propertyRescaler) {
+        this(rangeArrays.toArray(new UIRangeArrayAccess[rangeArrays.size()]),propertyRescaler);
     }
 
     @Override
     public void addRangeArrayListener(RangeArrayListener ral) {
         synchronized (rangeArrayListeners){
-            rangeArrayListeners.add(WeakListeners.create(RangeArrayListener.class, ral, this));
+            //rangeArrayListeners.add(WeakListeners.create(RangeArrayListener.class, ral, this));
+            rangeArrayListeners.add(ral);
         }
     }
     
@@ -68,7 +70,19 @@ public class UIRangeArraySeriesAccess<P> implements UIRangeArrayAccess<P> {
 
     @Override
     public Range<P> getFirst() {
-        return r[0].getFirst();
+        Range<P> first = null; long offset = 0;
+        for (int i = 0; i < r.length; i++) {
+            try{
+                first = r[i].getFirst();
+                if(first!=null){
+                    first = rescaledRange(first, offset,propertyRescaler);
+                    break;
+                }
+            }catch(Exception a){}
+            offset += r[i].getFileSize();
+        }
+        if(first==null){ throw new ArrayIndexOutOfBoundsException("Empty"); }
+        return first;
     }
 
     @Override
@@ -136,17 +150,22 @@ public class UIRangeArraySeriesAccess<P> implements UIRangeArrayAccess<P> {
         for (int i = 0; i < unsyncArrays.length; i++) {
             unsyncArrays[i] = r[i].tryToGetUnsynchronizedCopy();
         }
-        return new Lst(unsyncArrays, creationModCount);
+        
+        return new Lst(unsyncArrays, creationModCount,propertyRescaler,r);
     }
     
     private static final class Lst<P> implements UnsyncRangeArrayCopy<P> {
 
         private final UnsyncRangeArrayCopy[]unsyncArrays;
+        private final UIRangeArrayAccess ra[];
         final long creationModCount;
+        private final PropertyRescaler<P> propertyRescaler;
 
-        public Lst(UnsyncRangeArrayCopy[] unsyncArrays, long creationModCount) {
+        public Lst(UnsyncRangeArrayCopy[] unsyncArrays, long creationModCount,PropertyRescaler<P> propertyRescaler,UIRangeArrayAccess ra[]) {
             this.unsyncArrays = unsyncArrays;
             this.creationModCount = creationModCount;
+            this.propertyRescaler = propertyRescaler;
+            this.ra = ra;
         }
 
         @Override
@@ -177,17 +196,15 @@ public class UIRangeArraySeriesAccess<P> implements UIRangeArrayAccess<P> {
         }
 
         private Range tryGet(int index){
-            int size = 0;
+            long fileSpaceOffset = 0;
+            int arrayOffset = 0;
             for (int i = 0; i < unsyncArrays.length; i++) {
-                if(size + unsyncArrays[i].size() > index){
-                    return rescaledRange(unsyncArrays[i].get(index - size),size);
+                if(arrayOffset + unsyncArrays[i].size() > index){
+                    return rescaledRange(unsyncArrays[i].get(index - arrayOffset),fileSpaceOffset,propertyRescaler);
                 }
-                size+=unsyncArrays[i].size();
+                arrayOffset+=unsyncArrays[i].size();
+                fileSpaceOffset+=ra[i].getFileSize();
             } return null;
-        }
-        
-        private Range rescaledRange(Range orginal, long size_i){
-           return new RangeImpl(size_i+orginal.starting(), size_i+orginal.ending(), orginal.getProperty());
         }
         
         private final class Itr<P> implements Iterator<Range<P>> {
@@ -251,11 +268,16 @@ public class UIRangeArraySeriesAccess<P> implements UIRangeArrayAccess<P> {
             this.index = index;
         }
         
+        private static  boolean l = false;
+        
         @Override
         public void rangeArrayModified(long modificationResultStart, long modificationResultEnd, Range elementOperated, ModificationType modificationType, boolean removed, long modCount) {
             final UIRangeArraySeriesAccess _THIS = this_reference.get();
+            if(!l){ new Throwable().printStackTrace(); l = true;}
+            if(!l)System.out.println("ind="+index+" mod="+(+modificationResultStart)+"->"
+                    + (modificationResultEnd)+ " "+_THIS);
             if(_THIS==null)return;
-
+            _THIS.atomicModCount.incrementAndGet();
             if(_THIS.rangeArrayListeners.isEmpty())return;
             
             long relativePosition = 0;
@@ -280,7 +302,6 @@ public class UIRangeArraySeriesAccess<P> implements UIRangeArrayAccess<P> {
             synchronized (_THIS.rangeArrayListeners){
                 Collections.copy(ll, _THIS.rangeArrayListeners);
             }
-            _THIS.atomicModCount.incrementAndGet();
             for(RangeArrayListener r: ll){
                 r.rangeArrayModified(
                         relativePosition+modificationResultStart, 
@@ -294,4 +315,8 @@ public class UIRangeArraySeriesAccess<P> implements UIRangeArrayAccess<P> {
         
     }
     
+    private static Range rescaledRange(Range orginal, long offset,PropertyRescaler propertyRescaler){
+        Object rescaledProperty = propertyRescaler.rescale(orginal.getProperty(), offset);
+        return new Lst.RangeImpl(offset+orginal.starting(), offset+orginal.ending(), rescaledProperty);
+    }
 }

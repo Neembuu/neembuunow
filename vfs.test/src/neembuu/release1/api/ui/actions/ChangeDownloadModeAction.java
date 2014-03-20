@@ -17,12 +17,14 @@
 
 package neembuu.release1.api.ui.actions;
 
-import java.awt.event.ActionListener;
+import neembuu.vfs.file.AutoCompleteControls;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface ChangeDownloadModeAction extends ActionListener{
+public interface ChangeDownloadModeAction{
+    void init(AutoCompleteControls autoCompleteControls);
     boolean isAutoCompleteEnabled();
+    void actionPerformed();
 }

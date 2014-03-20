@@ -50,8 +50,8 @@ public final class LinkGroupMakers {
         defaultLinkGroupMaker = maker;
     }
 
-    public static LinkGroup tryMaking(TrialLinkHandler tlh){
-        LinkGroup linkGroup = null;
+    public static TrialLinkGroup tryMaking(TrialLinkHandler tlh){
+        TrialLinkGroup linkGroup = null;
         synchronized (makers){
             for(LinkGroupMaker maker : makers){
                 linkGroup =  maker.tryMaking(tlh);

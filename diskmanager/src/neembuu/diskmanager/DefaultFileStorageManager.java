@@ -19,6 +19,7 @@ package neembuu.diskmanager;
 import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.Comparator;
@@ -192,7 +193,7 @@ final class DefaultFileStorageManager implements FileStorageManager{
     }
     
     @Override
-    public final void completeSession(File outputFile, long fileSize)throws Exception{
+    public final void copyIfCompleteTo(SeekableByteChannel output, long fileSize)throws Exception{
         synchronized (drsms){
             Collections.sort(drsms, new Comparator<RegionStorageManager>() {
                 @Override
@@ -201,11 +202,16 @@ final class DefaultFileStorageManager implements FileStorageManager{
                 }
             });
             
-            if(outputFile!=null){
-                saveFileTo(outputFile,fileSize);
+            if(output!=null){
+                saveFileTo(output,fileSize);
             }
-            
-            
+        }
+    }
+
+    @Override
+    public void deleteSession() throws Exception{
+        synchronized (drsms){
+            close();
             for (RegionStorageManager rsm : drsms) {
                 rsm.close();
             }
@@ -228,7 +234,7 @@ final class DefaultFileStorageManager implements FileStorageManager{
         DefaultRegionStorageManager.closeLogger(readQMThLogger);
     }
     
-    private void saveFileTo(File outputFile,long fileSize)throws Exception{
+    private void saveFileTo(SeekableByteChannel output,long fileSize)throws Exception{
         long t = 0; long s=0,e=0;
         for (int i = 0; i < drsms.size(); i++) {
             s = drsms.get(i).starting(); e = drsms.get(i).endingByFileSize();
@@ -245,16 +251,9 @@ final class DefaultFileStorageManager implements FileStorageManager{
             throw a;
         }
 
-
-        FileChannel fc = //new RandomAccessFile(outputFile, "w").getChannel();
-                FileChannel.open(outputFile.toPath(),
-                    StandardOpenOption.WRITE,StandardOpenOption.CREATE
-                );
         for (RegionStorageManager rsm : drsms) {
-            rsm.transferToReOpenIfRequired(fc.position(rsm.starting()));
+            rsm.transferToReOpenIfRequired(output.position(rsm.starting()));
         }
-        fc.force(true);
-        fc.close();
     }
     
     private void deleteFiles(File[]f)throws Exception{

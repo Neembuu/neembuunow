@@ -1,7 +1,8 @@
 package neembuu.diskmanager;
 
+import java.nio.channels.FileChannel;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
-import org.junit.Test;
 
 /**
  *
@@ -30,6 +31,17 @@ public class CompleteSession {
                 }).build()
         );
         
-        dfsm.completeSession(new java.io.File("C:\\Users\\Shashank Tulsyan\\Downloads\\tl.flv"), 33576498);
+        FileChannel fc = //new RandomAccessFile(outputFile, "w").getChannel();
+                FileChannel.open(new java.io.File("C:\\Users\\Shashank Tulsyan\\Downloads\\tl.flv").toPath(),
+                    StandardOpenOption.WRITE,StandardOpenOption.CREATE
+                );
+        
+        dfsm.copyIfCompleteTo(fc, 33576498);
+        fc.force(true);
+        fc.close();
+        
+        dfsm.close();
+        
+        dfsm.deleteSession();
     }
 }

@@ -18,7 +18,7 @@
 package neembuu.release1.defaultImpl.linkgroup;
 
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
-import neembuu.release1.api.linkgroup.LinkGroup;
+import neembuu.release1.api.linkgroup.TrialLinkGroup;
 import neembuu.release1.api.linkgroup.LinkGroupMaker;
 import neembuu.release1.defaultImpl.linkgroup.SplitsLinkGroup.SplitPart;
 
@@ -29,7 +29,7 @@ import neembuu.release1.defaultImpl.linkgroup.SplitsLinkGroup.SplitPart;
 public class SplitsLinkGroupMaker implements LinkGroupMaker{
 
     @Override
-    public LinkGroup tryMaking(TrialLinkHandler tlh) {
+    public TrialLinkGroup tryMaking(TrialLinkHandler tlh) {
         return tryHandle(tlh);
     }
     

@@ -17,16 +17,24 @@
 
 package neembuu.release1.api.ui.access;
 
-import neembuu.release1.api.File;
-import neembuu.release1.api.VirtualFile;
+import jpfm.FileAttributesProvider;
+import jpfm.fs.BasicCascadableProvider;
+import jpfm.mount.BasicCascadeMount;
+import neembuu.release1.api.file.OnlineFile;
+import neembuu.release1.api.RealFileProvider;
+import neembuu.vfs.file.SeekableConnectionFile;
 
 /**
  *
  * @author Shashank Tulsyan
  */
 public interface AddRemoveFromFileSystem {
-    void remove(VirtualFile vf);
-    void add(VirtualFile vf);
+    void remove(FileAttributesProvider vf);
+    void add(FileAttributesProvider vf);
     
-    VirtualFile create(File f)throws Exception;
+    SeekableConnectionFile create(OnlineFile f)throws Exception;
+    
+    RealFileProvider getRealFileProvider();
+    
+    BasicCascadeMount cascadeMount(BasicCascadableProvider basicCascadable)throws UnsupportedOperationException;
 }

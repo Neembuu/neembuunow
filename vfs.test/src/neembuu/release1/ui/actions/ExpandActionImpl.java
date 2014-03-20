@@ -17,7 +17,6 @@
 
 package neembuu.release1.ui.actions;
 
-import java.awt.event.ActionEvent;
 import neembuu.release1.api.ui.ExpansionState;
 import neembuu.release1.api.ui.access.ExpandActionUIA;
 import neembuu.release1.api.ui.actions.ExpandAction;
@@ -29,13 +28,22 @@ import neembuu.release1.api.ui.actions.ExpandAction;
 public class ExpandActionImpl implements ExpandAction{
     private int state = 1;    
     private final ExpandActionUIA ui;
-
-    public ExpandActionImpl(ExpandActionUIA ui) {
+    
+    public enum Mode {
+        SingleLinkType,
+        MultiVariantType,
+        SplitLinkType
+    }
+    
+    private final Mode mode;
+    
+    public ExpandActionImpl(ExpandActionUIA ui, Mode mode) {
         this.ui = ui;
+        this.mode = mode;
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed() {
         expandContractPressed();
     }
    
@@ -76,7 +84,9 @@ public class ExpandActionImpl implements ExpandAction{
     }
     
     private void setToContracted(){
-        ui.sizeAndProgressPane().setVisible(false);
+        ui.setVisibleVariantProgress(false);
+        ui.setVisibleProgress(false);
+        
         ui.graphPanel().setVisible(false);{
             ui.initGraph(false);
         }
@@ -89,7 +99,8 @@ public class ExpandActionImpl implements ExpandAction{
     }
     
     private void setToSemiExpanded(){
-        ui.sizeAndProgressPane().setVisible(true);
+        showAppropriateProgressRegions();
+
         ui.graphPanel().setVisible(false);{
             ui.initGraph(false);
         }
@@ -102,7 +113,8 @@ public class ExpandActionImpl implements ExpandAction{
     }
     
     private void setToFullyExpanded(){
-        ui.sizeAndProgressPane().setVisible(true);
+        showAppropriateProgressRegions();
+        
         ui.initGraph(true);
         ui.graphPanel().setVisible(true);
         ui.hiddenStatsPane().setVisible(true);
@@ -112,4 +124,25 @@ public class ExpandActionImpl implements ExpandAction{
         
         state = 3;
     }
+    
+    private void showAppropriateProgressRegions(){
+        switch (mode) {
+            case SingleLinkType:
+                ui.setVisibleVariantProgress(false);
+                ui.setVisibleProgress(true);
+                break;
+            case SplitLinkType:
+                ui.setVisibleVariantProgress(true);
+                ui.setVisibleProgress(true);
+                ui.initVariants();
+                break;
+            case MultiVariantType:
+                ui.setVisibleVariantProgress(true);
+                ui.setVisibleProgress(false);
+                ui.initVariants();
+                break;
+            default: throw new AssertionError();
+        }
+    }
+    
 }

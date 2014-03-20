@@ -18,24 +18,21 @@
 package neembuu.release1.ui.actions;
 
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.io.File;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import neembuu.release1.Main;
-import neembuu.release1.api.linkhandler.LinkHandler;
-import neembuu.release1.api.linkhandler.LinkHandlerProviders;
+import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.RealFileProvider;
-import neembuu.release1.api.linkhandler.TrialLinkHandler;
-import neembuu.release1.api.VirtualFile;
 import neembuu.release1.api.ui.MainComponent;
-import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
+import neembuu.release1.api.file.NeembuuFileCreator;
 import neembuu.release1.api.ui.access.CloseActionUIA;
 import neembuu.release1.api.ui.access.RemoveFromUI;
 import neembuu.release1.api.ui.actions.CloseAction;
 import neembuu.release1.api.ui.actions.DeleteAction;
 import neembuu.release1.api.ui.actions.OpenAction;
 import neembuu.release1.api.ui.actions.ReAddAction;
+import neembuu.release1.api.ui.actions.ReAddAction.CallBack;
 import neembuu.release1.api.ui.actions.SaveAction;
 import neembuu.release1.ui.Colors;
 
@@ -46,73 +43,48 @@ import neembuu.release1.ui.Colors;
 public class LinkActionsImpl {
     private final CloseActionUIA ui;
     private final RemoveFromUI removeFromUI;
-    private final RealFileProvider realFileProvider;
     private final MainComponent mainComponent;
-    private final TrialLinkHandler trialLinkHandler;
     
-    private VirtualFile vf;
+    private volatile NeembuuFile connectionFile;
     
-    private final AddRemoveFromFileSystem addRemoveFromFileSystem;
+    private final NeembuuFileCreator neembuuFileCreator;
+    private final OpenAction openAction;
 
-
-    private final DeleteAction delete = new DeleteAction() {@Override public void actionPerformed(ActionEvent e) {
+    private final DeleteAction delete = new DeleteAction() {@Override public void actionPerformed() {
             delete();
         }};;
-    private final SaveAction save = new SaveAction() {@Override public void actionPerformed(ActionEvent e) {
+    private final SaveAction save = new SaveAction() {@Override public void actionPerformed() {
             saveFileClicked();
         }};;
-    private final OpenAction open = new OpenAction() {@Override public void actionPerformed(ActionEvent e) {
-            openVirtualFile();
-        }};;
+    
     private final CloseAction close = new CloseAction() {
-        @Override public void actionPerformed(ActionEvent e) {
+        @Override public void actionPerformed() {
             closeAction(true,false);}
-        @Override public void closeOnlyUI() {
+        @Override public void initializeUIAsClosed() {
             closeAction(true,true);
         }};;
     private final ReAddAction addAndPlay = new ReAddAction() {
-        @Override public void actionPerformed(ActionEvent e,boolean anotherThread) {
+        
+        @Override public void actionPerformed(boolean anotherThread) {
             reAddAction(anotherThread);
-        }@Override public void setCallBack(ReAddAction.CallBack callBack) {
-            if(LinkActionsImpl.this.callBack==null)LinkActionsImpl.this.callBack = callBack;
-            else throw new IllegalStateException("Callback already set to "+LinkActionsImpl.this.callBack);
-        }
-    };
+        }@Override public void addCallBack(CallBack callBack) {
+            LinkActionsImpl.this.callBacks.add(callBack);
+        }@Override public void removeCallBack(CallBack callBack) { 
+            LinkActionsImpl.this.callBacks.remove(callBack);
+        }};
 
-    ReAddAction.CallBack callBack = null;
+    private final LinkedList<CallBack> callBacks = new LinkedList<CallBack>();
     
-    public LinkActionsImpl(CloseActionUIA ui, RemoveFromUI removeFromUI, RealFileProvider realFileProvider, MainComponent mainComponent,AddRemoveFromFileSystem addRemoveFromFileSystem, TrialLinkHandler trialLinkHandler) {
-        this.ui = ui;
-        this.removeFromUI = removeFromUI;
-        this.realFileProvider = realFileProvider;
-        this.mainComponent = mainComponent;
-        this.addRemoveFromFileSystem = addRemoveFromFileSystem;
-        this.trialLinkHandler = trialLinkHandler;
-    }
+    public LinkActionsImpl(CloseActionUIA ui, RemoveFromUI removeFromUI, 
+            MainComponent mainComponent, NeembuuFileCreator neembuuFileCreator, OpenAction oa) {
+        this.ui = ui;this.removeFromUI = removeFromUI;openAction = oa;
+        this.mainComponent = mainComponent; this.neembuuFileCreator = neembuuFileCreator;}
     
-    public DeleteAction getDelete() {
-        return delete;
-    }
+    public DeleteAction getDelete() {return delete;}
+    public CloseAction getClose() {return close;}
 
-    
-    public CloseAction getClose() {
-        return close;
-    }
-
-    
-    public OpenAction getOpen() {
-        return open;
-    }
-
-    
-    public ReAddAction getReAdd() {
-        return addAndPlay;
-    }
-
-    
-    public SaveAction getSave() {
-        return save;
-    }
+    public ReAddAction getReAdd() {return addAndPlay;}
+    public SaveAction getSave() {return save;}
 
     
     public void delete(){
@@ -141,61 +113,57 @@ public class LinkActionsImpl {
         if(closeOrOpen){
             ui.border().setColor(Color.WHITE);
             ui.fileNameLabel().setForeground(Colors.BORDER);
-            ui.contract();
-            ui.openButton().setVisible(false);
-            if(!onlyUI)closeActionProcess(false);
+            ui.contract();ui.openButton().setVisible(false);
+            if(!onlyUI)closeActionProcess(false,false);
         }else /*open*/{
-            createNewVirtualFile();
-            ui.border().setColor(Colors.BORDER);
-            ui.repaint();
+            if(!createNewVirtualFile()){ //undo UI changes
+                closeAction(true, onlyUI);
+                ui.repaint();return;}
+            ui.border().setColor(Colors.BORDER);ui.repaint();
             ui.fileNameLabel().setForeground(Color.BLACK);
-            ui.fileNameLabel().setText(vf.getConnectionFile().getName());
+            ui.fileNameLabel().setText(connectionFile.getMinimumFileInfo().getName());
             ui.openButton().setVisible(true);
             
-            addRemoveFromFileSystem.add(vf);
-            openVirtualFile();
+            
+            connectionFile.addToFileSystem();
+            
+            openAction.actionPerformed();
             if(onlyUI){ throw new IllegalStateException("Will never happen"); }
         }
     }
     
-    void closeActionProcess(boolean ignoreError){
-        if(vf==null){ // virtual file has not been created so it cannot be closed
+    void closeActionProcess(boolean ignoreError,boolean calledFromDelete){
+        if(connectionFile==null){ // virtual file has not been created so it cannot be closed
             return;
         }
         try{
-            addRemoveFromFileSystem.remove(vf);
+            //addRemoveFromFileSystem.remove(connectionFile);
+            connectionFile.removeFromFileSystem();
         }catch(Exception a){
             if(!ignoreError)
                 Main.getLOGGER().log(Level.SEVERE, "Error in removing from filesystem, "
                     + "file might have not been added in the FS so it cannot be removed",a);
         }
         try{
-            vf.getConnectionFile().closeCompletely();
+            connectionFile.closeCompletely();
             //vf = null; file cannot be deleted if this is done.
         }catch(Exception a){
-            if(!ignoreError)Main.getLOGGER().log(Level.SEVERE, "Error in completely closing file",a);
+            if(!ignoreError && !calledFromDelete)
+                Main.getLOGGER().log(Level.SEVERE, "Error in completely closing file",a);
         }
     }
     
-    void saveAction(java.io.File outputFilePath){
-        closeActionProcess(false);
 
-        try{
-            vf.getConnectionFile().getFileStorageManager().completeSession(outputFilePath, vf.getConnectionFile().getFileSize());
-        }catch(Exception a){
-            Main.getLOGGER().log(Level.SEVERE, "Could not save file",a);
-            JOptionPane.showMessageDialog(mainComponent.getJFrame(), a.getMessage(),"Could not save file", JOptionPane.ERROR_MESSAGE);
-        }
-    }
     
     void deleteAction(){
-        VirtualFile v = vf; //closeActionProcess sets v = null, so making a copy
-        closeActionProcess(false);
+        NeembuuFile v = connectionFile; //closeActionProcess sets v = null, so making a copy
+        closeActionProcess(false,true);
         try{
             if(v==null){
                 throw new UnsupportedOperationException("File removed, but could not find and delete temporary data");
             }else {
-                v.getConnectionFile().getFileStorageManager().completeSession(null, v.getConnectionFile().getFileSize());
+                //connectionFile.getFileStorageManager().completeSession(null, connectionFile.getFileSize());
+                connectionFile.deleteSession();
             }
         }catch(Exception a){
             Main.getLOGGER().log(Level.SEVERE, "Could not delete file",a);
@@ -203,60 +171,19 @@ public class LinkActionsImpl {
         }
     }
     
+    
     void saveFileClicked(){
-        javax.swing.JFileChooser fileChooser = new javax.swing.JFileChooser();
-        fileChooser.setSelectedFile(new File(System.getProperty("java.home")+File.separator+
-                vf.getConnectionFile().getName()));
-        fileChooser.setFileSelectionMode(javax.swing.JFileChooser.FILES_ONLY);
-        int retVal = fileChooser.showSaveDialog(mainComponent.getJFrame());
-        if(retVal == javax.swing.JFileChooser.APPROVE_OPTION){
-            saveAction(fileChooser.getSelectedFile().getAbsoluteFile());
-        }else {
-
-        }
+        SaveActionImpl sai = new SaveActionImpl(connectionFile, mainComponent);
+        sai.actionPerformed();
     }
-    
-    
-    public void openVirtualFile(){
-        try{
-            if(!vf.canGetRealFile()){
-                JOptionPane.showMessageDialog(mainComponent.getJFrame(),"This file is cannot be opened directly.","Cannot open file",JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            java.io.File f = vf.getRealFile(); //File f = realFileProvider.getRealFile(vf);
-            java.awt.Desktop.getDesktop().open(f);
-
-        }catch(Exception a){
-            JOptionPane.showMessageDialog(mainComponent.getJFrame(),a.getMessage(),"Could not open file",JOptionPane.ERROR_MESSAGE);
-            Main.getLOGGER().log(Level.SEVERE,"Could not open file",a);
-        }
-    }
-    
         
-    private void createNewVirtualFile(){
-        LinkHandler linkHandler = 
-            LinkHandlerProviders.getHandler(trialLinkHandler.getReferenceLinkString());
-        if(linkHandler==null){
-            JOptionPane.showMessageDialog(mainComponent.getJFrame(), 
-                    "It seems this website is not\n"
-                    + "supported anymore by Neembuu now.", 
-                    "Could not handle this link", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        if(linkHandler.getFiles().size() > 1) {
-            Main.getLOGGER().info("LinkHandler "+linkHandler+" has more than one file when"
-                    + " it was expected to have only one. Using only first file.");
-        }
-        
-        neembuu.release1.api.File f = linkHandler.getFiles().get(0);
-        
-        if(vf!=null){
-            closeActionProcess(true);
+    private boolean createNewVirtualFile(){        
+        if(connectionFile!=null){
+            closeActionProcess(true,false);
         }
         
         try{
-            vf = addRemoveFromFileSystem.create(f);
+            connectionFile = neembuuFileCreator.create();
         }catch(Exception a){
             JOptionPane.showMessageDialog(mainComponent.getJFrame(), 
                     "Sorry! There is nothing you \n"
@@ -264,11 +191,16 @@ public class LinkActionsImpl {
                     + "Reason : "+a.getMessage(), 
                     "Could not make virtual file", JOptionPane.ERROR_MESSAGE);
             a.printStackTrace();
+            return false;
         }
         
-        if(callBack==null){
+        if(callBacks.isEmpty()){
             throw new IllegalStateException("Creation call back not set");
-        }callBack.doneCreation(vf);
+        }for (CallBack callBack : callBacks) {
+            callBack.doneCreation(connectionFile);
+        }
+        
+        return true;
     }
     
     

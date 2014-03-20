@@ -136,11 +136,7 @@ final class DefaultRegionStorageManager implements RegionStorageManager{
     @Override
     public void transferToReOpenIfRequired(WritableByteChannel wbc)throws IOException {
         FileChannel tempFileChannel;
-        if(fileChannel.isOpen()){
-            tempFileChannel = fileChannel;
-        }else {
-            tempFileChannel = new RandomAccessFile(regionStore, "r").getChannel();
-        }
+        tempFileChannel = new RandomAccessFile(regionStore, "r").getChannel();
         tempFileChannel.transferTo(0, amountWritten, wbc);
         tempFileChannel.close();
     }

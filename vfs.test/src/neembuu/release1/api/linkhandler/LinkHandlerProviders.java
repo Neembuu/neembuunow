@@ -77,26 +77,22 @@ public final class LinkHandlerProviders {
     }
     
     
-    public static LinkHandler getHandler(String url){
+    public static LinkHandler getHandler(TrialLinkHandler trialLinkHandler)throws Exception{
 //        printProviders();
-        TrialLinkHandler trialLinkHandler;
+        // todo : we need to add code which allows us to distinguish between handlers
+        // like there might be 2 handlers for the same link, of should have preferance
+        // over other. Like we can have 2 implementations of YoutubeLinkHanlder
+        // both should be tried and whichever works should be used.
+        // also if both work, there should be a way to give preferance to one of them.
+        // like some kind of priority/ranking flag
         synchronized (providers){
             for(LinkHandlerProvider fnasp : providers){
-                trialLinkHandler = fnasp.tryHandling(url);
                 if(trialLinkHandler.canHandle()){
-                    System.out.println(fnasp.getClass().getSimpleName() + " is handling " + url);
-                    LOGGER.log(Level.INFO, "{0} is handling {1}", new Object[]{fnasp.getClass().getSimpleName(), url});
-                    return fnasp.getLinkHandler(url);
+                    LinkHandler lh = fnasp.getLinkHandler(trialLinkHandler);
+                    if(lh!=null){return lh;}
                 }
             }
-            
-            //Check if the default provider can handle this link
-            trialLinkHandler = defaultLinkProvider.tryHandling(url);
-            if(trialLinkHandler.canHandle()){
-                return defaultLinkProvider.getLinkHandler(url);
-            }
-            
-            return null;
+            return defaultLinkProvider.getLinkHandler(trialLinkHandler); // may be null
         }
     }
     /**

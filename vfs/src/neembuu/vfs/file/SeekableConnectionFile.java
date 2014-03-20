@@ -16,7 +16,7 @@
  */
 package neembuu.vfs.file;
 
-import jpfm.DirectoryStream;
+import jpfm.JPfmMutableContainable;
 import jpfm.volume.CascadableAbstractFile;
 import jpfm.volume.OpenCloseListener;
 import neembuu.diskmanager.FileStorageManager;
@@ -27,9 +27,10 @@ import neembuu.diskmanager.FileStorageManager;
  */
 public interface SeekableConnectionFile 
     extends FileBeingDownloaded,
-            CascadableAbstractFile{
+            CascadableAbstractFile,
+            AutoCompleteControls,
+            JPfmMutableContainable{
     DownloadConstrainHandler getDownloadConstrainHandler();
-    void setParent(DirectoryStream parent);
     void addDownloadCompletedListener(DownloadCompletedListener dcl);
     void removeDownloadCompletedListener(DownloadCompletedListener dcl);
     
@@ -40,11 +41,10 @@ public interface SeekableConnectionFile
     /**
      * Called when file has been unmounted and so all resources must be closed
      * for good.
+     * @throws java.lang.Exception
      */
     void closeCompletely()throws Exception;
     
     void addOpenCloseListener(OpenCloseListener closeListener);
     void removeOpenCloseListener(OpenCloseListener closeListener);
-    
-    void setAutoCompleteEnabled(boolean autoCompleteEnabled);
 }

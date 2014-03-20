@@ -17,23 +17,12 @@
 package neembuu.release1.ui.actions;
 
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.logging.Level;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import neembuu.release1.Main;
-import neembuu.release1.api.VirtualFile;
+import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.ui.access.CloseActionUIA;
 import neembuu.release1.api.ui.access.LowerControlsUIA;
+import neembuu.release1.api.ui.actions.ChangeDownloadModeAction;
 import neembuu.release1.api.ui.actions.ReAddAction;
-import neembuu.release1.ui.Colors;
-import neembuu.release1.ui.TintedGreyScaledImage;
-import neembuu.vfs.file.FileBeingDownloaded;
+import neembuu.vfs.file.MinimumFileInfo;
 
 
 /**
@@ -44,103 +33,36 @@ public class ReAddActionCallBackImpl implements ReAddAction.CallBack {
 
     private final CloseActionUIA uia;
     private final LowerControlsUIA lowerControlUIA;
+    private final ChangeDownloadModeAction changeDownloadModeAction;
+    
+    private final boolean initalizeProgress;
 
-    public ReAddActionCallBackImpl(CloseActionUIA uia, LowerControlsUIA lowerControlUIA) {
-        this.uia = uia;
+    public ReAddActionCallBackImpl(CloseActionUIA uia, LowerControlsUIA lowerControlUIA,
+            ChangeDownloadModeAction changeDownloadModeAction,boolean initalizeProgress) {
+        this.uia = uia; this.initalizeProgress = initalizeProgress;
         this.lowerControlUIA = lowerControlUIA;
+        this.changeDownloadModeAction = changeDownloadModeAction;
     }
 
     @Override
-    public void doneCreation(VirtualFile vf) {
-        FileBeingDownloaded file = vf.getFileUIAccess();
+    public void doneCreation(NeembuuFile neembuuFile) {
 
-        uia.fileNameLabel().setText(vf.getConnectionFile().getName());
-        updateFileSizeString(file);
+        uia.fileNameLabel().setText(neembuuFile.getMinimumFileInfo().getName());
+        updateFileSizeString(neembuuFile.getMinimumFileInfo());
 
-        lowerControlUIA.progress().init(file);
-
-        try {
-            Path tempFile = Files.createTempFile(null, getFileExtension(file.getName()));
-            java.io.File tempfile1 = tempFile.toFile();
-
-            Icon clr = null, bw = null;
-            try {
-                Image clri = sun.awt.shell.ShellFolder.getShellFolder(tempfile1).getIcon(true);
-                clr = new ImageIcon(clri);
-            } catch (Exception a) {
-                clr = javax.swing.filechooser.FileSystemView.getFileSystemView().getSystemIcon(tempfile1);
-            }
-            
-            try{
-                Files.delete(tempFile);
-            }catch(Exception a){
-                // creating a junk file : | 
-                a.printStackTrace();
-            }
-            
-            bw = TintedGreyScaledImage.getTintedImage(getBF(clr), Colors.TINTED_IMAGE, false);
-            uia.openButton().setIcon_bw(bw);
-            uia.openButton().setIcon_clr(clr);
-        } catch (Exception a) {
-            Main.getLOGGER().log(Level.INFO, "Could not find icon, using default", a);
+        if(initalizeProgress){
+            lowerControlUIA.progress().init(neembuuFile.fileBeingDownloaded());
         }
+        changeDownloadModeAction.init(neembuuFile.autoCompleteControls());
+        
+        Utils.TintedIcons tintedIcons = Utils.makeTintedIconsForFile(neembuuFile.getMinimumFileInfo().getName());
+        if(tintedIcons==null){return;}
+        uia.openButton().setIcon_silent(tintedIcons.unicoloredIcon);
+        uia.openButton().setIcon_active(tintedIcons.coloredIcon);
     }
 
-    private void updateFileSizeString(FileBeingDownloaded fileBeingDownloaded) {
-        double sz = fileBeingDownloaded.getFileSize();
-        String suffix;
-        if (sz < 1000) {
-            suffix = " B";
-        } else if (sz < 1000 * 1000) {
-            suffix = " KB";
-            sz /= 1024;
-        } else if (sz < 1000 * 1000 * 1000) {
-            suffix = " MB";
-            sz /= 1024 * 1024;
-        } else if (sz < 1000 * 1000 * 1000 * 1000) {
-            suffix = " GB";
-            sz /= 1024 * 1024 * 1024;
-        } else {
-            suffix = " TB";
-            sz /= 1024 * 1024 * 1024 * 1024;
-        }
-        if (sz < 10) {
-            sz = Math.round(sz * 100.0) / 100.0;
-        } else if (sz < 100) {
-            sz = Math.round(sz * 10.0) / 10.0;
-        }
-        uia.fileSizeLabel().setText(sz + " " + suffix);
+    private void updateFileSizeString(MinimumFileInfo fileInfo) {
+        uia.fileSizeLabel().setText(Utils.makeFileSizeString(fileInfo));
     }
 
-    private static BufferedImage getBF(Icon icon) {
-        BufferedImage bi = new BufferedImage(
-                icon.getIconWidth(),
-                icon.getIconHeight(),
-                BufferedImage.TYPE_INT_RGB);
-        Graphics g = bi.createGraphics();
-        g.setColor(Color.WHITE);
-        g.fillRect(0, 0, icon.getIconWidth(), icon.getIconHeight());
-        // paint the Icon to the BufferedImage.
-        icon.paintIcon(null, g, 0, 0);
-        return bi;
-    }
-
-    private static BufferedImage getBF(Image img) {
-        BufferedImage bi = new BufferedImage(32, 32, BufferedImage.TYPE_INT_RGB);
-        Graphics g = bi.createGraphics();
-        g.setColor(Color.WHITE);
-        bi.getGraphics().drawImage(img, 0, 0, null);
-        return bi;
-    }
-    
-    private String getFileExtension(String fn){
-        if(!fn.contains(".")){
-            return ".";
-        }
-        int di = fn.lastIndexOf(".");
-        if (di > 0) {
-            return fn.substring(di);
-        }
-        return ".";
-    }
 }

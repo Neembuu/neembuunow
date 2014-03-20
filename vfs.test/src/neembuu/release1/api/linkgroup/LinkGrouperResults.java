@@ -25,7 +25,7 @@ import neembuu.release1.api.linkhandler.TrialLinkHandler;
  * @author Shashank Tulsyan
  */
 public interface LinkGrouperResults {
-    List<LinkGroup> incomplete_linkPackages();
-    List<LinkGroup> complete_linkPackages();
+    List<TrialLinkGroup> incomplete_linkPackages();
+    List<TrialLinkGroup> complete_linkPackages();
     List<TrialLinkHandler> unhandleAbleLinks();
 }

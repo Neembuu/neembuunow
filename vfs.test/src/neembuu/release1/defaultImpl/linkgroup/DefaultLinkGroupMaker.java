@@ -18,7 +18,7 @@
 package neembuu.release1.defaultImpl.linkgroup;
 
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
-import neembuu.release1.api.linkgroup.LinkGroup;
+import neembuu.release1.api.linkgroup.TrialLinkGroup;
 import neembuu.release1.api.linkgroup.LinkGroupMaker;
 
 /**
@@ -27,7 +27,7 @@ import neembuu.release1.api.linkgroup.LinkGroupMaker;
  */
 public class DefaultLinkGroupMaker implements LinkGroupMaker {
     @Override
-    public LinkGroup tryMaking(TrialLinkHandler tlh){
+    public TrialLinkGroup tryMaking(TrialLinkHandler tlh){
         DefaultLinkGroup result = new DefaultLinkGroup(tlh);
         return result;
     }

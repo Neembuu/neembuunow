@@ -513,8 +513,8 @@ public final class MonitoredSeekableHttpFilePanel
     private void killConnectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_killConnectionActionPerformed
         System.err.println("kill button pressed for region="+lastRegionSelected);
         try{
-            ((neembuu.vfs.readmanager.impl.BasicRegionHandler)lastRegionSelected.getProperty()).
-                    getConnection().abort();
+            ((neembuu.vfs.readmanager.ReadRequestState)lastRegionSelected.getProperty()).
+                    getConnectionControls().abort();
         }catch(Exception any){
             LOGGER.log(Level.SEVERE, "Connection killing exception", any);
         }

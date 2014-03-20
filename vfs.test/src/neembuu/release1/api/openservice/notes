@@ -1,0 +1,33 @@
+
+http://stackoverflow.com/questions/18326507/how-to-get-command-line-of-windows-open-with-function
+http://msdn.microsoft.com/en-us/library/windows/desktop/bb773471%28v=vs.85%29.aspx
+
+
+TCHAR commandline[1024];
+DWORD size = ARRAYSIZE(commandline);
+AssocQueryString(0, ASSOCSTR_COMMAND, _T(".txt"), 0, commandline, &size);
+
+https://tortoisesvn.googlecode.com/svn/trunk/src/Utils/CommonAppUtils.cpp
+
+
+Idea1
+1) Use tortoise code
+make it a dll
+load the dll
+call native functions
+
+OR
+
+use JNA to do the same thing as above
+
+2) VLC
+2.1) Find VLC using heuristics
+2.1.1) Find if VLC bundled with Neembuu present
+2.1.2) Find in Program files\VideoLan\VLC
+2.1.3) Find in Program files (x86)\VideoLan\VLC
+2.1.4) Ask user to download VLC if not present
+
+
+3) Fallback
+Call ShellExecute using standard Java library
+

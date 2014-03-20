@@ -24,5 +24,5 @@ import neembuu.release1.api.linkhandler.TrialLinkHandler;
  * @author Shashank Tulsyan
  */
 public interface LinkGroupMaker {
-    LinkGroup tryMaking(TrialLinkHandler tlh);
+    TrialLinkGroup tryMaking(TrialLinkHandler tlh);
 }

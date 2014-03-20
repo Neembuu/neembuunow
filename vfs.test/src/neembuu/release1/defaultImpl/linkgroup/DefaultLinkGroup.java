@@ -20,14 +20,14 @@ package neembuu.release1.defaultImpl.linkgroup;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import neembuu.release1.api.linkgroup.LinkGroup;
+import neembuu.release1.api.linkgroup.TrialLinkGroup;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public class DefaultLinkGroup implements LinkGroup { 
+public class DefaultLinkGroup implements TrialLinkGroup { 
 
     @Override
     public boolean absorb(TrialLinkHandler other) {
@@ -49,7 +49,12 @@ public class DefaultLinkGroup implements LinkGroup {
     }
 
     @Override
-    public List<TrialLinkHandler> getLinks() {
+    public List<TrialLinkHandler> getFailedLinks() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<TrialLinkHandler> getAbsorbedLinks() {
         return Collections.singletonList(tlh);
     }
     
@@ -64,5 +69,8 @@ public class DefaultLinkGroup implements LinkGroup {
         return result;
     }
 
-    
+    @Override
+    public String tempDisplayName() {
+        return tlh.tempDisplayName();
+    }
 }

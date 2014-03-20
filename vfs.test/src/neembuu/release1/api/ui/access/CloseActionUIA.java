@@ -40,8 +40,8 @@ public interface CloseActionUIA {
     
     public interface OpenButton {
         void setVisible(boolean v);
-        void setIcon_bw(Icon bw);
-        void setIcon_clr(Icon clr);
+        void setIcon_silent(Icon bw);
+        void setIcon_active(Icon clr);
         void setCaption(String caption);
         String getCaption();
     }

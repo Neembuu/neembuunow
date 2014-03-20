@@ -21,5 +21,9 @@ package neembuu.release1.api;
  * @author Shashank Tulsyan
  */
 public interface RealFileProvider {
-    java.io.File getRealFile(VirtualFile vf);
+    /**
+     * @param relativePathInVirtualFileSystem 
+     * @return null if not found, do not throw exception
+     */
+    java.io.File getRealFile(String... relativePathInVirtualFileSystem);
 }

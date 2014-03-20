@@ -126,12 +126,32 @@ final class GeneralThrottle implements Throttle {
                 }
             }else {
                 synchronized(cp.getThrottlingLock()){
-                    cp.getThrottlingLock().wait((long)millisec, nanosec);
+                    long actualWait = normalizeWaitTime((long)millisec, nanosec);
+                    if(actualWait>0){
+                        cp.getThrottlingLock().wait(actualWait);
+                    } // wait = 0 mean infinite wait :O :O :O  O my God!
+                    // while it should actually be no wait as per our purpose.
                 }
             }
         }catch(InterruptedException ie){
             logThrottleState(127, null,ie);
         }
+    }
+    
+    private long normalizeWaitTime(long timeout, long nanos){
+        if (timeout < 0) {
+            throw new IllegalArgumentException("timeout value is negative");
+        }
+
+        if (nanos < 0 || nanos > 999999) {
+            throw new IllegalArgumentException(
+                                "nanosecond timeout value out of range");
+        }
+
+        if (nanos >= 500000 || (nanos != 0 && timeout == 0)) {
+            timeout++;
+        }
+        return timeout;
     }
     
     @Override

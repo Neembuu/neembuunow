@@ -16,15 +16,14 @@
  */
 package neembuu.release1.api.ui.actions;
 
-import java.awt.event.ActionListener;
 import neembuu.release1.api.ui.ExpansionState;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface ExpandAction extends ActionListener{
+public interface ExpandAction{
     ExpansionState getExpansionState();
-    
+    void actionPerformed();
     void setExpansionState(ExpansionState es);
 }

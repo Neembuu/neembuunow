@@ -24,16 +24,13 @@ import neembuu.vfs.readmanager.TotalFileReadStatistics;
  * This contains functions that UI classes might be interested in.
  * @author Shashank Tulsyan
  */
-public interface FileBeingDownloaded {
+public interface FileBeingDownloaded extends MinimumFileInfo{
 
     UIRangeArrayAccess getRegionHandlers();
     
     TotalFileReadStatistics getTotalFileReadStatistics();
     
     boolean isAutoCompleteEnabled();
-    
-    String getName();
-    long getFileSize();
     
     void addRequestPatternListener(RequestPatternListener rpl);
     void removeRequestPatternListener(RequestPatternListener rpl);

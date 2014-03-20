@@ -18,7 +18,6 @@
 package neembuu.release1.api.ui.access;
 
 import javax.swing.JPanel;
-import neembuu.rangearray.Range;
 import neembuu.release1.api.ui.HeightProperty;
 
 /**
@@ -28,14 +27,19 @@ import neembuu.release1.api.ui.HeightProperty;
 public interface ExpandActionUIA {
     JPanel connectionControlPane();
     JPanel graphPanel();
-    JPanel sizeAndProgressPane();
     JPanel hiddenStatsPane();
     
     void initGraph(boolean findFirst);
+    void initVariants();
     
     short ht_smallest();
     short ht_medium();
     short ht_tallest();
     
     HeightProperty getHeight();
+    
+    void setVisibleProgress(boolean b);
+    void setVisibleVariantProgress(boolean b);
+    void setVisibleFileSize(boolean b);
+    void setVariantChooser(boolean b);
 }

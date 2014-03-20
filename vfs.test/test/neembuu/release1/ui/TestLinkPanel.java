@@ -17,8 +17,9 @@
 
 package neembuu.release1.ui;
 
+import neembuu.release1.ui.linkpanel.FakeLinkHandlerProvider;
 import javax.swing.JFrame;
-import javax.swing.UIManager;
+import neembuu.release1.api.linkhandler.LinkHandlerProviders;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.ui.linkcontainer.LinksContainer;
 import neembuu.release1.ui.linkpanel.TestGenericLinkPanel;
@@ -44,7 +45,8 @@ public class TestLinkPanel {
                 = new TestGenericLinkPanel(mp,lc,mainComponent);
         
         lc.addUI(genericLinkPanel.singleLink(), 0);
-        
+        //lc.addUI(genericLinkPanel.multiLink(), 0);
+        lc.addUI(genericLinkPanel.multiVariantTypeLink(),0);
     }
     
     public static void main(String[] args) {        
@@ -52,14 +54,11 @@ public class TestLinkPanel {
         
         frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 500);
+        frame.setSize(600, 500);
         
-        
+        LinkHandlerProviders.registerDefaultProvider(new FakeLinkHandlerProvider());
         TestLinkPanel linkPanel = new TestLinkPanel();
-        
         frame.setVisible(true);
-        
-        
     }
     
     static JFrame frame;

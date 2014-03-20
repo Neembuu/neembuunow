@@ -66,7 +66,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -84,7 +83,6 @@ import neembuu.rangearray.RangeArrayUtils;
 import neembuu.rangearray.RangeUtils;
 import neembuu.rangearray.UnsyncRangeArrayCopy;
 import neembuu.rangearray.UnsynchronizedAccess;
-import neembuu.util.weaklisteners.WeakListeners;
 
 /**
  * RangeArray is like a {@link java.util.Vector } (Vector can be thought of as an expandable array)
@@ -1823,13 +1821,17 @@ public class RangeArrayImpl<P>
         UnsyncRangeArrayCopy rs = tryToGetUnsynchronizedCopy();
         for(int i=rs.size()-1;i>=0;i--){
             int val = RangeUtils.compare(rs.get(i), element);
-            if(val==0)return rs.get(i-1);
+            if(val==0){
+                if(i < 1) return null;
+                return rs.get(i-1);
+            }
             else if(val<0)return null;
         }return null;
     }
 
     @Override
     public Range<P> getFirst() {
+        if(isEmpty()){throw new IndexOutOfBoundsException("Empty");}
         return store.get(1);
     }
 
@@ -2235,7 +2237,8 @@ public class RangeArrayImpl<P>
     @Override
     public final void addRangeArrayListener(RangeArrayListener ral){
         synchronized (rangeArrayListeners){
-            rangeArrayListeners.add(WeakListeners.create(RangeArrayListener.class, ral, this));
+            //rangeArrayListeners.add(WeakListeners.create(RangeArrayListener.class, ral, this));
+            rangeArrayListeners.add(ral);
         }
     }
     

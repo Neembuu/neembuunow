@@ -18,16 +18,13 @@
 package neembuu.release1.defaultImpl;
 
 import neembuu.release1.defaultImpl.linkgroup.LinkGrouperImpl;
-import neembuu.release1.api.linkgroup.LinkGroup;
+import neembuu.release1.api.linkgroup.TrialLinkGroup;
 import java.util.LinkedList;
 import java.util.List;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
-import neembuu.release1.api.linkgroup.LinkGroupMakers;
 import neembuu.release1.api.linkgroup.LinkGrouperResults;
 import neembuu.release1.api.linkparser.LinkParserResult;
 import static neembuu.release1.defaultImpl.LinkOrganizerImplTest.makeList_TrialLinkHandler;
-import neembuu.release1.defaultImpl.linkgroup.DefaultLinkGroupMaker;
-import neembuu.release1.defaultImpl.linkgroup.SplitsLinkGroupMaker;
 
 /**
  *
@@ -37,7 +34,7 @@ public class LinkGrouperTest {
     public static void main(String[] args) {        
         final LinkedList<TrialLinkHandler> trialLinkHandlers = makeList_TrialLinkHandler();
         
-        List<LinkGroup> linkPackages = new LinkedList<LinkGroup>();
+        List<TrialLinkGroup> linkPackages = new LinkedList<TrialLinkGroup>();
         
         LinkGrouperImpl grouperImpl = new LinkGrouperImpl();
         LinkGrouperResults results =  grouperImpl.group(new LinkParserResult() {
@@ -46,11 +43,11 @@ public class LinkGrouperTest {
         });
         
         System.out.println("+++done+++");
-        for(LinkGroup lg : results.complete_linkPackages()){
+        for(TrialLinkGroup lg : results.complete_linkPackages()){
             System.out.println(lg);
         }
         System.out.println("+++incomplete+++");
-        for(LinkGroup lg : results.incomplete_linkPackages()){
+        for(TrialLinkGroup lg : results.incomplete_linkPackages()){
             System.out.println(lg);
         }
         System.out.println("+++unhandlable+++");

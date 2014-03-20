@@ -17,7 +17,7 @@
 package neembuu.release1.ui.linkcontainer;
 
 import java.util.LinkedList;
-import neembuu.release1.api.ui.ExpandableUI;
+import neembuu.release1.api.ui.linkpanel.ExpandableUI;
 import neembuu.release1.api.ui.HeightProperty;
 
 /**

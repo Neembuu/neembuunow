@@ -77,4 +77,6 @@ public interface ReadRequestState{
     String tryGettingPendingRequestsList();
     
     boolean isMainDirectionOfDownload();
+    
+    ConnectionControls getConnectionControls();
 }

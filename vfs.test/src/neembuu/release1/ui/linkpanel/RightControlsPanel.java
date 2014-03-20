@@ -17,9 +17,13 @@
 
 package neembuu.release1.ui.linkpanel;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import neembuu.release1.api.ui.actions.CloseAction;
+import neembuu.release1.api.ui.actions.ExpandAction;
+import neembuu.release1.api.ui.actions.SaveAction;
 
 /**
  *
@@ -86,11 +90,17 @@ final class RightControlsPanel {
     
     
     void initActions(
-            ActionListener expandContractPressed, 
-            ActionListener saveFileClicked, 
-            ActionListener closeAction){
-        downBtn.addActionListener(expandContractPressed);
-        saveBtn.addActionListener(saveFileClicked);
-        crossBtn.addActionListener(closeAction);
+            final ExpandAction expandContractPressed, 
+            final SaveAction saveFileClicked, 
+            final CloseAction closeAction){
+        downBtn.addActionListener(new ActionListener() {
+            @Override public void actionPerformed(ActionEvent e) {
+                expandContractPressed.actionPerformed(); }});
+        saveBtn.addActionListener(new ActionListener() {
+            @Override public void actionPerformed(ActionEvent e) {
+                saveFileClicked.actionPerformed(); }});
+        crossBtn.addActionListener(new ActionListener() {
+            @Override public void actionPerformed(ActionEvent e) {
+                closeAction.actionPerformed(); }});
     }
 }

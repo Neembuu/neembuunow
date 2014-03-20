@@ -72,18 +72,23 @@ public class LinkOrganizerImplTest {
     public static final class TrialLinkHandlerDummy implements TrialLinkHandler{
         boolean canHandle;
         boolean multi = false;
-        String displayName, url;
+        String displayName, url,fileSource;
+        double fakeSpeedTarget_inKiBps;
         
-        TrialLinkHandlerDummy canHandle(boolean b){canHandle = b; return this;}
-        TrialLinkHandlerDummy multi(boolean b){multi = b; return this;}
-        TrialLinkHandlerDummy displayName(String n){displayName = n; return this;}
-        TrialLinkHandlerDummy url(String u){url = u; return this;}
+        public TrialLinkHandlerDummy canHandle(boolean b){canHandle = b; return this;}
+        public TrialLinkHandlerDummy multi(boolean b){multi = b; return this;}
+        public TrialLinkHandlerDummy displayName(String n){displayName = n; return this;}
+        public TrialLinkHandlerDummy url(String u){url = u; return this;}
+        public TrialLinkHandlerDummy fileSource(String fileSrc){fileSource = fileSrc; return this;}
+        public TrialLinkHandlerDummy fakeSpeedTarget_inKiBps(double s){fakeSpeedTarget_inKiBps = s; return this;}
         
         @Override public boolean canHandle() { return true; }
         @Override public String getErrorMessage() { return null; }
         @Override public boolean containsMultipleLinks() {return multi; }
         @Override public String tempDisplayName() { return displayName; }
         @Override public String getReferenceLinkString() { return url; }
-        //@Override public LinkHandlerProvider getLinkHandlerProvider() { return null; }
+        public String getFileSource() { return fileSource; }
+        public double getFakeSpeedTarget_inKiBps() { return fakeSpeedTarget_inKiBps;}
+        //@Override public LinkHandlerProvider getLinkHandlerProvider() { return null; }        
     }
 }

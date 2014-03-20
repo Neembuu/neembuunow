@@ -18,8 +18,8 @@
 package neembuu.release1.api.ui.access;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import neembuu.release1.api.ui.ExpansionState;
 
 /**
@@ -27,10 +27,12 @@ import neembuu.release1.api.ui.ExpansionState;
  * @author Shashank Tulsyan
  */
 public interface ProgressUIA {
-    JButton saveButton();
+    JComponent saveButton();
     ExpansionState getExpansionState();
-    JLabel progressPercetLabel();
-    JButton killConnectionButton();
     
-    JPanel progressBarPanel();
+    ProgressUI overallProgressUI();
+    ProgressUI variantProgressUI();
+    
+    JButton killConnectionButton();
+    JComboBox variantSelectionComboBox();
 }

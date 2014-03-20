@@ -83,6 +83,10 @@ public final class RangeArrayParams<P> {
         long fileSize = RangeArray.MAX_VALUE_SUPPORTED;
         List<Range<P>> contents = null;
         boolean carriesProperty = true;
+        
+        public static <PQ> Builder<PQ> create(){
+            return new Builder<PQ>();
+        }
 
         public Builder<P> setContents(List<Range<P>> contents) {
             this.contents = contents;

@@ -18,6 +18,7 @@ package neembuu.diskmanager;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.channels.SeekableByteChannel;
 import java.util.logging.Logger;
 
 /**
@@ -45,8 +46,10 @@ public interface FileStorageManager {
      * @return 
      */
     Logger getReadQueueManagerThreadLogger();
+        
+    void copyIfCompleteTo(SeekableByteChannel output, long fileSize)throws Exception;
     
-    void completeSession(File outputFile, long fileSize)throws Exception;
+    void deleteSession()throws Exception;
     
     void close() throws Exception;
 }

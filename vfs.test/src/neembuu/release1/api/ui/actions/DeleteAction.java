@@ -17,12 +17,10 @@
 
 package neembuu.release1.api.ui.actions;
 
-import java.awt.event.ActionListener;
-
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface DeleteAction extends ActionListener{
-    
+public interface DeleteAction{
+    void actionPerformed();
 }

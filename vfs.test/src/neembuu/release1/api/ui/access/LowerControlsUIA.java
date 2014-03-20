@@ -17,7 +17,7 @@
 
 package neembuu.release1.api.ui.access;
 
-import neembuu.release1.api.ui.Progress;
+import neembuu.release1.api.ui.linkpanel.Progress;
 
 /**
  *

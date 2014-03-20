@@ -26,19 +26,19 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
-import neembuu.release1.api.ui.ExpandableUI;
 import neembuu.release1.api.ui.ExpansionState;
-import neembuu.release1.api.ui.Graph;
+import neembuu.release1.api.ui.linkpanel.Graph;
 import neembuu.release1.api.ui.HeightProperty;
-import neembuu.release1.api.ui.OpenableEUI;
-import neembuu.release1.api.ui.Progress;
+import neembuu.release1.api.ui.linkpanel.OpenableEUI;
+import neembuu.release1.api.ui.linkpanel.Progress;
+import neembuu.release1.api.ui.linkpanel.Variants;
 import neembuu.release1.api.ui.access.ChangeDownloadModeUIA;
 import neembuu.release1.api.ui.access.CloseActionUIA;
 import neembuu.release1.api.ui.access.ExpandActionUIA;
 import neembuu.release1.api.ui.access.GraphUIA;
 import neembuu.release1.api.ui.access.LowerControlsUIA;
 import neembuu.release1.api.ui.access.ProgressUIA;
-import neembuu.release1.api.ui.access.split.MultiLinkProgressUI;
+import neembuu.release1.api.ui.access.ProgressUI;
 import neembuu.release1.api.ui.actions.ChangeDownloadModeAction;
 import neembuu.release1.api.ui.actions.CloseAction;
 import neembuu.release1.api.ui.actions.DeleteAction;
@@ -47,11 +47,10 @@ import neembuu.release1.api.ui.actions.ConnectionActions;
 import neembuu.release1.api.ui.actions.OpenAction;
 import neembuu.release1.api.ui.actions.ReAddAction;
 import neembuu.release1.api.ui.actions.SaveAction;
+import neembuu.release1.api.ui.actions.VariantSelectionAction;
 import neembuu.release1.ui.Colors;
 import neembuu.release1.ui.Fonts;
-import neembuu.release1.ui.GraphImpl;
 import neembuu.release1.ui.HeightPropertyImpl;
-import neembuu.release1.ui.ProgressImpl;
 import neembuu.swing.TextBubbleBorder;
 
 /**
@@ -61,8 +60,6 @@ import neembuu.swing.TextBubbleBorder;
 final class GenericLinkPanel extends javax.swing.JPanel {
 
     private final TextBubbleBorder border;
-    private final Graph graph;
-    private final Progress progress;
     
     private final int ht_smallest = 50;
     private final int ht_medium = 80;
@@ -72,12 +69,16 @@ final class GenericLinkPanel extends javax.swing.JPanel {
             RightControlsPanel.makeRightControlPanel();
     private final FileIconPanel fileIconPanel = new FileIconPanel();
 
+    private Graph graph;
+    private Progress progress;
+    private Variants v;
+    
     private ExpandAction expandAction;
     private DeleteAction deleteAction;
     private ReAddAction reAddAction;
     private ChangeDownloadModeAction  changeDownloadModeAction;
     private ConnectionActions connectionActions;
-    
+    private VariantSelectionAction variantSelectionAction;    
     
     private final String downloadFullFileToolTip = "<html>"
                 + "<b>Download entire file mode</b><br/>"
@@ -101,24 +102,29 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         initHeight();
         hiddenPaneInit();
         overlayInit();
-        graph = new GraphImpl(graphUIA);
-        progress =  new ProgressImpl(progressUIA,graph);
+
         changeDownloadModeButton.setToolTipText(downloadFullFileToolTip);
         killConnectionButton.setEnabled(false);
+    }
+    
+    void init(Graph graph,Progress progress, Variants v1){
+        this.graph = graph; this.progress = progress; this.v = v1;
     }
     
     void initActions(
             ExpandAction expandAction, OpenAction openAction, 
             CloseAction closeAction, DeleteAction deleteAction, 
             ReAddAction reAddAction, SaveAction saveAction, 
-            ConnectionActions connectionActions, ChangeDownloadModeAction  changeDownloadModeAction) {
+            ConnectionActions connectionActions, ChangeDownloadModeAction  changeDownloadModeAction,
+            VariantSelectionAction variantSelectionAction) {
         this.expandAction = expandAction;
         this.deleteAction = deleteAction;
         this.reAddAction = reAddAction;
         this.connectionActions = connectionActions;
         this.changeDownloadModeAction = changeDownloadModeAction;
+        this.variantSelectionAction = variantSelectionAction;
         rightControlsPanel.initActions(expandAction, saveAction, closeAction);
-        fileIconPanel.getOpenButton().addActionListener(openAction);
+        fileIconPanel.setOpenAction(openAction);
     }
     
     
@@ -136,6 +142,9 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         layeredPane = new javax.swing.JLayeredPane();
+        overlay = new javax.swing.JPanel();
+        reEnableButton = HiddenBorderButton.make("images/small+.png", "images/small+_s.png", false);
+        delete = HiddenBorderButton.make("images/delete.png", "images/delete_s.png", false);
         actualContentsPanel = new javax.swing.JPanel();
         vlcPane = getFileIconPanelWithButton();
         fileNamePane = new javax.swing.JPanel();
@@ -145,10 +154,10 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         fileSizeLabel = new javax.swing.JLabel();
         progressBarPanel = new javax.swing.JPanel();
         progressPercetLabel = new javax.swing.JLabel();
-        sizeAndProgressPane_ofSplit = new javax.swing.JPanel();
-        progressBarPanel_ofSplit = new javax.swing.JPanel();
-        progressPercetLabel_ofSplit = new javax.swing.JLabel();
-        splitNumberComboBox = new javax.swing.JComboBox();
+        sizeAndProgressPane_lower = new javax.swing.JPanel();
+        progressBarPanel_lower = new javax.swing.JPanel();
+        progressPercetLabel_lower = new javax.swing.JLabel();
+        variantComboBox = new javax.swing.JComboBox();
         graphPanel = new javax.swing.JPanel();
         hiddenStatsPane = new javax.swing.JPanel();
         selectedConnectionLabel = new javax.swing.JLabel();
@@ -158,12 +167,54 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         killConnectionButton = new javax.swing.JButton();
         changeDownloadModeButton = new javax.swing.JToggleButton();
         linkEditButton = new javax.swing.JButton();
-        overlay = new javax.swing.JPanel();
-        reEnableButton = HiddenBorderButton.make("images/small+.png", "images/small+_s.png", false);
-        delete = HiddenBorderButton.make("images/delete.png", "images/delete_s.png", false);
 
         setBackground(new java.awt.Color(255, 255, 255));
         setBorder(border);
+
+        overlay.setBackground(Colors.OVERLAY);
+        overlay.setOpaque(false);
+        overlay.setPreferredSize(new java.awt.Dimension(40, 40));
+
+        reEnableButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/small+.png"))); // NOI18N
+        reEnableButton.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.reEnableButton.text")); // NOI18N
+        reEnableButton.setToolTipText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.reEnableButton.toolTipText")); // NOI18N
+        reEnableButton.setContentAreaFilled(false);
+        reEnableButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reEnableButtonActionPerformed(evt);
+            }
+        });
+
+        delete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/delete.png"))); // NOI18N
+        delete.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.delete.text")); // NOI18N
+        delete.setToolTipText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.delete.toolTipText")); // NOI18N
+        delete.setContentAreaFilled(false);
+        delete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout overlayLayout = new javax.swing.GroupLayout(overlay);
+        overlay.setLayout(overlayLayout);
+        overlayLayout.setHorizontalGroup(
+            overlayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, overlayLayout.createSequentialGroup()
+                .addContainerGap(298, Short.MAX_VALUE)
+                .addComponent(delete, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(reEnableButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10))
+        );
+        overlayLayout.setVerticalGroup(
+            overlayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(overlayLayout.createSequentialGroup()
+                .addGap(2, 2, 2)
+                .addGroup(overlayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(reEnableButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(delete, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 119, Short.MAX_VALUE))
+        );
 
         actualContentsPanel.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -246,12 +297,11 @@ final class GenericLinkPanel extends javax.swing.JPanel {
             sizeAndProgressPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(sizeAndProgressPaneLayout.createSequentialGroup()
                 .addGap(4, 4, 4)
-                .addComponent(fileSizeLabel)
-                .addGap(25, 25, 25)
+                .addComponent(fileSizeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(progressBarPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addComponent(progressPercetLabel)
-                .addGap(10, 10, 10))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(progressPercetLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         sizeAndProgressPaneLayout.setVerticalGroup(
             sizeAndProgressPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -263,53 +313,57 @@ final class GenericLinkPanel extends javax.swing.JPanel {
             .addComponent(progressPercetLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        sizeAndProgressPane_ofSplit.setBackground(new java.awt.Color(255, 255, 255));
-        sizeAndProgressPane_ofSplit.setMinimumSize(new java.awt.Dimension(100, 30));
-        sizeAndProgressPane_ofSplit.setPreferredSize(new java.awt.Dimension(300, 30));
+        sizeAndProgressPane_lower.setBackground(new java.awt.Color(255, 255, 255));
+        sizeAndProgressPane_lower.setMinimumSize(new java.awt.Dimension(100, 30));
+        sizeAndProgressPane_lower.setPreferredSize(new java.awt.Dimension(300, 30));
 
-        javax.swing.GroupLayout progressBarPanel_ofSplitLayout = new javax.swing.GroupLayout(progressBarPanel_ofSplit);
-        progressBarPanel_ofSplit.setLayout(progressBarPanel_ofSplitLayout);
-        progressBarPanel_ofSplitLayout.setHorizontalGroup(
-            progressBarPanel_ofSplitLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout progressBarPanel_lowerLayout = new javax.swing.GroupLayout(progressBarPanel_lower);
+        progressBarPanel_lower.setLayout(progressBarPanel_lowerLayout);
+        progressBarPanel_lowerLayout.setHorizontalGroup(
+            progressBarPanel_lowerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
-        progressBarPanel_ofSplitLayout.setVerticalGroup(
-            progressBarPanel_ofSplitLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        progressBarPanel_lowerLayout.setVerticalGroup(
+            progressBarPanel_lowerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
-        progressPercetLabel_ofSplit.setFont(Fonts.MyriadPro.deriveFont(18f)
+        progressPercetLabel_lower.setFont(Fonts.MyriadPro.deriveFont(18f)
         );
-        progressPercetLabel_ofSplit.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.progressPercetLabel_ofSplit.text")); // NOI18N
+        progressPercetLabel_lower.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.progressPercetLabel_lower.text")); // NOI18N
 
-        splitNumberComboBox.setFont(Fonts.MyriadPro.deriveFont(11f));
-        splitNumberComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "001", "001/100MB", "700MB/420p", "1080p/700MB", "1080p/.7GB", "0.7GB/1080p", "70.0MB", "420p/500MB" }));
-        splitNumberComboBox.setMinimumSize(new java.awt.Dimension(30, 16));
-        splitNumberComboBox.setPreferredSize(new java.awt.Dimension(45, 16));
+        variantComboBox.setFont(Fonts.MyriadPro.deriveFont(11f));
+        variantComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "001", "001/100MB", "700MB/420p", "1080p/700MB", "1080p/.7GB", "0.7GB/1080p", "70.0MB", "420p/500MB" }));
+        variantComboBox.setMinimumSize(new java.awt.Dimension(30, 16));
+        variantComboBox.setPreferredSize(new java.awt.Dimension(45, 16));
+        variantComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboBoxActionPerformed(evt);
+            }
+        });
 
-        javax.swing.GroupLayout sizeAndProgressPane_ofSplitLayout = new javax.swing.GroupLayout(sizeAndProgressPane_ofSplit);
-        sizeAndProgressPane_ofSplit.setLayout(sizeAndProgressPane_ofSplitLayout);
-        sizeAndProgressPane_ofSplitLayout.setHorizontalGroup(
-            sizeAndProgressPane_ofSplitLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(sizeAndProgressPane_ofSplitLayout.createSequentialGroup()
+        javax.swing.GroupLayout sizeAndProgressPane_lowerLayout = new javax.swing.GroupLayout(sizeAndProgressPane_lower);
+        sizeAndProgressPane_lower.setLayout(sizeAndProgressPane_lowerLayout);
+        sizeAndProgressPane_lowerLayout.setHorizontalGroup(
+            sizeAndProgressPane_lowerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sizeAndProgressPane_lowerLayout.createSequentialGroup()
                 .addGap(0, 0, 0)
-                .addComponent(splitNumberComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(variantComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(2, 2, 2)
-                .addComponent(progressBarPanel_ofSplit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addComponent(progressPercetLabel_ofSplit)
-                .addGap(10, 10, 10))
+                .addComponent(progressBarPanel_lower, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(progressPercetLabel_lower, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
-        sizeAndProgressPane_ofSplitLayout.setVerticalGroup(
-            sizeAndProgressPane_ofSplitLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sizeAndProgressPane_ofSplitLayout.createSequentialGroup()
+        sizeAndProgressPane_lowerLayout.setVerticalGroup(
+            sizeAndProgressPane_lowerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sizeAndProgressPane_lowerLayout.createSequentialGroup()
                 .addGap(2, 2, 2)
-                .addComponent(progressBarPanel_ofSplit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(progressBarPanel_lower, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(2, 2, 2))
-            .addComponent(progressPercetLabel_ofSplit, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sizeAndProgressPane_ofSplitLayout.createSequentialGroup()
+            .addComponent(progressPercetLabel_lower, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sizeAndProgressPane_lowerLayout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(splitNumberComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(variantComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         graphPanel.setPreferredSize(new java.awt.Dimension(364, 100));
@@ -454,7 +508,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
                                 .addComponent(rightCtrlPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 2, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(sizeAndProgressPane, javax.swing.GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE)
-                            .addComponent(sizeAndProgressPane_ofSplit, javax.swing.GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE))))
+                            .addComponent(sizeAndProgressPane_lower, javax.swing.GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         actualContentsPanelLayout.setVerticalGroup(
@@ -469,59 +523,14 @@ final class GenericLinkPanel extends javax.swing.JPanel {
                 .addGap(0, 0, 0)
                 .addComponent(sizeAndProgressPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(sizeAndProgressPane_ofSplit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(sizeAndProgressPane_lower, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(graphPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(graphPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
                 .addGap(0, 0, 0)
                 .addComponent(hiddenStatsPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
                 .addComponent(connectionControlPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0))
-        );
-
-        overlay.setBackground(Colors.OVERLAY);
-        overlay.setOpaque(false);
-        overlay.setPreferredSize(new java.awt.Dimension(40, 40));
-
-        reEnableButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/small+.png"))); // NOI18N
-        reEnableButton.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.reEnableButton.text")); // NOI18N
-        reEnableButton.setToolTipText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.reEnableButton.toolTipText")); // NOI18N
-        reEnableButton.setContentAreaFilled(false);
-        reEnableButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                reEnableButtonActionPerformed(evt);
-            }
-        });
-
-        delete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/delete.png"))); // NOI18N
-        delete.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.delete.text")); // NOI18N
-        delete.setToolTipText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.delete.toolTipText")); // NOI18N
-        delete.setContentAreaFilled(false);
-        delete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deleteActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout overlayLayout = new javax.swing.GroupLayout(overlay);
-        overlay.setLayout(overlayLayout);
-        overlayLayout.setHorizontalGroup(
-            overlayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, overlayLayout.createSequentialGroup()
-                .addContainerGap(298, Short.MAX_VALUE)
-                .addComponent(delete, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(reEnableButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(10, 10, 10))
-        );
-        overlayLayout.setVerticalGroup(
-            overlayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(overlayLayout.createSequentialGroup()
-                .addGap(2, 2, 2)
-                .addGroup(overlayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(reEnableButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(delete, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 119, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layeredPaneLayout = new javax.swing.GroupLayout(layeredPane);
@@ -550,8 +559,8 @@ final class GenericLinkPanel extends javax.swing.JPanel {
                     .addComponent(overlay, javax.swing.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE)
                     .addGap(0, 0, 0)))
         );
-        layeredPane.setLayer(actualContentsPanel, javax.swing.JLayeredPane.DEFAULT_LAYER);
         layeredPane.setLayer(overlay, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        layeredPane.setLayer(actualContentsPanel, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -577,7 +586,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_nextConnectionButtonActionPerformed
 
     private void changeDownloadModeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeDownloadModeButtonActionPerformed
-        changeDownloadModeAction.actionPerformed(evt);
+        changeDownloadModeAction.actionPerformed();
     }//GEN-LAST:event_changeDownloadModeButtonActionPerformed
 
     private void previousConnectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousConnectionButtonActionPerformed
@@ -589,12 +598,16 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_linkEditButtonActionPerformed
 
     private void deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteActionPerformed
-        deleteAction.actionPerformed(evt);
+        deleteAction.actionPerformed();
     }//GEN-LAST:event_deleteActionPerformed
 
     private void reEnableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reEnableButtonActionPerformed
-        reAddAction.actionPerformed(evt,true);
+        reAddAction.actionPerformed(true);
     }//GEN-LAST:event_reEnableButtonActionPerformed
+
+    private void comboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxActionPerformed
+        variantSelectionAction.actionPerformed();
+    }//GEN-LAST:event_comboBoxActionPerformed
 
     private JPanel getFileIconPanelWithButton(){
         return fileIconPanel.getJPanel();
@@ -602,6 +615,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
 
     private void initHeight(){
         sizeAndProgressPane.setVisible(false);
+        sizeAndProgressPane_lower.setVisible(false);
         graphPanel.setVisible(false);
         hiddenStatsPane.setVisible(false);
         connectionControlPane.setVisible(false);
@@ -614,19 +628,14 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         delete.setVisible(false);
         reEnableButton.setVisible(false);
         MouseAdapter ma = new  MouseAdapter() {
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
+            @Override public void mouseEntered(MouseEvent e) {
                 delete.setVisible(true);
                 reEnableButton.setVisible(true);
             }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
+            @Override public void mouseExited(MouseEvent e) {
                 delete.setVisible(false);
                 reEnableButton.setVisible(false);
             }
-            
         };
         overlay.addMouseListener(ma);
         delete.addMouseListener(ma);
@@ -646,8 +655,8 @@ final class GenericLinkPanel extends javax.swing.JPanel {
             @Override
             public void mouseEntered(MouseEvent e) {
                 String s = progress.getSelectedRangeTooltip();
-                if(s==null){s="";}
-                selectedConnectionLabel.setText(s.replace("\n", " "));
+                if(s==null){s="No Connection is selected";}
+                selectedConnectionLabel.setText(s.replace("\n", " ").replace("<br/>", " "));
                 selectedConnectionLabel.setVisible(true);
             }
 
@@ -685,26 +694,27 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     private javax.swing.JPanel overlay;
     private javax.swing.JButton previousConnectionButton;
     private javax.swing.JPanel progressBarPanel;
-    private javax.swing.JPanel progressBarPanel_ofSplit;
+    private javax.swing.JPanel progressBarPanel_lower;
     private javax.swing.JLabel progressPercetLabel;
-    private javax.swing.JLabel progressPercetLabel_ofSplit;
+    private javax.swing.JLabel progressPercetLabel_lower;
     private javax.swing.JButton reEnableButton;
     private javax.swing.JPanel rightCtrlPane;
     private javax.swing.JLabel selectedConnectionLabel;
     private javax.swing.JPanel sizeAndProgressPane;
-    private javax.swing.JPanel sizeAndProgressPane_ofSplit;
-    private javax.swing.JComboBox splitNumberComboBox;
+    private javax.swing.JPanel sizeAndProgressPane_lower;
+    private javax.swing.JComboBox variantComboBox;
     private javax.swing.JPanel vlcPane;
     // End of variables declaration//GEN-END:variables
 
-    private final ProgressUIA progressUIA = new ProgressUIA() {
-        @Override public JButton saveButton() { return rightControlsPanel.getSaveBtn(); }
+    final ProgressUIA progressUIA = new ProgressUIA() {
+        @Override public JComponent saveButton() { return rightControlsPanel.getSaveBtn(); }
         @Override public ExpansionState getExpansionState() {return expandAction.getExpansionState(); }
-        @Override public JLabel progressPercetLabel() { return progressPercetLabel;}
         @Override public JButton killConnectionButton() { return killConnectionButton;}
-        @Override public JPanel progressBarPanel() { return progressBarPanel;} };
+        @Override public ProgressUI overallProgressUI(){ return overall;} 
+        @Override public ProgressUI variantProgressUI() { return split;}
+        @Override public JComboBox variantSelectionComboBox() { return variantComboBox;}};
     
-    private final GraphUIA graphUIA = new GraphUIA() {
+    final GraphUIA graphUIA = new GraphUIA() {
         @Override public JPanel graphPanel() {return graphPanel;}
         @Override public ExpansionState getExpansionState() {return expandAction.getExpansionState();}  };
     
@@ -713,7 +723,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
 
     final ChangeDownloadModeUIA changeDownloadModeUIA = new ChangeDownloadModeUIA() {
         @Override public JToggleButton changeDownloadModeButton() { return changeDownloadModeButton; }
-        @Override public void repaintProgressBar() {progress.repaint();} };
+        @Override public void repaintProgressBar() {progress.repaint(); } };
     
     final CloseActionUIA closeActionUIA = new CloseActionUIA() {
         @Override public JPanel overlay() { return overlay; }
@@ -728,29 +738,36 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     final ExpandActionUIA expandActionUIA = new ExpandActionUIA() {
         @Override public JPanel connectionControlPane() { return connectionControlPane; }
         @Override public JPanel graphPanel() { return graphPanel; }
-        @Override public JPanel sizeAndProgressPane() { return sizeAndProgressPane; }
+        @Override public void setVisibleProgress(boolean b) { sizeAndProgressPane.setVisible(b); }
+        @Override public void setVariantChooser(boolean b) { variantComboBox.setVisible(b); }
+        @Override public void setVisibleFileSize(boolean b) { fileSizeLabel.setVisible(b); }
         @Override public JPanel hiddenStatsPane() { return hiddenStatsPane; }
         @Override public void initGraph(boolean findFirst) { graph.initGraph(null, findFirst); }
+        @Override public void initVariants() { v.init(); } 
         @Override public short ht_smallest() { return ht_smallest; }
         @Override public short ht_medium() { return ht_medium; }
         @Override public short ht_tallest() { return ht_tallest; }
-        @Override public HeightProperty getHeight() { return heightProperty; } };
+        @Override public HeightProperty getHeight() { return heightProperty; } 
+        @Override public void setVisibleVariantProgress(boolean b){ sizeAndProgressPane_lower.setVisible(b);}};
     
     final CloseActionUIA.OpenButton openButton = new CloseActionUIA.OpenButton() {
         @Override public void setVisible(boolean v) { fileIconPanel.getOpenButton().setVisible(v); }
-        @Override public void setIcon_bw(Icon bw) { fileIconPanel.getOpenButton().setIcon_bw(bw);}
-        @Override public void setIcon_clr(Icon clr) {fileIconPanel.getOpenButton().setIcon_clr(clr);}
+        @Override public void setIcon_silent(Icon bw) { fileIconPanel.getOpenButton().setIcon_bw(bw);}
+        @Override public void setIcon_active(Icon clr) {fileIconPanel.getOpenButton().setIcon_clr(clr);}
         @Override public String getCaption() { return fileIconPanel.getCaption(); }
         @Override public void setCaption(String caption) { fileIconPanel.setCaption(caption); } };
     
-    final MultiLinkProgressUI multiLinkProgressUI = new MultiLinkProgressUI() {
-        @Override public JLabel progressPercetLabel() {return progressPercetLabel_ofSplit; }
-        @Override public JPanel progressBarPanel() { return progressBarPanel_ofSplit;}
-        @Override public JComboBox linksComboBox() { return splitNumberComboBox;}};
+    final ProgressUI split = new ProgressUI() {
+        @Override public JLabel progressPercentLabel() {return progressPercetLabel_lower; }
+        @Override public JPanel progressBarPanel() { return progressBarPanel_lower;}};
+    
+    final ProgressUI overall = new ProgressUI() {
+        @Override public JLabel progressPercentLabel() { return progressPercetLabel;}
+        @Override public JPanel progressBarPanel() { return progressBarPanel;} };
     
     final OpenableEUI expandableUI = new OpenableEUI() {
         @Override public JComponent getJComponent() { return GenericLinkPanel.this; }
         @Override public HeightProperty heightProperty() { return heightProperty; }
-        @Override public void open(){ reAddAction.actionPerformed(null, false); }
+        @Override public void open(){ reAddAction.actionPerformed(false); }
     };
 }

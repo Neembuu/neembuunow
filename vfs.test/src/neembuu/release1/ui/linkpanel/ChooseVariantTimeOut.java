@@ -1,0 +1,268 @@
+/*
+ * Copyright (C) 2014 Shashank Tulsyan
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package neembuu.release1.ui.linkpanel;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.LinkedList;
+import java.util.List;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.Timer;
+import neembuu.release1.api.ui.MainComponent;
+import neembuu.release1.ui.Colors;
+import neembuu.release1.ui.InitLookAndFeel;
+
+/**
+ *
+ * @author Shashank Tulsyan
+ */
+public class ChooseVariantTimeOut extends javax.swing.JPanel {
+    private final JDialog jd;
+    private final long waitDuration;
+    private Entry selected;
+    
+    public static interface Entry {
+        String type(); String speed();
+    }
+    
+    ChooseVariantTimeOut(
+            JDialog jd, Entry defaultOption,
+            List<Entry> options, long waitDuration) {
+        this.jd = jd; this.waitDuration = waitDuration;
+        selected = defaultOption;
+        initComponents();
+        
+        int i = 1;
+        addSpace(10, i); i++;
+        for (Entry entry : options) {
+            addSpace(5, i); i++;
+            addEntry(entry, defaultOption==entry,i); i++;
+        }
+        
+        t.start();
+    }
+    
+    private final Timer t = new Timer(300, new ActionListener() {
+        double waited = 0;
+        @Override public void actionPerformed(ActionEvent e) {
+            if(waited>waitDuration){t.stop(); jd.setVisible(false); jd.dispose(); }
+            waited += 0.3d;
+            
+            String p = "Automatically opening " + selected.type() + " in "
+                    + ((int)(waitDuration-waited))
+                    + " seconds ...";
+            automaticallyOpenWarningMessage.setText(p);
+            
+        }
+    });
+
+    public static Entry newEntry(final String type,final long sizeInBytes, long durationInMillisec){
+        double s = sizeInBytes/(durationInMillisec/1000d);
+        final String speedToStr = toString(s);
+        return new Entry() {
+            @Override public String type() { return type; }
+            @Override public String speed() { return speedToStr; }
+        };
+    }
+    
+    private static String toString(double sz){
+        String suffix;
+        if (sz < 1000) {
+            suffix = " Bps";
+        } else if (sz < 1000 * 1000) {
+            suffix = " KiBps";
+            sz /= 1024;
+        } else if (sz < 1000 * 1000 * 1000) {
+            suffix = " MiBps";
+            sz /= 1024 * 1024;
+        } else if (sz < 1000 * 1000 * 1000 * 1000) {
+            suffix = " GiBps";
+            sz /= 1024 * 1024 * 1024;
+        } else {
+            suffix = " TiBps";
+            sz /= 1024 * 1024 * 1024 * 1024;
+        }
+        if (sz < 10) {
+            sz = Math.round(sz * 100.0) / 100.0;
+        } else if (sz < 100) {
+            sz = Math.round(sz * 10.0) / 10.0;
+        }
+        return " "+((int)sz) + " " + suffix;
+    }
+    
+    public static Entry showMessage(
+            MainComponent m,
+            final long waitDurationSeconds,
+            final Entry defaultChoice,
+            final List<Entry>choices){
+        JFrame jf = null;
+        try{
+            jf = m.getJFrame();
+        }catch(NullPointerException npe){
+
+        }
+        final JDialog jd = new JDialog(jf, "Please select a type", true);
+        
+        //jd.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        final ChooseVariantTimeOut x = new ChooseVariantTimeOut(jd, defaultChoice, choices, waitDurationSeconds);
+        jd.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        jd.addWindowListener(new WindowAdapter() {
+            @Override public void windowClosing(WindowEvent e) {
+                System.out.println("closed");
+                x.selected = null; x.t.stop(); jd.setVisible(false);jd.dispose();
+            }});
+        jd.getContentPane().add(x);        
+        jd.setSize(x.getPreferredSize().width,
+                x.getPreferredSize().height + 50); 
+        //jd.setResizable(false);
+        jd.setVisible(true);
+
+        return x.selected;
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
+
+        automaticallyOpenWarningMessage = new javax.swing.JLabel();
+        variantsPanel = new javax.swing.JPanel();
+        typeLabel = new javax.swing.JLabel();
+        speedRequiredLabel = new javax.swing.JLabel();
+
+        setBackground(new java.awt.Color(255, 255, 255));
+
+        automaticallyOpenWarningMessage.setText(org.openide.util.NbBundle.getMessage(ChooseVariantTimeOut.class, "ChooseVariantTimeOut.automaticallyOpenWarningMessage.text")); // NOI18N
+
+        variantsPanel.setLayout(new java.awt.GridBagLayout());
+
+        typeLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        typeLabel.setText(org.openide.util.NbBundle.getMessage(ChooseVariantTimeOut.class, "ChooseVariantTimeOut.typeLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        variantsPanel.add(typeLabel, gridBagConstraints);
+
+        speedRequiredLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        speedRequiredLabel.setText(org.openide.util.NbBundle.getMessage(ChooseVariantTimeOut.class, "ChooseVariantTimeOut.speedRequiredLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        variantsPanel.add(speedRequiredLabel, gridBagConstraints);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(automaticallyOpenWarningMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)
+                    .addComponent(variantsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(variantsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(automaticallyOpenWarningMessage)
+                .addContainerGap())
+        );
+    }// </editor-fold>//GEN-END:initComponents
+
+    
+    
+    private void addSpace(int s, int i){
+        java.awt.GridBagConstraints gridBagConstraints;
+        
+        javax.swing.Box.Filler filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, s), new java.awt.Dimension(0, s), new java.awt.Dimension(32767, s));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = i;
+        variantsPanel.add(filler1, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = i;
+        variantsPanel.add(filler1, gridBagConstraints);
+    }
+    
+    private void addEntry(final Entry entry,boolean default_,int i){
+        java.awt.GridBagConstraints gridBagConstraints;
+        
+        JButton typeSelector = new JButton(entry.type());
+        JLabel speedInfo = new JLabel(entry.speed());
+        
+        if(default_){
+            typeSelector.setBackground(Colors.PROGRESS_BAR_FILL_BUFFER);
+        }else {
+            typeSelector.setFocusable(false);
+        }
+        
+        typeSelector.setText(entry.type()); // NOI18N
+        typeSelector.addActionListener(new java.awt.event.ActionListener() {
+            @Override public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selected = entry; t.stop(); jd.setVisible(false);jd.dispose();
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = i;
+        variantsPanel.add(typeSelector, gridBagConstraints);
+
+        speedInfo.setText(entry.speed()); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = i;
+        variantsPanel.add(speedInfo, gridBagConstraints);
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel automaticallyOpenWarningMessage;
+    private javax.swing.JLabel speedRequiredLabel;
+    private javax.swing.JLabel typeLabel;
+    private javax.swing.JPanel variantsPanel;
+    // End of variables declaration//GEN-END:variables
+
+    public static void main(String[] args) {
+        InitLookAndFeel.init();
+        
+        List<Entry> es = new LinkedList<>();
+        
+        Entry e = newEntry("480 P", 50*1024, 122);
+        
+        es.add(newEntry("320 P", 25*1024, 122));
+        es.add(e);
+        es.add(newEntry("720 P", 100*1024, 122));
+        es.add(newEntry("1080 P", 300*1024, 122));
+        
+        Entry x = showMessage(null, 200, e, es);
+        System.out.println("x="+x.type());
+    }
+}

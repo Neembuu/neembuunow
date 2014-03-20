@@ -16,16 +16,18 @@
  */
 package neembuu.release1.mountmanager;
 
-import java.io.File;
 import jpfm.DirectoryStream;
 import jpfm.FileAttributesProvider;
+import jpfm.JPfmMutableContainable;
+import jpfm.fs.BasicCascadableProvider;
+import jpfm.fs.SimpleReadOnlyFileSystem;
+import jpfm.mount.BasicCascadeMount;
 import jpfm.util.UniversallyValidFileName;
 import jpfm.volume.vector.VectorRootDirectory;
 import neembuu.diskmanager.DiskManager;
+import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.RealFileProvider;
-import neembuu.release1.api.VirtualFile;
 import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
-import neembuu.vfs.file.FileBeingDownloaded;
 import neembuu.vfs.file.SeekableConnectionFile;
 import neembuu.vfs.file.TroubleHandler;
 
@@ -39,33 +41,43 @@ public class AddRemoveFromFileSystem_Root implements AddRemoveFromFileSystem {
     private final TroubleHandler troubleHandler;
     private final DiskManager diskManager;
     private final RealFileProvider realFileProvider;
+    private final SimpleReadOnlyFileSystem fs;
 
-    public AddRemoveFromFileSystem_Root(VectorRootDirectory volume, TroubleHandler troubleHandler, DiskManager diskManager,RealFileProvider realFileProvider) {
+    public AddRemoveFromFileSystem_Root(VectorRootDirectory volume, TroubleHandler troubleHandler, DiskManager diskManager, RealFileProvider realFileProvider, SimpleReadOnlyFileSystem fs) {
         this.volume = volume;
         this.troubleHandler = troubleHandler;
         this.diskManager = diskManager;
         this.realFileProvider = realFileProvider;
+        this.fs = fs;
     }
     
     
     @Override
-    public VirtualFile create(neembuu.release1.api.File f)throws Exception {
+    public SeekableConnectionFile create(neembuu.release1.api.file.OnlineFile f)throws Exception {
         return createImpl(f);
     }
 
-    @Override
-    public void remove(VirtualFile v) {
-        volume.remove(v.getConnectionFile());
-        v.getConnectionFile().setParent(null);
+    @Override public RealFileProvider getRealFileProvider() {
+        return realFileProvider;
     }
 
     @Override
-    public void add(VirtualFile v) {
-        if(volume.contains(v.getConnectionFile())){
+    public void remove(FileAttributesProvider v) {
+        volume.remove(v);
+        if(v instanceof JPfmMutableContainable){
+            ((JPfmMutableContainable)v).setParent(null);
+        }
+    }
+
+    @Override
+    public void add(FileAttributesProvider v) {
+        if(volume.contains(v)){
             throw new IllegalStateException("Already present");
         }
-        volume.add(v.getConnectionFile());
-        v.getConnectionFile().setParent(volume);
+        volume.add(v);
+        if(v instanceof JPfmMutableContainable){
+            ((JPfmMutableContainable)v).setParent(volume);
+        }
     }
     
     public String getSuitableFileName(String filename, DirectoryStream parent){
@@ -88,38 +100,23 @@ public class AddRemoveFromFileSystem_Root implements AddRemoveFromFileSystem {
         return filename;
     }
     
-    private VirtualFile createImpl(neembuu.release1.api.File f)throws Exception{
-        String fileName = getSuitableFileName(f.fileName(), volume);
+    private SeekableConnectionFile createImpl(neembuu.release1.api.file.OnlineFile f)throws Exception{
+        String fileName = getSuitableFileName(f.getName(), volume);
         final SeekableConnectionFile connectionFile
                 = SeekableConnectionFile_1to1.create(
-                        f.fileName(),
-                        f.fileSize(),
+                        f.getName(),
+                        f.getFileSize(),
                         f.getConnectionProvider(),
                         diskManager,
                         troubleHandler, 
                         volume);        
-        VirtualFile vf = new VirtualFile() {
-
-            @Override
-            public FileBeingDownloaded getFileUIAccess() {
-                return connectionFile;
-            }
-            
-            @Override
-            public SeekableConnectionFile getConnectionFile() {
-                return connectionFile;
-            }
-
-            @Override
-            public boolean canGetRealFile() {
-                return true;
-            }
-
-            @Override
-            public java.io.File getRealFile() {
-                return realFileProvider.getRealFile(this);
-            }
-        };
-        return vf;
+        
+        return connectionFile;
     }
+
+    @Override
+    public BasicCascadeMount cascadeMount(BasicCascadableProvider basicCascadable)  {
+        return fs.cascadeMount(basicCascadable);
+    }
+    
 }

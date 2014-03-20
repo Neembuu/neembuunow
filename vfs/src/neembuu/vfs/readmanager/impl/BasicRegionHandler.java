@@ -20,7 +20,6 @@ package neembuu.vfs.readmanager.impl;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.ByteBuffer;
-import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,6 +49,7 @@ import neembuu.vfs.connection.NewConnectionParams;
 import neembuu.vfs.connection.TransientConnectionListener;
 import neembuu.vfs.progresscontrol.Throttle;
 import neembuu.vfs.progresscontrol.ThrottleStatistics;
+import neembuu.vfs.readmanager.ConnectionControls;
 import neembuu.vfs.readmanager.DownloadDataChannel;
 import neembuu.vfs.readmanager.DownloadedRegion;
 import neembuu.vfs.readmanager.RegionHandler;
@@ -61,7 +61,7 @@ import net.jcip.annotations.NotThreadSafe;
  *
  * @author Shashank Tulsyan
  */
-public final class BasicRegionHandler 
+final class BasicRegionHandler 
         implements 
             Completer,
             RegionHandler, 
@@ -1308,6 +1308,15 @@ public final class BasicRegionHandler
             }
             //waitStop();
         }//else if(DEBUG)System.out.println("RQM:628 not waiting");
+    }
+
+    @Override
+    public ConnectionControls getConnectionControls() {
+        return new ConnectionControls() {
+            @Override public void abort() throws Exception {
+                getConnection().abort();
+            }
+        };
     }
     
     static String _(int x){

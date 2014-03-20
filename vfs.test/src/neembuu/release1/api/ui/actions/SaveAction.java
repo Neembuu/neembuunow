@@ -16,12 +16,10 @@
  */
 package neembuu.release1.api.ui.actions;
 
-import java.awt.event.ActionListener;
-
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface SaveAction extends ActionListener{
-    
+public interface SaveAction {
+    void actionPerformed();
 }

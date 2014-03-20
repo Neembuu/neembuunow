@@ -16,6 +16,7 @@
  */
 package neembuu.rangearray;
 
+import java.util.List;
 import neembuu.rangearray.vectorimpl.RangeArrayImpl;
 
 /**
@@ -28,5 +29,12 @@ public final class RangeArrayFactory {
     public static RangeArray newDefaultRangeArray(RangeArrayParams rangeArrayParams){
         if(rangeArrayParams==null)rangeArrayParams=new RangeArrayParams.Builder().build();
         return new RangeArrayImpl(rangeArrayParams);
+    }
+    
+    public static <P> UIRangeArrayAccess merge(List<UIRangeArrayAccess<P>> p,PropertyRescaler<P> pr){
+        int sz = p.size();
+        if(sz < 1){ throw new IllegalArgumentException("Nothing to merge"); }
+        if(sz == 1){ return new MergedSingleUIRangeArrayAccess(p.get(0)); }
+        return new UIRangeArraySeriesAccess(p,pr);
     }
 }

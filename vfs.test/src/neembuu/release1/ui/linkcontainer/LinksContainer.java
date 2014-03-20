@@ -23,7 +23,7 @@ import java.util.LinkedList;
 import javax.swing.GroupLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import neembuu.release1.api.ui.ExpandableUI;
+import neembuu.release1.api.ui.linkpanel.ExpandableUI;
 import neembuu.release1.api.ui.HeightProperty;
 import neembuu.release1.api.ui.ExpandableUIContainer;
 import neembuu.release1.ui.MainPanel;

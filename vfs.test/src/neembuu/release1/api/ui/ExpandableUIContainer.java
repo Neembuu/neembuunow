@@ -17,6 +17,8 @@
 
 package neembuu.release1.api.ui;
 
+import neembuu.release1.api.ui.linkpanel.ExpandableUI;
+
 /**
  *
  * @author Shashank Tulsyan

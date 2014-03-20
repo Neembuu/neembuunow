@@ -21,6 +21,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.logging.Level;
 import javax.swing.JOptionPane;
+import jpfm.FileAttributesProvider;
 import jpfm.FormatterEvent;
 import jpfm.JPfm;
 import jpfm.MountListener;
@@ -36,7 +37,6 @@ import neembuu.diskmanager.DiskManager;
 import neembuu.release1.Application;
 import neembuu.release1.Main;
 import neembuu.release1.api.RealFileProvider;
-import neembuu.release1.api.VirtualFile;
 import neembuu.release1.api.ui.IndefiniteTaskUI;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
@@ -69,7 +69,7 @@ public class MountManager {
         this.diskManager = diskManager;
         volume = new VectorRootDirectory(10, 3,CommonFileAttributesProvider.DEFAULT);
         fs = new SimpleReadOnlyFileSystem(volume);
-        addRemoveFromFileSystem = new AddRemoveFromFileSystem_Root(volume,troubleHandler, diskManager,realFileProvider);
+        addRemoveFromFileSystem = new AddRemoveFromFileSystem_Root(volume,troubleHandler, diskManager,realFileProvider,fs);
     }
 
     public Mount getMount() {
@@ -157,9 +157,12 @@ public class MountManager {
     }
     
     private final RealFileProvider realFileProvider =  new RealFileProvider() {
-            @Override public File getRealFile(VirtualFile vf) {
-                return new File(getMount().getMountLocation().getAsFile(),
-                        vf.getConnectionFile().getName());      } }; 
+            @Override public File getRealFile(String... relativePathInVirtualFileSystem) {
+                String pth=getMount().getMountLocation().toString();
+                for (String stringPath : relativePathInVirtualFileSystem) {
+                    pth+=(File.separatorChar+stringPath);
+                }return new File(pth);
+            } }; 
 
     private final AddRemoveFromFileSystem addRemoveFromFileSystem;
     
