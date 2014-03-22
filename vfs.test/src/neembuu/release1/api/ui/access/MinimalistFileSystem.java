@@ -28,7 +28,7 @@ import neembuu.vfs.file.SeekableConnectionFile;
  *
  * @author Shashank Tulsyan
  */
-public interface AddRemoveFromFileSystem {
+public interface MinimalistFileSystem {
     void remove(FileAttributesProvider vf);
     void add(FileAttributesProvider vf);
     

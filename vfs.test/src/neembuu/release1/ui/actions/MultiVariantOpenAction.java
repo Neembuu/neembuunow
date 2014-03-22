@@ -26,7 +26,7 @@ import neembuu.release1.api.file.PropertyProvider;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.actions.OpenAction;
 import neembuu.release1.api.ui.actions.ReAddAction.CallBack;
-import neembuu.release1.ui.linkpanel.ChooseVariantTimeOut;
+import neembuu.release1.ui.ChooseVariantTimeOut;
 import neembuu.vfs.progresscontrol.DownloadSpeedProvider;
 
 /**
@@ -59,29 +59,25 @@ public class MultiVariantOpenAction implements OpenAction, CallBack{
             impl.actionPerformed(); throw new UnsupportedOperationException("Expected multiple files to be present as this is multivariant type");
         }
         
-        final double downloadSpeed_KiBps  = downloadSpeedProvider.getDownloadSpeed_KiBps();
-        long duration_in_milliseconds = neembuuFile.getPropertyProvider().getLongPropertyValue(PropertyProvider.LongProperty.MEDIA_DURATION_IN_MILLISECONDS);
-        
-        double idealFileSize = 0;
-        
-        if(duration_in_milliseconds!=PropertyProvider.PROPERTY_NOT_FOUND){
-            idealFileSize = downloadSpeed_KiBps*duration_in_milliseconds*(1.024d);
-        }
+        final double downloadSpeed  = downloadSpeedProvider.getDownloadSpeed_KiBps();
+
         
         double previous_delta = Double.MAX_VALUE; 
         NeembuuFile idealFile=null;
         for (NeembuuFile file : files) {
             if(idealFile==null){ idealFile = file; }
-            double delta = Math.abs(file.getMinimumFileInfo().getFileSize() - idealFileSize);
-            if(delta< previous_delta){
+            
+            long duration_in_milliseconds = file.getPropertyProvider().getLongPropertyValue(PropertyProvider.LongProperty.MEDIA_DURATION_IN_MILLISECONDS);
+            long fileSize = file.getMinimumFileInfo().getFileSize();
+            
+            double speedRequired = fileSize/(duration_in_milliseconds*1.024d);
+            
+            double delta = downloadSpeed - speedRequired;
+            
+            if(delta< previous_delta && delta >= 0){
                 idealFile = file; previous_delta = delta;
-                System.out.println("delta="+delta);
             }
         }
-        
-        System.out.println("leastdelta="+previous_delta);
-        System.out.println("downloadSpeed="+downloadSpeed_KiBps);
-        System.out.println("idealFile="+idealFile.getMinimumFileInfo().getName());
         
         ChooseVariantTimeOut.Entry defaultOption = ChooseVariantTimeOut.newEntry(
             idealFile.getPropertyProvider().getStringPropertyValue(PropertyProvider.StringProperty.VARIANT_DESCRIPTION), 

@@ -46,14 +46,15 @@ import neembuu.release1.api.linkparser.LinkParserResult;
 import neembuu.release1.api.ui.linkpanel.Graph;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.linkpanel.OpenableEUI;
-import neembuu.release1.api.ui.linkpanel.Progress;
-import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
+import neembuu.release1.api.ui.access.MinimalistFileSystem;
 import neembuu.release1.api.ui.access.RemoveFromUI;
 import neembuu.release1.api.ui.actions.ChangeDownloadModeAction;
 import neembuu.release1.api.ui.actions.ConnectionActions;
 import neembuu.release1.api.ui.actions.ExpandAction;
 import neembuu.release1.api.ui.actions.OpenAction;
 import neembuu.release1.api.ui.actions.VariantSelectionAction;
+import neembuu.release1.api.ui.linkpanel.VariantSelector;
+import neembuu.release1.api.ui.linkpanel.VariantSelector.Selectable;
 import neembuu.release1.defaultImpl.DummyMultiVariantTrialLinkHandler;
 import neembuu.release1.defaultImpl.LinkOrganizerImplTest;
 import neembuu.release1.defaultImpl.file.SimpleNeembuuFileCreator;
@@ -93,14 +94,14 @@ public class TestGenericLinkPanel {
     
     public OpenableEUI singleLink(){
         final GenericLinkPanel lp = new GenericLinkPanel();
-        final OpenableEUI openableEUI = lp.expandableUI;
+        final OpenableEUI openableEUI = lp.openableEUI;
         
         Graph graph = new GraphImpl(lp.graphUIA);
-        Progress progress =  new ProgressImpl(lp.progressUIA,graph,ProgressImpl.Mode.OverallProgressUI);
+        ProgressImpl progress =  new ProgressImpl(lp.progressUIA,graph,ProgressImpl.Mode.OverallProgressUI);
         
-        lp.init(graph, progress, VariantsImpl.makeDummy());
+        lp.init(graph, progress.progressProvider, VariantsImpl.makeDummy());
         
-        ConnectionActions connectionActions = new ConnectionActionsImpl(lp.lowerControlsUIA);
+        ConnectionActions connectionActions = new ConnectionActionsImpl(progress.progressProvider);
         ChangeDownloadModeAction changeDownloadModeAction = new ChangeDownloadModeActionImpl(lp.changeDownloadModeUIA);
 
         final RemoveFromUI removeFromUI = new RemoveFromUI() {
@@ -124,17 +125,17 @@ public class TestGenericLinkPanel {
                 lp.closeActionUIA, removeFromUI, mainComponent, fileCreator, openAction);
         
         linkActionsImpl.getReAdd().addCallBack(new ReAddActionCallBackImpl(
-                lp.closeActionUIA, lp.lowerControlsUIA,changeDownloadModeAction,true));
+                lp.closeActionUIA, progress.progressProvider,changeDownloadModeAction,true));
         
         ExpandAction expandAction = new ExpandActionImpl(lp.expandActionUIA,ExpandActionImpl.Mode.MultiVariantType);
         
         lp.initActions(expandAction, openAction, linkActionsImpl.getClose(), 
                 linkActionsImpl.getDelete(), linkActionsImpl.getReAdd(), 
-                linkActionsImpl.getSave(), connectionActions, changeDownloadModeAction, null);
+                linkActionsImpl.getSave(), connectionActions, changeDownloadModeAction);
         
         lp.closeActionUIA.fileNameLabel().setText(trialLinkHandlerDummy.tempDisplayName());
         
-        lp.lowerControlsUIA.progress().init(new FakeFileBeingDownloaded());
+        progress.progressProvider.progress().init(new FakeFileBeingDownloaded());
         
         return openableEUI;
     }
@@ -142,15 +143,14 @@ public class TestGenericLinkPanel {
     
     public OpenableEUI splitLink(){
         GenericLinkPanel lp = new GenericLinkPanel();
-        final OpenableEUI openableEUI = lp.expandableUI;
+        final OpenableEUI openableEUI = lp.openableEUI;
         
         Graph graph = new GraphImpl(lp.graphUIA);
-        Progress progress =  new ProgressImpl(lp.progressUIA,graph,ProgressImpl.Mode.OverallProgressUI);
-        VSA vsa = new VSA(lp.progressUIA.variantSelectionComboBox());
-        VariantsImpl vi = new VariantsImpl(vsa);
-        lp.init(graph, progress, vi);
+        ProgressImpl progress =  new ProgressImpl(lp.progressUIA,graph,ProgressImpl.Mode.OverallProgressUI);
+
+        lp.init(graph, progress.progressProvider,VariantsImpl.makeDummy());
         
-        ConnectionActions connectionActions = new ConnectionActionsImpl(lp.lowerControlsUIA);
+        ConnectionActions connectionActions = new ConnectionActionsImpl(progress.progressProvider);
         ChangeDownloadModeAction changeDownloadModeAction = new ChangeDownloadModeActionImpl(lp.changeDownloadModeUIA);
 
         final RemoveFromUI removeFromUI = new RemoveFromUI() {
@@ -168,13 +168,13 @@ public class TestGenericLinkPanel {
         
         linkActionsImpl.getReAdd().addCallBack(openActionImpl);
         linkActionsImpl.getReAdd().addCallBack(new ReAddActionCallBackImpl(
-                lp.closeActionUIA, lp.lowerControlsUIA, changeDownloadModeAction,true));
-        linkActionsImpl.getReAdd().addCallBack(new VariantProgressInitializer(lp.progressUIA,saveAction_forVariants));
+                lp.closeActionUIA, progress.progressProvider, changeDownloadModeAction,true));
+        linkActionsImpl.getReAdd().addCallBack(new VariantProgressProvider(lp.progressUIA,saveAction_forVariants,null,null,true));
                 
         lp.initActions(expandAction, openActionImpl, linkActionsImpl.getClose(), 
                 linkActionsImpl.getDelete(), linkActionsImpl.getReAdd(), 
                 saveAction_forVariants/*plugging in customization : D*/, 
-                connectionActions, changeDownloadModeAction, vsa);
+                connectionActions, changeDownloadModeAction);
         
         lp.closeActionUIA.fileNameLabel().setText("<Test merge link>");
         //linkActionsImpl.getClose().actionPerformed(null);// replicating user close (X) pressed action
@@ -186,15 +186,17 @@ public class TestGenericLinkPanel {
     
     public OpenableEUI multiVariantTypeLink(){
         GenericLinkPanel lp = new GenericLinkPanel();
-        final OpenableEUI openableEUI = lp.expandableUI;
+        final OpenableEUI openableEUI = lp.openableEUI;
         
         Graph graph = new GraphImpl(lp.graphUIA);
-        Progress progress =  new ProgressImpl(lp.progressUIA,graph,ProgressImpl.Mode.OverallProgressUI);
-        VSA vsa = new VSA(lp.progressUIA.variantSelectionComboBox());
-        VariantsImpl vi = new VariantsImpl(vsa);
-        lp.init(graph, progress, vi);
+
+        SaveAction_forVariants saveAction_forVariants = new SaveAction_forVariants(mainComponent, lp.progressUIA);
+        VariantProgressProvider vpi = 
+            new VariantProgressProvider(lp.progressUIA,saveAction_forVariants,graph,lp.closeActionUIA,false);
+                
+        lp.init(graph, vpi, VariantsImpl.makeDummy());
         
-        ConnectionActions connectionActions = new ConnectionActionsImpl(lp.lowerControlsUIA);
+        ConnectionActions connectionActions = new ConnectionActionsImpl(vpi);
         ChangeDownloadModeAction changeDownloadModeAction = new ChangeDownloadModeActionImpl(lp.changeDownloadModeUIA);
 
         final RemoveFromUI removeFromUI = new RemoveFromUI() {
@@ -206,40 +208,26 @@ public class TestGenericLinkPanel {
         
         MultiVariantFileCreator fileCreator = createMultiVariantTypeForTest();
         
-        SaveAction_forVariants saveAction_forVariants = new SaveAction_forVariants(mainComponent, lp.progressUIA);
-        
         MultiVariantOpenAction openAction = new MultiVariantOpenAction(realFileProviderMultiVariant, mainComponent, 
-                new DownloadSpeedProvider() {
-                    @Override public double getDownloadSpeed_KiBps() {
-                        return 100;
-                    }
-        });
+            new DownloadSpeedProvider(){@Override public double getDownloadSpeed_KiBps(){return 256;}});
 
         linkActionsImpl = new LinkActionsImpl(
                 lp.closeActionUIA, removeFromUI, mainComponent, fileCreator,openAction);
         
         linkActionsImpl.getReAdd().addCallBack(openAction);
         linkActionsImpl.getReAdd().addCallBack(new ReAddActionCallBackImpl(
-                lp.closeActionUIA, lp.lowerControlsUIA, changeDownloadModeAction,false));
-        
-        linkActionsImpl.getReAdd().addCallBack(new VariantProgressInitializer(lp.progressUIA,saveAction_forVariants));
+                lp.closeActionUIA, vpi, changeDownloadModeAction,false));
+        linkActionsImpl.getReAdd().addCallBack(vpi);
                 
         lp.initActions(expandAction, openAction, linkActionsImpl.getClose(), 
                 linkActionsImpl.getDelete(), linkActionsImpl.getReAdd(), 
                 saveAction_forVariants/*plugging in customization : D*/, 
-                connectionActions, changeDownloadModeAction, vsa);
+                connectionActions, changeDownloadModeAction);
         
         lp.closeActionUIA.fileNameLabel().setText("<Test merge link>");
         //linkActionsImpl.getClose().actionPerformed(null);// replicating user close (X) pressed action
         linkActionsImpl.getReAdd().actionPerformed(true);// replicating a user click on (+) re-add button
-        
-        try{
-            java.awt.Desktop.getDesktop().open(new File(mountLocation));
-        }catch(Exception a){
-            a.printStackTrace();
-        }
-        
-        
+
         return openableEUI;
     }
     
@@ -258,19 +246,6 @@ public class TestGenericLinkPanel {
             return new File(mountLocation+"\\test120k.rmvb\\test120k.rmvb"); 
         } };
     
-    private static class VSA implements VariantSelectionAction {
-        private final JComboBox cb; public VSA(JComboBox cb) { this.cb = cb; }
-        VariantSelectionAction.Selectable previous = null;
-        @Override public void actionPerformed() {
-            Object o = cb.getSelectedItem();
-            if(o instanceof VariantSelectionAction.Selectable){
-                if(previous!=null){ previous.unSelect(); }
-                previous = ((VariantSelectionAction.Selectable)o);
-                previous.select();
-            }else {  System.out.println("unknown item selected="+o); }
-        }
-    };
-    
     private MultiVariantFileCreator createMultiVariantTypeForTest(){
 
         final LinkedList<TrialLinkHandler> tlh = new LinkedList<TrialLinkHandler>();
@@ -285,7 +260,7 @@ public class TestGenericLinkPanel {
         return new MultiVariantFileCreator(results.complete_linkPackages().get(0), arffs);
     }
     
-    AddRemoveFromFileSystem arffs = createFSforTest();
+    MinimalistFileSystem arffs = createFSforTest();
     
     private SplitMergeNeembuuFileCreator createSplitTypeForTest(){
          
@@ -298,10 +273,10 @@ public class TestGenericLinkPanel {
     
     private TrialLinkGroup createSplitLinksForTest(){
         final LinkedList<TrialLinkHandler> tlh = new LinkedList<TrialLinkHandler>();
-        tlh.add(LinkOrganizerImplTest.make(fn+".001").fakeSpeedTarget_inKiBps(500).fileSource(srcSplit+".001"));
-        tlh.add(LinkOrganizerImplTest.make(fn+".002").fakeSpeedTarget_inKiBps(500).fileSource(srcSplit+".002"));
-        tlh.add(LinkOrganizerImplTest.make(fn+".003").fakeSpeedTarget_inKiBps(500).fileSource(srcSplit+".003"));
-        tlh.add(LinkOrganizerImplTest.make(fn+".004").fakeSpeedTarget_inKiBps(500).fileSource(srcSplit+".004"));
+        tlh.add(LinkOrganizerImplTest.make(fn+".001").fakeSpeedTarget_inKiBps(50).fileSource(srcSplit+".001"));
+        tlh.add(LinkOrganizerImplTest.make(fn+".002").fakeSpeedTarget_inKiBps(50).fileSource(srcSplit+".002"));
+        tlh.add(LinkOrganizerImplTest.make(fn+".003").fakeSpeedTarget_inKiBps(50).fileSource(srcSplit+".003"));
+        tlh.add(LinkOrganizerImplTest.make(fn+".004").fakeSpeedTarget_inKiBps(50).fileSource(srcSplit+".004"));
         
         LinkGrouperImpl grouperImpl = new LinkGrouperImpl();
         LinkGrouperResults results =  grouperImpl.group(new LinkParserResult() {
@@ -314,7 +289,7 @@ public class TestGenericLinkPanel {
     
     private final String mountLocation = "J:\\neembuu\\virtual\\mountloc";
     
-    private AddRemoveFromFileSystem createFSforTest(){
+    private MinimalistFileSystem createFSforTest(){
         
         UnprofessionalTroubleHandler troubleHandler = new UnprofessionalTroubleHandler(mainComponent,null);
 

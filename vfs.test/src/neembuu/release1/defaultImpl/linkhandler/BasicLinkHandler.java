@@ -50,11 +50,11 @@ public final class BasicLinkHandler implements LinkHandler {
         }
         
         public BasicOnlineFile.Builder createFile(){
-            return BasicOnlineFile.Builder.create();
+            return BasicOnlineFile.Builder.create(this);
         }
         
         public Builder addFile(NewConnectionProvider ncp, String name, long size) {
-            linkHandler.files.add(BasicOnlineFile.Builder.create().setName(name).setNewConnectionProvider(ncp).setSize(size).build()); return this;
+            linkHandler.files.add(createFile().setName(name).setNewConnectionProvider(ncp).setSize(size).build()); return this;
         }
 
         public Builder addFile(String url, String name, long size) {

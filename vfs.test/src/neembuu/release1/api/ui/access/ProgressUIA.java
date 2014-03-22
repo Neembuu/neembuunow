@@ -18,9 +18,9 @@
 package neembuu.release1.api.ui.access;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import neembuu.release1.api.ui.ExpansionState;
+import neembuu.release1.api.ui.linkpanel.VariantSelector;
 
 /**
  *
@@ -34,5 +34,5 @@ public interface ProgressUIA {
     ProgressUI variantProgressUI();
     
     JButton killConnectionButton();
-    JComboBox variantSelectionComboBox();
+    VariantSelector variantSelector();
 }

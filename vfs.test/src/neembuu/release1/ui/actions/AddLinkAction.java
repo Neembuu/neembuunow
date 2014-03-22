@@ -30,13 +30,14 @@ import neembuu.release1.api.ui.IndefiniteTaskUI;
 import neembuu.release1.api.ui.ExpandableUIContainer;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.linkpanel.OpenableEUI;
-import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
+import neembuu.release1.api.ui.access.MinimalistFileSystem;
 import neembuu.release1.defaultImpl.linkgroup.LinkGrouperImpl;
 import neembuu.release1.defaultImpl.LinkParserImpl;
 import neembuu.release1.ui.linkcontainer.LinksContainer;
 import neembuu.release1.ui.MainPanel;
 import neembuu.release1.ui.NeembuuUI;
 import neembuu.release1.ui.linkpanel.GLPFactory;
+import neembuu.vfs.progresscontrol.DownloadSpeedProvider;
 
 /**
  *
@@ -49,7 +50,7 @@ public class AddLinkAction implements Runnable {
     private final ExpandableUIContainer luic1;
     private final MainComponent mainComponent;
     private RealFileProvider realFileProvider;
-    private AddRemoveFromFileSystem addRemoveFromFileSystem;
+    private MinimalistFileSystem addRemoveFromFileSystem;
     private final AddLinkUI addLinkUI;
     
     public AddLinkAction(NeembuuUI nui,MainPanel mp) {
@@ -129,42 +130,18 @@ public class AddLinkAction implements Runnable {
     
     private void createUIFor(LinkGrouperResults results){
         for(TrialLinkGroup linkGroup :  results.complete_linkPackages()){
-            int size = linkGroup.getAbsorbedLinks().size();
-            if(size==0)return;
-            OpenableEUI openableEUI;
-            if(size > 1){
-                openableEUI = createUIFor001Type(linkGroup);
-            }else {
-                if(linkGroup.getAbsorbedLinks().get(0).containsMultipleLinks()){
-                    openableEUI = createUIForMultiVariantType(linkGroup);
-                }else {
-                    openableEUI = createUIForSingleLink(linkGroup);
-                }
-            }
+            
+            OpenableEUI openableEUI = GLPFactory.make(
+                luic1, mainComponent, realFileProvider, 
+                addRemoveFromFileSystem,linkGroup,new DownloadSpeedProvider(){
+                    @Override public double getDownloadSpeed_KiBps(){return 256;}});
+            
+            if(openableEUI==null){return;}
             ((LinksContainer)luic1).addUI(openableEUI, 0);
             if(open){
                 openableEUI.open();
             }
         }
-    }
-    
-    private OpenableEUI createUIFor001Type(TrialLinkGroup linkGroup){
-        return GLPFactory.makeSplitLinkUI(
-                luic1, mainComponent, realFileProvider, 
-                addRemoveFromFileSystem, linkGroup);
-
-    }
-    
-    private OpenableEUI createUIForMultiVariantType(TrialLinkGroup linkGroup){
-        return GLPFactory.makeSingleLinkUI(
-                luic1, mainComponent, realFileProvider, 
-                addRemoveFromFileSystem, linkGroup.getAbsorbedLinks().get(0));
-    }
-    
-    private OpenableEUI createUIForSingleLink(TrialLinkGroup linkGroup){
-        return GLPFactory.makeSingleLinkUI(
-                luic1, mainComponent, realFileProvider, 
-                addRemoveFromFileSystem, linkGroup.getAbsorbedLinks().get(0));
     }
     
     private String makeResidualParagraph(LinkGrouperResults grouperResults, LinkParserResult parserResult){

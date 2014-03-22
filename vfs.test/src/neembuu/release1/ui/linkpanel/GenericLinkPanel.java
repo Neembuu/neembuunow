@@ -21,7 +21,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.Icon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -30,13 +29,12 @@ import neembuu.release1.api.ui.ExpansionState;
 import neembuu.release1.api.ui.linkpanel.Graph;
 import neembuu.release1.api.ui.HeightProperty;
 import neembuu.release1.api.ui.linkpanel.OpenableEUI;
-import neembuu.release1.api.ui.linkpanel.Progress;
 import neembuu.release1.api.ui.linkpanel.Variants;
 import neembuu.release1.api.ui.access.ChangeDownloadModeUIA;
 import neembuu.release1.api.ui.access.CloseActionUIA;
 import neembuu.release1.api.ui.access.ExpandActionUIA;
 import neembuu.release1.api.ui.access.GraphUIA;
-import neembuu.release1.api.ui.access.LowerControlsUIA;
+import neembuu.release1.api.ui.linkpanel.ProgressProvider;
 import neembuu.release1.api.ui.access.ProgressUIA;
 import neembuu.release1.api.ui.access.ProgressUI;
 import neembuu.release1.api.ui.actions.ChangeDownloadModeAction;
@@ -47,7 +45,7 @@ import neembuu.release1.api.ui.actions.ConnectionActions;
 import neembuu.release1.api.ui.actions.OpenAction;
 import neembuu.release1.api.ui.actions.ReAddAction;
 import neembuu.release1.api.ui.actions.SaveAction;
-import neembuu.release1.api.ui.actions.VariantSelectionAction;
+import neembuu.release1.api.ui.linkpanel.VariantSelector;
 import neembuu.release1.ui.Colors;
 import neembuu.release1.ui.Fonts;
 import neembuu.release1.ui.HeightPropertyImpl;
@@ -70,7 +68,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     private final FileIconPanel fileIconPanel = new FileIconPanel();
 
     private Graph graph;
-    private Progress progress;
+    private ProgressProvider progress;
     private Variants v;
     
     private ExpandAction expandAction;
@@ -78,7 +76,6 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     private ReAddAction reAddAction;
     private ChangeDownloadModeAction  changeDownloadModeAction;
     private ConnectionActions connectionActions;
-    private VariantSelectionAction variantSelectionAction;    
     
     private final String downloadFullFileToolTip = "<html>"
                 + "<b>Download entire file mode</b><br/>"
@@ -105,9 +102,12 @@ final class GenericLinkPanel extends javax.swing.JPanel {
 
         changeDownloadModeButton.setToolTipText(downloadFullFileToolTip);
         killConnectionButton.setEnabled(false);
+        
+        variantSelectorButton.setBackground(Colors.BUTTON_TINT);
+        variantSelector = new VariantSelectorImpl(variantSelectorButton);
     }
     
-    void init(Graph graph,Progress progress, Variants v1){
+    void init(Graph graph,ProgressProvider progress, Variants v1){
         this.graph = graph; this.progress = progress; this.v = v1;
     }
     
@@ -115,14 +115,12 @@ final class GenericLinkPanel extends javax.swing.JPanel {
             ExpandAction expandAction, OpenAction openAction, 
             CloseAction closeAction, DeleteAction deleteAction, 
             ReAddAction reAddAction, SaveAction saveAction, 
-            ConnectionActions connectionActions, ChangeDownloadModeAction  changeDownloadModeAction,
-            VariantSelectionAction variantSelectionAction) {
+            ConnectionActions connectionActions, ChangeDownloadModeAction  changeDownloadModeAction) {
         this.expandAction = expandAction;
         this.deleteAction = deleteAction;
         this.reAddAction = reAddAction;
         this.connectionActions = connectionActions;
         this.changeDownloadModeAction = changeDownloadModeAction;
-        this.variantSelectionAction = variantSelectionAction;
         rightControlsPanel.initActions(expandAction, saveAction, closeAction);
         fileIconPanel.setOpenAction(openAction);
     }
@@ -157,7 +155,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         sizeAndProgressPane_lower = new javax.swing.JPanel();
         progressBarPanel_lower = new javax.swing.JPanel();
         progressPercetLabel_lower = new javax.swing.JLabel();
-        variantComboBox = new javax.swing.JComboBox();
+        variantSelectorButton = new javax.swing.JButton();
         graphPanel = new javax.swing.JPanel();
         hiddenStatsPane = new javax.swing.JPanel();
         selectedConnectionLabel = new javax.swing.JLabel();
@@ -332,11 +330,11 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         );
         progressPercetLabel_lower.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.progressPercetLabel_lower.text")); // NOI18N
 
-        variantComboBox.setFont(Fonts.MyriadPro.deriveFont(11f));
-        variantComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "001", "001/100MB", "700MB/420p", "1080p/700MB", "1080p/.7GB", "0.7GB/1080p", "70.0MB", "420p/500MB" }));
-        variantComboBox.setMinimumSize(new java.awt.Dimension(30, 16));
-        variantComboBox.setPreferredSize(new java.awt.Dimension(45, 16));
-        variantComboBox.addActionListener(new java.awt.event.ActionListener() {
+        variantSelectorButton.setFont(Fonts.MyriadPro.deriveFont(15f));
+        variantSelectorButton.setMargin(new java.awt.Insets(2, -30, 2, -30));
+        variantSelectorButton.setMinimumSize(new java.awt.Dimension(30, 16));
+        variantSelectorButton.setPreferredSize(new java.awt.Dimension(45, 16));
+        variantSelectorButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxActionPerformed(evt);
             }
@@ -348,7 +346,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
             sizeAndProgressPane_lowerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(sizeAndProgressPane_lowerLayout.createSequentialGroup()
                 .addGap(0, 0, 0)
-                .addComponent(variantComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(variantSelectorButton, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(2, 2, 2)
                 .addComponent(progressBarPanel_lower, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -363,7 +361,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
             .addComponent(progressPercetLabel_lower, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sizeAndProgressPane_lowerLayout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(variantComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(variantSelectorButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         graphPanel.setPreferredSize(new java.awt.Dimension(364, 100));
@@ -606,7 +604,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_reEnableButtonActionPerformed
 
     private void comboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxActionPerformed
-        variantSelectionAction.actionPerformed();
+        variantSelector.actionPerformed();
     }//GEN-LAST:event_comboBoxActionPerformed
 
     private JPanel getFileIconPanelWithButton(){
@@ -654,7 +652,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         MouseAdapter ma = new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                String s = progress.getSelectedRangeTooltip();
+                String s = progress.progress().getSelectedRangeTooltip();
                 if(s==null){s="No Connection is selected";}
                 selectedConnectionLabel.setText(s.replace("\n", " ").replace("<br/>", " "));
                 selectedConnectionLabel.setVisible(true);
@@ -702,28 +700,27 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     private javax.swing.JLabel selectedConnectionLabel;
     private javax.swing.JPanel sizeAndProgressPane;
     private javax.swing.JPanel sizeAndProgressPane_lower;
-    private javax.swing.JComboBox variantComboBox;
+    private javax.swing.JButton variantSelectorButton;
     private javax.swing.JPanel vlcPane;
     // End of variables declaration//GEN-END:variables
 
+    final VariantSelector variantSelector;
+    
     final ProgressUIA progressUIA = new ProgressUIA() {
         @Override public JComponent saveButton() { return rightControlsPanel.getSaveBtn(); }
         @Override public ExpansionState getExpansionState() {return expandAction.getExpansionState(); }
         @Override public JButton killConnectionButton() { return killConnectionButton;}
         @Override public ProgressUI overallProgressUI(){ return overall;} 
         @Override public ProgressUI variantProgressUI() { return split;}
-        @Override public JComboBox variantSelectionComboBox() { return variantComboBox;}};
+        @Override public VariantSelector variantSelector() { return variantSelector;}};
     
     final GraphUIA graphUIA = new GraphUIA() {
         @Override public JPanel graphPanel() {return graphPanel;}
         @Override public ExpansionState getExpansionState() {return expandAction.getExpansionState();}  };
-    
-    final LowerControlsUIA lowerControlsUIA = new LowerControlsUIA(){
-        @Override public Progress progress() { return progress; } };
 
     final ChangeDownloadModeUIA changeDownloadModeUIA = new ChangeDownloadModeUIA() {
         @Override public JToggleButton changeDownloadModeButton() { return changeDownloadModeButton; }
-        @Override public void repaintProgressBar() {progress.repaint(); } };
+        @Override public void repaintProgressBar() {progress.progress().repaint(); } };
     
     final CloseActionUIA closeActionUIA = new CloseActionUIA() {
         @Override public JPanel overlay() { return overlay; }
@@ -739,7 +736,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         @Override public JPanel connectionControlPane() { return connectionControlPane; }
         @Override public JPanel graphPanel() { return graphPanel; }
         @Override public void setVisibleProgress(boolean b) { sizeAndProgressPane.setVisible(b); }
-        @Override public void setVariantChooser(boolean b) { variantComboBox.setVisible(b); }
+        @Override public void setVariantChooser(boolean b) { variantSelectorButton.setVisible(b); }
         @Override public void setVisibleFileSize(boolean b) { fileSizeLabel.setVisible(b); }
         @Override public JPanel hiddenStatsPane() { return hiddenStatsPane; }
         @Override public void initGraph(boolean findFirst) { graph.initGraph(null, findFirst); }
@@ -751,7 +748,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         @Override public void setVisibleVariantProgress(boolean b){ sizeAndProgressPane_lower.setVisible(b);}};
     
     final CloseActionUIA.OpenButton openButton = new CloseActionUIA.OpenButton() {
-        @Override public void setVisible(boolean v) { fileIconPanel.getOpenButton().setVisible(v); }
+        @Override public void setVisible(boolean v) { fileIconPanel.setVisible(v); }
         @Override public void setIcon_silent(Icon bw) { fileIconPanel.getOpenButton().setIcon_bw(bw);}
         @Override public void setIcon_active(Icon clr) {fileIconPanel.getOpenButton().setIcon_clr(clr);}
         @Override public String getCaption() { return fileIconPanel.getCaption(); }
@@ -765,7 +762,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         @Override public JLabel progressPercentLabel() { return progressPercetLabel;}
         @Override public JPanel progressBarPanel() { return progressBarPanel;} };
     
-    final OpenableEUI expandableUI = new OpenableEUI() {
+    final OpenableEUI openableEUI = new OpenableEUI() {
         @Override public JComponent getJComponent() { return GenericLinkPanel.this; }
         @Override public HeightProperty heightProperty() { return heightProperty; }
         @Override public void open(){ reAddAction.actionPerformed(false); }

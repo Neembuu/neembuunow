@@ -33,10 +33,10 @@ public class DummyMultiVariantLinkHandler implements LinkHandler{
     private final List<OnlineFile> ofs = new ArrayList<OnlineFile>();
     
     public DummyMultiVariantLinkHandler() {
-        ofs.add(make("BigBuckBunny_320x180.mp4",50,"320x180"));
-        ofs.add(make("BigBuckBunny_640x360.m4v",100,"640,360"));
-        ofs.add(make("big_buck_bunny_480p_stereo.avi",150,"480p"));
-        ofs.add(make("big_buck_bunny_720p_stereo.avi",300,"720p"));       
+        ofs.add(make("BigBuckBunny_320x180.mp4",500,"320x180"));
+        ofs.add(make("BigBuckBunny_640x360.m4v",1000,"640,360"));
+        ofs.add(make("big_buck_bunny_480p_stereo.avi",1500,"480p"));
+        ofs.add(make("big_buck_bunny_720p_stereo.avi",3000,"720p"));       
     }
     
     private OnlineFile make(String name, double speed,String q){
@@ -44,6 +44,7 @@ public class DummyMultiVariantLinkHandler implements LinkHandler{
         long size = getFileSize(fullPath);
         return BasicOnlineFile.Builder.create()
             .putStringPropertyValue(PropertyProvider.StringProperty.VARIANT_DESCRIPTION, q)
+            .putLongPropertyValue(PropertyProvider.LongProperty.MEDIA_DURATION_IN_MILLISECONDS, 596*1000)
             .setName(name).setSize(size)
             .setNewConnectionProvider(new FakeConnectionProvider(fullPath,speed)).build();
     }

@@ -28,7 +28,7 @@ public final class BasicPropertyProvider implements PropertyProvider{
     private final HashMap map = new HashMap();
     
     public long putLongPropertyValue(LongProperty k, long property) {
-        Object v = map.put(k,property);
+        Object v = map.put(k,property); if(v==null){return PROPERTY_NOT_FOUND;}
         return (long)v;
     }
 

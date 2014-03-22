@@ -15,23 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neembuu.release1.ui.linkpanel;
+package neembuu.release1.api.ui.linkpanel;
 
-import neembuu.release1.api.ui.linkpanel.Variants;
+import java.util.List;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public class VariantsImpl implements Variants {
-
-    public VariantsImpl() {  }
+public interface VariantSelector {
+    /*String getText();
+    void setText(String text);*/
     
-    public static Variants makeDummy(){
-        return new Variants() {@Override public void init() {}}; }
+    List<Selectable> getItems();
+    
+    Selectable getSelectedItem();
+    
+    void actionPerformed();
 
-    @Override
-    public void init() {
-        throw new UnsupportedOperationException();
+    public static interface Selectable {
+        void select();
+        void unSelect();
+        String getText();
+        String getSmallText();
     }
 }

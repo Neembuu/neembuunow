@@ -27,7 +27,7 @@ import jpfm.volume.vector.VectorRootDirectory;
 import neembuu.diskmanager.DiskManager;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.RealFileProvider;
-import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
+import neembuu.release1.api.ui.access.MinimalistFileSystem;
 import neembuu.vfs.file.SeekableConnectionFile;
 import neembuu.vfs.file.TroubleHandler;
 
@@ -35,7 +35,7 @@ import neembuu.vfs.file.TroubleHandler;
  *
  * @author Shashank Tulsyan
  */
-public class AddRemoveFromFileSystem_Root implements AddRemoveFromFileSystem {
+public class AddRemoveFromFileSystem_Root implements MinimalistFileSystem {
 
     private final VectorRootDirectory volume;
     private final TroubleHandler troubleHandler;

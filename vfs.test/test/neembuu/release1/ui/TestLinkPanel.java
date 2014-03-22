@@ -45,7 +45,7 @@ public class TestLinkPanel {
                 = new TestGenericLinkPanel(mp,lc,mainComponent);
         
         lc.addUI(genericLinkPanel.singleLink(), 0);
-        //lc.addUI(genericLinkPanel.multiLink(), 0);
+        //lc.addUI(genericLinkPanel.splitLink(), 0);
         lc.addUI(genericLinkPanel.multiVariantTypeLink(),0);
     }
     

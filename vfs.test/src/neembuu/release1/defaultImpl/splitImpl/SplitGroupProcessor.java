@@ -25,7 +25,7 @@ import jpfm.DirectoryStream;
 import jpfm.FileAttributesProvider;
 import jpfm.fs.splitfs.CascadableSplitFS;
 import jpfm.mount.BasicCascadeMount;
-import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
+import neembuu.release1.api.ui.access.MinimalistFileSystem;
 import neembuu.vfs.file.ConstrainUtility;
 import neembuu.vfs.file.SeekableConnectionFile;
 
@@ -62,7 +62,7 @@ public class SplitGroupProcessor  {
     }
 
     public SplitGroupSession handle(List<SeekableConnectionFile> splitVirtualFiles,
-            AddRemoveFromFileSystem addRemoveFromFileSystem
+            MinimalistFileSystem addRemoveFromFileSystem
             ) {
         
         List<SeekableConnectionFile> sessions_ = canHandle(splitVirtualFiles);

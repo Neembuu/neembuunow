@@ -19,7 +19,7 @@ package neembuu.release1.ui.actions;
 
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.ui.access.CloseActionUIA;
-import neembuu.release1.api.ui.access.LowerControlsUIA;
+import neembuu.release1.api.ui.linkpanel.ProgressProvider;
 import neembuu.release1.api.ui.actions.ChangeDownloadModeAction;
 import neembuu.release1.api.ui.actions.ReAddAction;
 import neembuu.vfs.file.MinimumFileInfo;
@@ -32,12 +32,12 @@ import neembuu.vfs.file.MinimumFileInfo;
 public class ReAddActionCallBackImpl implements ReAddAction.CallBack {
 
     private final CloseActionUIA uia;
-    private final LowerControlsUIA lowerControlUIA;
+    private final ProgressProvider lowerControlUIA;
     private final ChangeDownloadModeAction changeDownloadModeAction;
     
     private final boolean initalizeProgress;
 
-    public ReAddActionCallBackImpl(CloseActionUIA uia, LowerControlsUIA lowerControlUIA,
+    public ReAddActionCallBackImpl(CloseActionUIA uia, ProgressProvider lowerControlUIA,
             ChangeDownloadModeAction changeDownloadModeAction,boolean initalizeProgress) {
         this.uia = uia; this.initalizeProgress = initalizeProgress;
         this.lowerControlUIA = lowerControlUIA;

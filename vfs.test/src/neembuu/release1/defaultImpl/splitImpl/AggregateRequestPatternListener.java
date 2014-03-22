@@ -16,7 +16,6 @@
  */
 package neembuu.release1.defaultImpl.splitImpl;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -55,12 +54,12 @@ public class AggregateRequestPatternListener implements RequestPatternListener {
         for (SeekableConnectionFile file : connectionFiles) {
             if (i == 0) {
                 cummulativeFileSizes[i] = file.getFileSize();
+                file.addRequestPatternListener(new AggregateRequestPatternListener(0,h));
             } else {
                 cummulativeFileSizes[i] = cummulativeFileSizes[i - 1] + file.getFileSize();
+                file.addRequestPatternListener(new AggregateRequestPatternListener(
+                    cummulativeFileSizes[i-1],h));
             }
-
-            file.addRequestPatternListener(new AggregateRequestPatternListener(
-                    cummulativeFileSizes[i],h));
         }
     }
 }

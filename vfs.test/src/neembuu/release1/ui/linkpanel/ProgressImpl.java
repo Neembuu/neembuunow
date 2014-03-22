@@ -32,6 +32,7 @@ import neembuu.rangearray.UIRangeArrayAccess;
 import neembuu.rangearray.UnsyncRangeArrayCopy;
 import neembuu.release1.Main;
 import neembuu.release1.api.ui.ExpansionState;
+import neembuu.release1.api.ui.linkpanel.ProgressProvider;
 import neembuu.release1.api.ui.linkpanel.Graph;
 import neembuu.release1.api.ui.linkpanel.Progress;
 import neembuu.release1.api.ui.access.ProgressUI;
@@ -80,6 +81,12 @@ public class ProgressImpl implements Progress {
             default: throw new AssertionError();
         }
     }
+    
+    public final ProgressProvider progressProvider = new ProgressProvider() {
+        @Override public Progress progress() {
+            return ProgressImpl.this;
+        }
+    };
     
     private volatile FileBeingDownloaded file;
     

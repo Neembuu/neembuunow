@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import neembuu.release1.api.file.NeembuuFile;
 import jpfm.FileAttributesProvider;
 import neembuu.release1.api.file.PropertyProvider;
-import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
+import neembuu.release1.api.ui.access.MinimalistFileSystem;
 import neembuu.release1.defaultImpl.file.BasicPropertyProvider;
 import neembuu.vfs.file.AutoCompleteControls;
 import neembuu.vfs.file.FileBeingDownloaded;
@@ -44,7 +44,7 @@ public class MultiVariantSession implements NeembuuFile {
     
     private final AtomicBoolean completelyClosed = new AtomicBoolean(false);
     
-    private final AddRemoveFromFileSystem root;
+    private final MinimalistFileSystem root;
     
     public static final class Holder  { RequestPatternListener requestPatternListener; }
     private final Holder h = new Holder();
@@ -53,7 +53,7 @@ public class MultiVariantSession implements NeembuuFile {
     
     public MultiVariantSession(List<NeembuuFile> connectionFiles,
             FileAttributesProvider folder,
-            AddRemoveFromFileSystem root) {
+            MinimalistFileSystem root) {
         this.connectionFiles = connectionFiles;
         this.folder = folder; this.root = root;
     }
@@ -113,7 +113,7 @@ public class MultiVariantSession implements NeembuuFile {
 
     @Override
     public boolean mayBeSaved() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return false;/*cannot save a folder lol!*/
     }
     
     private final MinimumFileInfo minimumFileInfo = new MinimumFileInfo() {

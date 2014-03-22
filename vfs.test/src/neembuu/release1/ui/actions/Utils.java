@@ -76,12 +76,15 @@ public class Utils {
             suffix = " TB";
             sz /= 1024 * 1024 * 1024 * 1024;
         }
+        String toRet = "";
         if (sz < 10) {
-            sz = Math.round(sz * 100.0) / 100.0;
+            toRet += Math.round(sz * 100.0) / 100.0;
         } else if (sz < 100) {
-            sz = Math.round(sz * 10.0) / 10.0;
+            toRet += Math.round(sz * 10.0) / 10.0;
+        } else if (sz < 1000){
+            toRet += ((int)sz);
         }
-        return sz + " " + suffix;
+        return toRet + " " + suffix;
     }
     
     private static BufferedImage iconToBufferedImage(Icon icon) {

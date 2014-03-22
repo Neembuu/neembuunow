@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.file.PropertyProvider;
-import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
+import neembuu.release1.api.ui.access.MinimalistFileSystem;
 import neembuu.release1.defaultImpl.file.BasicPropertyProvider;
 import neembuu.vfs.file.AutoCompleteControls;
 import neembuu.vfs.file.FileBeingDownloaded;
@@ -37,19 +37,19 @@ import neembuu.vfs.file.SeekableConnectionFile;
  */
 public class NeembuuFileWrapSCF implements NeembuuFile {
     private final SeekableConnectionFile file;
-    private final AddRemoveFromFileSystem root;
+    private final MinimalistFileSystem root;
     
     private final AtomicBoolean completelyClosed = new AtomicBoolean(false);
     
     private final PropertyProvider bpp;
     private final String[] basePath;
 
-    public NeembuuFileWrapSCF(SeekableConnectionFile file, AddRemoveFromFileSystem root) {
-        this(file, root, new BasicPropertyProvider(),null);
+    public NeembuuFileWrapSCF(SeekableConnectionFile file, MinimalistFileSystem root) {
+        this(file, root, null,null);
     }
 
-    public NeembuuFileWrapSCF(SeekableConnectionFile file, AddRemoveFromFileSystem root, PropertyProvider bpp,final String[] basePath) {
-        this.file = file; this.root = root; this.bpp = bpp; 
+    public NeembuuFileWrapSCF(SeekableConnectionFile file, MinimalistFileSystem root, PropertyProvider bpp,final String[] basePath) {
+        this.file = file; this.root = root; this.bpp = bpp==null?new BasicPropertyProvider():bpp; 
         this.basePath = basePath==null?new String[0]:basePath;
     }
 

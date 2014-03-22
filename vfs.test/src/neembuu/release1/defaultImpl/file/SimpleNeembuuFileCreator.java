@@ -23,7 +23,7 @@ import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProviders;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.file.NeembuuFileCreator;
-import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
+import neembuu.release1.api.ui.access.MinimalistFileSystem;
 import neembuu.release1.mountmanager.NeembuuFileWrapSCF;
 
 /**
@@ -33,10 +33,10 @@ import neembuu.release1.mountmanager.NeembuuFileWrapSCF;
 public class SimpleNeembuuFileCreator implements NeembuuFileCreator{
 
     private final TrialLinkHandler trialLinkHandler;
-    private final AddRemoveFromFileSystem addRemoveFromFileSystem;
+    private final MinimalistFileSystem addRemoveFromFileSystem;
 
     public SimpleNeembuuFileCreator(TrialLinkHandler trialLinkHandler, 
-            AddRemoveFromFileSystem addRemoveFromFileSystem) {
+            MinimalistFileSystem addRemoveFromFileSystem) {
         this.trialLinkHandler = trialLinkHandler;
         this.addRemoveFromFileSystem = addRemoveFromFileSystem;
     }

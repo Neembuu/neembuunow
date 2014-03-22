@@ -15,7 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neembuu.release1.api.ui.access;
+package neembuu.release1.api.ui.linkpanel;
 
 import neembuu.release1.api.ui.linkpanel.Progress;
 
@@ -23,6 +23,6 @@ import neembuu.release1.api.ui.linkpanel.Progress;
  *
  * @author Shashank Tulsyan
  */
-public interface LowerControlsUIA {
+public interface ProgressProvider {
     Progress progress();
 }

@@ -36,7 +36,7 @@ public class DefaultLinkGroup implements TrialLinkGroup {
     
     @Override
     public String toString() {
-        String ret = tlh.tempDisplayName() +"{\n";
+        String ret = tlh.tempDisplayName() +"(DefaultLinkGroup){\n";
         ret += "\t"+tlh.tempDisplayName()+"\n";
         ret+= "}\n";
         return ret;

@@ -39,7 +39,7 @@ import neembuu.release1.Main;
 import neembuu.release1.api.RealFileProvider;
 import neembuu.release1.api.ui.IndefiniteTaskUI;
 import neembuu.release1.api.ui.MainComponent;
-import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
+import neembuu.release1.api.ui.access.MinimalistFileSystem;
 import neembuu.release1.api.ui.access.MainUIA;
 import neembuu.release1.pismo.PismoInstaller;
 import neembuu.vfs.file.TroubleHandler;
@@ -164,10 +164,10 @@ public class MountManager {
                 }return new File(pth);
             } }; 
 
-    private final AddRemoveFromFileSystem addRemoveFromFileSystem;
+    private final MinimalistFileSystem addRemoveFromFileSystem;
     
     public final RealFileProvider getRealFileProvider() {  return realFileProvider; }
-    public final AddRemoveFromFileSystem getAddRemoveFromFileSystem() { return addRemoveFromFileSystem; }
+    public final MinimalistFileSystem getAddRemoveFromFileSystem() { return addRemoveFromFileSystem; }
     
     
 }

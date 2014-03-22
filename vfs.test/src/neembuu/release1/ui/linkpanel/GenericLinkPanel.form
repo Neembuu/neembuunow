@@ -423,7 +423,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
-                          <Component id="variantComboBox" min="-2" pref="73" max="-2" attributes="0"/>
+                          <Component id="variantSelectorButton" min="-2" pref="73" max="-2" attributes="0"/>
                           <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
                           <Component id="progressBarPanel_lower" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -441,7 +441,7 @@
                       <Component id="progressPercetLabel_lower" alignment="0" pref="30" max="32767" attributes="0"/>
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                          <Component id="variantComboBox" min="-2" pref="29" max="-2" attributes="0"/>
+                          <Component id="variantSelectorButton" min="-2" pref="29" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -472,22 +472,13 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JComboBox" name="variantComboBox">
+                <Component class="javax.swing.JButton" name="variantSelectorButton">
                   <Properties>
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                      <Connection code="Fonts.MyriadPro.deriveFont(11f)" type="code"/>
+                      <Connection code="Fonts.MyriadPro.deriveFont(15f)" type="code"/>
                     </Property>
-                    <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                      <StringArray count="8">
-                        <StringItem index="0" value="001"/>
-                        <StringItem index="1" value="001/100MB"/>
-                        <StringItem index="2" value="700MB/420p"/>
-                        <StringItem index="3" value="1080p/700MB"/>
-                        <StringItem index="4" value="1080p/.7GB"/>
-                        <StringItem index="5" value="0.7GB/1080p"/>
-                        <StringItem index="6" value="70.0MB"/>
-                        <StringItem index="7" value="420p/500MB"/>
-                      </StringArray>
+                    <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+                      <Insets value="[2, -30, 2, -30]"/>
                     </Property>
                     <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[30, 16]"/>

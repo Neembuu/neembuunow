@@ -36,7 +36,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 public class DirectLinkHandlerProvider implements LinkHandlerProvider {    
     private static final Logger LOGGER = LoggerUtil.getLogger();
     
-    private LinkHandler getDirectLinkHandler(String url){
+    private LinkHandler getDirectLinkHandler(String url)throws Exception{
         
         String fileName = url.substring(url.lastIndexOf('/')+1);
         
@@ -80,12 +80,13 @@ public class DirectLinkHandlerProvider implements LinkHandlerProvider {
             else {
                 return BasicLinkHandler.Builder.create().setGroupName(fileName)
                         .createFile()
-                                .setName(url).setUrl(url).setSize(length)
+                                .setName(fileName).setUrl(url).setSize(length)
                         .next()
                         .build();
             }
         }catch(Exception any){
             LOGGER.log(Level.INFO,"Can\'t get filesize",any);
+            throw any;
         }
         return BasicLinkHandler.Builder.create().addFile(url, fileName, -1).setGroupName(fileName).build();
     }
@@ -127,7 +128,7 @@ public class DirectLinkHandlerProvider implements LinkHandlerProvider {
     }
 
     @Override
-    public LinkHandler getLinkHandler(TrialLinkHandler trialLinkHandler) {
+    public LinkHandler getLinkHandler(TrialLinkHandler trialLinkHandler) throws Exception{
         return getDirectLinkHandler(trialLinkHandler.getReferenceLinkString());
     }
     

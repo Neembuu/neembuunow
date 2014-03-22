@@ -53,7 +53,7 @@ public class SaveAction_forVariants implements SaveAction {
         mainFileMenuItem.setVisible(false);
     }
     
-    public void addFile(Saveable a, final ProgressUIA p){
+    public void addFile(Saveable a){
         PopupEntry puia = new PopupEntry(a, a.getMinimumFileInfo().getName());
         doneFiles.add(puia);
     }

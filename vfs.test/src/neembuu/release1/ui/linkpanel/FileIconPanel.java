@@ -82,6 +82,12 @@ final class FileIconPanel {
     public HiddenBorderButton getOpenButton() {
         return openButton;
     }
+    
+    public void setVisible(boolean f){
+        openButton.setVisible(f);
+        captionLabel.setVisible(f);
+    }
+    
 
     public JPanel getJPanel() {
         return jPanel;

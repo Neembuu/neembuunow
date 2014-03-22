@@ -24,8 +24,5 @@ package neembuu.release1.api.ui.actions;
 public interface VariantSelectionAction {
     void actionPerformed();
     
-    public static interface Selectable {
-        void select();
-        void unSelect();
-    }
+    
 }

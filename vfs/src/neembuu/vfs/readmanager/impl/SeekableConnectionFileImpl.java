@@ -62,7 +62,7 @@ final class SeekableConnectionFileImpl // package private
 
     private final NewReadHandlerProvider readHandlerProvider;
     private final ReadQueueManager readManager;
-    private NewConnectionProvider newConnectionProvider;
+    private final NewConnectionProvider newConnectionProvider;
 
     private final SeekableConnectionFileParams scfp;
     private static final Logger LOGGER = LoggerUtil.getLogger();
@@ -264,6 +264,7 @@ final class SeekableConnectionFileImpl // package private
         synchronized (openCloseListeners){
             if(requestPatternListener==rpl){
                 requestPatternListener = requestPatternListener2;
+                requestPatternListener2 = null;
             }else if(requestPatternListener2==rpl){
                 requestPatternListener2 = null;
             }

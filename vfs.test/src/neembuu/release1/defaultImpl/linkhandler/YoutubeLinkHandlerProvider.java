@@ -17,20 +17,16 @@
 package neembuu.release1.defaultImpl.linkhandler;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import neembuu.release1.StringUtils;
-import neembuu.release1.api.file.OnlineFile;
 import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProvider;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
-import neembuu.release1.defaultImpl.file.BasicOnlineFile;
 import neembuu.release1.httpclient.NHttpClient;
 import neembuu.release1.log.LoggerUtil;
 import neembuu.release1.httpclient.utils.NHttpClientUtils;
-import neembuu.vfs.connection.sampleImpl.DownloadManager;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -49,45 +45,6 @@ import org.openide.util.Exceptions;
 public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
     private static final Logger LOGGER = LoggerUtil.getLogger();
     
-    static final class YoutubeLinkHandler implements LinkHandler{
-        private final String fileName; 
-        private final long fileSize;
-        private final String url;
-
-        public YoutubeLinkHandler(String fileName, long fileSize, String url) {
-            this.fileName = fileName;
-            this.fileSize = fileSize;
-            this.url = url;
-        }
-
-        @Override
-        public List<OnlineFile> getFiles() {
-            LinkedList<OnlineFile> ll = new LinkedList<OnlineFile>();
-            BasicOnlineFile bof = BasicOnlineFile.Builder.create()
-                    .setName(fileName)
-                    .setSize(fileSize)
-                    .setNewConnectionProvider(new DownloadManager(url))
-                    .build();
-            ll.add(bof);
-            return ll;
-        }
-        
-        @Override
-        public String getGroupName(){
-            return fileName;
-        }
-
-        @Override
-        public boolean foundName() {
-            return fileName!=null;
-        }
-    }
-
-    /**
-     * Inspired by: <a href="http://stackoverflow.com/questions/3717115/regular-expression-for-youtube-links">Stack Overflow</a>
-     * @param url
-     * @return 
-     */
     @Override
     public TrialLinkHandler tryHandling(final String url) {
         return new YT_TLH(url);
@@ -291,8 +248,12 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
 
         YT_TLH(String url) { this.url = url; }
 
-        @Override
-        public boolean canHandle() {
+        /**
+         * Inspired by: <a href="http://stackoverflow.com/questions/3717115/regular-expression-for-youtube-links">Stack Overflow</a>
+         * @param url
+         * @return 
+         */
+        @Override public boolean canHandle() {
             boolean result = url.matches("https?://(www.youtube.com/watch\\?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=]*)?");
             LOGGER.log(Level.INFO, "Youtube can handle this? ", result);
             return result;

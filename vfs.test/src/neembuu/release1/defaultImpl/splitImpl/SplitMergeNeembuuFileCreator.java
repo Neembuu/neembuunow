@@ -26,7 +26,7 @@ import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProviders;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.file.NeembuuFileCreator;
-import neembuu.release1.api.ui.access.AddRemoveFromFileSystem;
+import neembuu.release1.api.ui.access.MinimalistFileSystem;
 import neembuu.vfs.file.SeekableConnectionFile;
 
 /**
@@ -36,11 +36,11 @@ import neembuu.vfs.file.SeekableConnectionFile;
 public class SplitMergeNeembuuFileCreator implements NeembuuFileCreator {
 
     private final TrialLinkGroup trialLinkGroup;
-    private final AddRemoveFromFileSystem root;
+    private final MinimalistFileSystem root;
 
     SplitGroupSession splitGroupSession = null;
     
-    public SplitMergeNeembuuFileCreator(TrialLinkGroup trialLinkGroup, AddRemoveFromFileSystem root) {
+    public SplitMergeNeembuuFileCreator(TrialLinkGroup trialLinkGroup, MinimalistFileSystem root) {
         this.trialLinkGroup = trialLinkGroup;
         this.root = root;
     }

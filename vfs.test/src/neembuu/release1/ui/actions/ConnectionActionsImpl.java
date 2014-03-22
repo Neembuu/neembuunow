@@ -21,7 +21,7 @@ import java.util.logging.Level;
 import neembuu.rangearray.Range;
 import neembuu.rangearray.UIRangeArrayAccess;
 import neembuu.release1.Main;
-import neembuu.release1.api.ui.access.LowerControlsUIA;
+import neembuu.release1.api.ui.linkpanel.ProgressProvider;
 import neembuu.release1.api.ui.actions.ConnectionActions;
 
 /**
@@ -30,9 +30,9 @@ import neembuu.release1.api.ui.actions.ConnectionActions;
  */
 public class ConnectionActionsImpl implements ConnectionActions {
 
-    private final LowerControlsUIA ui;
+    private final ProgressProvider ui;
 
-    public ConnectionActionsImpl(LowerControlsUIA ui) {
+    public ConnectionActionsImpl(ProgressProvider ui) {
         this.ui = ui;
     }
     
