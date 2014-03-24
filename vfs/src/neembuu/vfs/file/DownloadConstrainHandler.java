@@ -42,7 +42,7 @@ public interface DownloadConstrainHandler {
     
     void setIndex(int index);
     
-    boolean isAutoCompleteEnabled();
+    //boolean isAutoCompleteEnabled();
     
     boolean hasAMainConnection();
     

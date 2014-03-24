@@ -495,13 +495,13 @@ public class MonitorFrame
             filesToMount = showAddFilesDialog();
         }else{
             System.setProperty("neembuu.vfs.test.MoniorFrame.resumepolicy", 
-                "emptyDirectory");
-                //"resumeFromPreviousState");
+                //"emptyDirectory");
+                "resumeFromPreviousState");
             
             if(SystemUtils.IS_OS_WINDOWS){
                     filesToMount=new String[]{
                         //"http://installer.jdownloader.org/test120k.rmvb.001",
-                        "http://update0.jdownloader.org/test120k.rmvb",
+                        "http://neembuu.com/test_videos/test120k.rmvb",
                         //"http://update3.jdownloader.org/speed.avi"
                         //"http://update3.jdownloader.org/testFiles/thedivide-tlr1_h1080p.mov",
                         //"http://installer.jdownloader.org/test/Downloads.7zip",
@@ -567,14 +567,14 @@ public class MonitorFrame
                 //SeekableHttpChannel.DEFAULT_HTTP_PORT = 8080;
             }else if(SystemUtils.IS_OS_LINUX) {
                 filesToMount=new String[]{
-                    //"http://update0.jdownloader.org/test120k.rmvb",
+                    //"http://neembuu.com/test_videos/test120k.rmvb",
                     "http://neembuu.sourceforge.net/test120k.rmvb",
                     "/media/j/Videos/Requiem_for_a_Duel.mkv"
                 };
             }else { // mac or something else
                 System.out.println("someother os, probably mac :"+ SystemUtils.OS_NAME);
                 filesToMount=new String[]{
-                    "http://update0.jdownloader.org/test120k.rmvb",
+                    "http://neembuu.com/test_videos/test120k.rmvb",
                     "/Volumes/MIDS/Videos/Requiem_for_a_Duel.mkv"
                 };
             }

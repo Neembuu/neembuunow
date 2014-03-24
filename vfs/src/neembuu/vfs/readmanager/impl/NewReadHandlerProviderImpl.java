@@ -30,7 +30,7 @@ import neembuu.rangearray.RangeUtils;
 import neembuu.vfs.file.TroubleHandler;
 import neembuu.vfs.progresscontrol.ThrottleFactory;
 import neembuu.vfs.readmanager.NewReadHandlerProvider;
-import neembuu.vfs.readmanager.ReadQueueManager;
+import neembuu.vfs.readmanager.rqm.ReadQueueManager;
 import neembuu.vfs.readmanager.RegionHandler;
 
 /**

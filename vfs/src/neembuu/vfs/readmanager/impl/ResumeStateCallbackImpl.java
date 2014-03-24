@@ -28,7 +28,7 @@ import neembuu.diskmanager.RegionStorageManager;
 import neembuu.diskmanager.ResumeStateCallback;
 import neembuu.rangearray.Range;
 import neembuu.vfs.progresscontrol.ThrottleFactory;
-import neembuu.vfs.readmanager.ReadQueueManager;
+import neembuu.vfs.readmanager.rqm.ReadQueueManager;
 
 /**
  *

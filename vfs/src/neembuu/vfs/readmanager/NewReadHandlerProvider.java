@@ -17,6 +17,7 @@
 
 package neembuu.vfs.readmanager;
 
+import neembuu.vfs.readmanager.rqm.ReadQueueManager;
 import java.util.logging.Logger;
 import neembuu.diskmanager.FileStorageManager;
 import neembuu.vfs.file.TroubleHandler;

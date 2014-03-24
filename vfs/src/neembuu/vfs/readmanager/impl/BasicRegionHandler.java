@@ -422,7 +422,7 @@ final class BasicRegionHandler
 
     @Override
     public final TotalFileReadStatistics getTotalFileReadStatistics() {
-        return file.getReadQueueManager();
+        return file.getTotalFileReadStatistics();
     }
 
     @Override

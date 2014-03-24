@@ -53,7 +53,7 @@ public class GeneralThrottleTestMeasurement extends OutputStream{
         
          DefaultHttpClient myClient = new DefaultHttpClient();
          myClient.execute(new HttpGet(
-                 //"http://update0.jdownloader.org/test120k.rmvb"
+                 //"http://neembuu.com/test_videos/test120k.rmvb"
                  
                  "http://localhost:8080/LocalFileServer-war/servlet/FileServer?"
                     + "totalFileSpeedLimit=8000&"

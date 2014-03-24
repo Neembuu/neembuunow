@@ -43,7 +43,7 @@ import neembuu.vfs.file.RequestPatternListener;
 import neembuu.vfs.file.SeekableConnectionFileParams;
 import neembuu.vfs.file.TroubleHandler;
 import neembuu.vfs.readmanager.NewReadHandlerProvider;
-import neembuu.vfs.readmanager.ReadQueueManager;
+import neembuu.vfs.readmanager.rqm.ReadQueueManager;
 import neembuu.vfs.readmanager.RegionHandler;
 import neembuu.vfs.readmanager.TotalFileReadStatistics;
 import net.jcip.annotations.NotThreadSafe;
@@ -92,6 +92,8 @@ final class SeekableConnectionFileImpl // package private
         return readManager;
     }
 
+    
+    
     @Override
     public void setParent(DirectoryStream parent) {
         this.parent = parent;
@@ -220,7 +222,7 @@ final class SeekableConnectionFileImpl // package private
 
     @Override
     public TotalFileReadStatistics getTotalFileReadStatistics() {
-        return readManager;
+        return readManager.getTotalFileReadStatistics();
     }
     
     @Override

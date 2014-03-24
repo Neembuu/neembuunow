@@ -29,7 +29,7 @@ import neembuu.diskmanager.DiskManagerParams;
 import neembuu.diskmanager.DiskManagers;
 import neembuu.util.logging.LoggerUtil;
 import neembuu.vfs.connection.NewConnectionProvider;
-import neembuu.vfs.connection.jdimpl.JD_DownloadManager;
+import neembuu.vfs.connection.sampleImpl.DownloadManager;
 import neembuu.vfs.file.AskResume;
 import neembuu.vfs.file.MonitoredHttpFile;
 import neembuu.vfs.file.SeekableConnectionFile;
@@ -100,8 +100,8 @@ public class MonitoredHttpFile_Builder_Test {
                 throw new IllegalStateException("newConnectionProvider==null url==null");
             } else {
                 newConnectionProvider =
-                        //new DownloadManager(url);
-                        new JD_DownloadManager(url);
+                        new DownloadManager(url);
+                        //new JD_DownloadManager(url);
                 long size_obt;
 
                 FileNameAndSizeFinderService.SIZE_AND_NAME size_and_name =
