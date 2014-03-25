@@ -19,7 +19,6 @@ package neembuu.vfs.test;
 import java.util.List;
 import javax.swing.JOptionPane;
 import jpfm.JPfmError;
-import jpfm.mount.Mount;
 import jpfm.operations.AlreadyCompleteException;
 import jpfm.operations.readwrite.ReadRequest;
 import neembuu.vfs.connection.NewConnectionParams;
@@ -31,15 +30,15 @@ import neembuu.vfs.file.TroubleHandler;
  */
 public final class SimpleTroubleHandler implements TroubleHandler{
 
-    private final MonitorFrame mf;
+    private final FrameProvider fp;
 
-    public SimpleTroubleHandler(MonitorFrame mf) {
-        this.mf = mf;
+    public SimpleTroubleHandler(FrameProvider fp) {
+        this.fp = fp;
     }
     
     @Override
     public void cannotCreateANewConnection(NewConnectionParams ncp, int numberOfRetries) {
-        JOptionPane.showMessageDialog(mf.frame, ncp.toString(), "Internet problem : retries "+numberOfRetries+" times",JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(fp.getJFrame(), ncp.toString(), "Internet problem : retries "+numberOfRetries+" times",JOptionPane.ERROR_MESSAGE);
     }
 
     @Override
@@ -50,7 +49,7 @@ public final class SimpleTroubleHandler implements TroubleHandler{
         for (ReadRequest rr : pendingReadRequest) {
             message+=rr.toString()+"\n";
         }
-        int ret = JOptionPane.showConfirmDialog(mf.frame, 
+        int ret = JOptionPane.showConfirmDialog(fp.getJFrame() , 
                 message, 
                 "Watch as you download might be inefficient",JOptionPane.OK_CANCEL_OPTION);
         RuntimeException re = new RuntimeException("User forced completion of requests");

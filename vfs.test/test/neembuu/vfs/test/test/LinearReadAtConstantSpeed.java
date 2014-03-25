@@ -17,23 +17,25 @@
 package neembuu.vfs.test.test;
 
 import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
+import java.nio.channels.SeekableByteChannel;
+import static neembuu.vfs.test.test.Common.createNew_FC_Virtual_File;
+import static neembuu.vfs.test.test.Common.show_StartNeembuuMessage;
 import org.junit.Test;
-import static junit.framework.Assert.*;
-import static neembuu.vfs.test.test.Common.*;
 /**
  *
  * @author Shashank Tulsyan
  */
 public class LinearReadAtConstantSpeed {
-    private static FileChannel fc_virtual_file=null;
+    private static SeekableByteChannel /*FileChannel*/ fc_virtual_file=null;//fc_virtual_file = null;
+
     
     long fileSize = 0;
     volatile long offset = 0;
     
     @Test
     public void linearRead()throws Exception{
-        fc_virtual_file = createNew_FC_Virtual_File();
+        boolean cascade = show_StartNeembuuMessage();
+        fc_virtual_file = createNew_FC_Virtual_File(cascade);
         
         java.awt.EventQueue.invokeLater(new Runnable() {
 

@@ -18,6 +18,7 @@
 package neembuu.vfs.test.test;
 
 import javax.swing.JOptionPane;
+import neembuu.vfs.test.Main;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -32,7 +33,8 @@ public final class BombardWithManyConnectionRequests {
 
     @BeforeClass
     public static void initalize() throws Exception{
-        JOptionPane.showMessageDialog(null, "Start" );
+        Main.main(new String[]{/*"cascadeMount"*/});
+        //JOptionPane.showMessageDialog(null, "Start" );
     }
     
     @Test

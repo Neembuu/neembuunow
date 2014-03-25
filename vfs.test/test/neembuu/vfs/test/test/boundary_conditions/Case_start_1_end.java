@@ -16,9 +16,8 @@
  */
 package neembuu.vfs.test.test.boundary_conditions;
 
-import neembuu.rangearray.vectorimpl.RangeArrayImpl;
 import org.junit.Test;
-import java.nio.channels.FileChannel;
+import java.nio.channels.SeekableByteChannel;
 import neembuu.rangearray.RangeArrayFactory;
 import neembuu.rangearray.RangeArrayParams;
 import org.junit.BeforeClass;
@@ -30,8 +29,8 @@ import static neembuu.vfs.test.test.Common.*;
  */
 public final class Case_start_1_end {
     
-    private static FileChannel fc_virtual_file=null;//fc_virtual_file = null;
-    private static FileChannel fc_real_file=null;//fc_real_file = null;
+    private static SeekableByteChannel /*FileChannel*/ fc_virtual_file=null;//fc_virtual_file = null;
+    private static SeekableByteChannel /*FileChannel*/ fc_real_file=null;//fc_real_file = null;
     
     @BeforeClass
     public static void initalize() throws Exception{
@@ -43,7 +42,6 @@ public final class Case_start_1_end {
         
         fc_real_file = createNew_FC_Real_File();        
 
-        ;
         
         downloadFollowingRegionsBeforeTesting(
             fc_real_file,
@@ -56,9 +54,8 @@ public final class Case_start_1_end {
             )
         );
         
-        show_StartNeembuuMessage();
-        
-        fc_virtual_file = createNew_FC_Virtual_File();
+        boolean cascade = show_StartNeembuuMessage();
+        fc_virtual_file = createNew_FC_Virtual_File(cascade);
         
         
         assertNotNull(fc_virtual_file);

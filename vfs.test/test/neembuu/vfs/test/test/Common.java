@@ -24,10 +24,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.SeekableByteChannel;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import jpfm.util.ContentPeek;
 import neembuu.rangearray.RangeUtils;
 import static junit.framework.Assert.*;
+import neembuu.vfs.test.Main;
+import neembuu.vfs.test.MountManagerService;
 
 /**
  *
@@ -49,18 +53,23 @@ public final class Common {
             file.delete();            
         }
     }
-    public static  void show_StartNeembuuMessage(){
-        JOptionPane.showMessageDialog(null, "Start Neembuu and then press ok");
+    public static boolean show_StartNeembuuMessage(){
+        //JOptionPane.showMessageDialog(null, "Start Neembuu and then press ok");
+        JFrame fr = new JFrame("Test");
+        final String[]options={"Cascade mount", "Direct Mount"};
+        int se = JOptionPane.showOptionDialog(fr, "Start Neembuu and then press ok", "Choose", 
+                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE , null,options ,options[0]);
+        return (se == 0);
     }
     
     public static  void downloadFollowingRegionsBeforeTesting(
-            FileChannel fc_real_file,
+            SeekableByteChannel /*FileChannel*/ fc_real_file,
             RangeArray<Range> regions)throws IOException{
         downloadFollowingRegionsBeforeTesting(fc_real_file, regions, "test120k.rmvb");
     }
     
     public static  void downloadFollowingRegionsBeforeTesting(
-            FileChannel fc_real_file,
+            SeekableByteChannel /*FileChannel*/ fc_real_file,
             RangeArray<Range> regions,
             String filename) throws IOException{
         File storageDirectory =new File("j:\\neembuu\\heap\\"
@@ -86,8 +95,14 @@ public final class Common {
     }
     
     
-    public static  FileChannel createNew_FC_Virtual_File(){
-        return createNew_FC_Virtual_File("test120k.rmvb");
+    public static SeekableByteChannel createNew_FC_Virtual_File(boolean cascade)throws Exception{
+        if(!cascade)
+            return createNew_FC_Virtual_File("test120k.rmvb");
+        else {
+            Main.main(new String[]{"cascadeMount"});
+            MountManagerService mm = Main.mountManagerService;
+            return mm.get("test120k.rmvb");
+        }
     }
     
     public static  FileChannel createNew_FC_Virtual_File(String n){
@@ -138,8 +153,8 @@ public final class Common {
     
     
     public static  void test_start_end(
-                FileChannel fc_virtual_file,
-                FileChannel fc_real_file,
+                SeekableByteChannel /*FileChannel*/ fc_virtual_file,
+                SeekableByteChannel /*FileChannel*/ fc_real_file,
                 long start,
                 long end
             )throws IOException{
@@ -157,8 +172,8 @@ public final class Common {
     }
     
     public static  void test_start_size(
-                FileChannel fc_virtual_file,
-                FileChannel fc_real_file,
+                SeekableByteChannel /*FileChannel*/ fc_virtual_file,
+                SeekableByteChannel /*FileChannel*/ fc_real_file,
                 long start,
                 int size
             )throws IOException{    
