@@ -177,11 +177,13 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
             httpPost.setEntity(entity);
             HttpResponse httpResponse = httpClient.execute(httpPost);
             
-            String responseString = EntityUtils.toString(httpResponse.getEntity());
+            final String responseString = EntityUtils.toString(httpResponse.getEntity());
             
             JSONObject jSonObject = new JSONObject(responseString);
             //System.out.println(jSonObject);
             JSONArray jSonArray = jSonObject.getJSONArray("url");
+            
+            System.out.println("urls: " + jSonArray);
             
             //Set the group name as the name of the video
             linkHandlerBuilder.setGroupName(jSonObject.getString("filename"));
@@ -197,14 +199,21 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
             for (int i = 0; i < jSonArray.length(); i++) {
                 jSonObject = (JSONObject) jSonArray.get(i);
                 String fileName = jSonObject.getString("text");
-                String type = jSonObject.getString("filetype").toLowerCase();
-                fileName = StringUtils.stringBetweenTwoStrings(fileName,"> ", "<");
-                fileName = fileName+"."+type;
+                System.out.println("Filename: " + fileName);
+                
+                final String type = jSonObject.getString("filetype").toLowerCase();
+                fileName = StringUtils.stringBetweenTwoStrings(fileName, ">", "<");
+                fileName = fileName + "." + type;
                 
                 String singleUrl = jSonObject.getString("url");
+                singleUrl = singleUrl.substring(0, singleUrl.indexOf("#"));
+                
+                System.out.println("URL: " + singleUrl);
 
                 long length = NHttpClientUtils.calculateLength(singleUrl);
-                if(length<=0){ continue; /*skip this url*/ }
+                //System.out.println("Length: " + length);
+                
+                if(length <= 0){ continue; /*skip this url*/ }
                 
                 /*System.out.println("{\n\turl="+singleUrl);
                 System.out.println("\tsize="+length);
@@ -218,6 +227,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
             
         } catch (Exception ex) {
             int retryLimit = ((YT_TLH)tlh).retryLimit;
+            ex.printStackTrace();
             System.out.println("retry no. = "+retryCount);
             if(retryCount > retryLimit) throw ex;
             return clipConverterExtraction(tlh,retryCount+1);
