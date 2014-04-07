@@ -78,15 +78,15 @@ public class VariantProgressProvider implements ReAddAction.CallBack, ProgressPr
     private final class VI implements Selectable {
         private final String display;
         private final NeembuuFile file;
-        private final Progress splitProgress;
+        private final Progress variantProgress;
 
         public VI(String display, NeembuuFile file) {
             this.display = display; this.file = file;
-            splitProgress = new ProgressImpl(p, graph,ProgressImpl.Mode.VariantProgressUI);
+            variantProgress = new ProgressImpl(p, graph,ProgressImpl.Mode.VariantProgressUI);
         }
         @Override public void select() {    
-            splitProgress.init(file.fileBeingDownloaded()); 
-            lastSelected = splitProgress;
+            variantProgress.init(file.fileBeingDownloaded()); 
+            lastSelected = variantProgress;
             
             if(uia==null)return;
             Utils.TintedIcons tintedIcons = Utils.makeTintedIconsForFile(file.getMinimumFileInfo().getName());
@@ -96,8 +96,8 @@ public class VariantProgressProvider implements ReAddAction.CallBack, ProgressPr
             uia.openButton().setCaption(display);            
         }
         @Override public void unSelect() {  
-            splitProgress.unInit(file.fileBeingDownloaded()); 
-            if(lastSelected==splitProgress){lastSelected = null;} 
+            variantProgress.unInit(file.fileBeingDownloaded()); 
+            if(lastSelected==variantProgress){lastSelected = null;} 
         } 
         @Override public String getText() {
             return Utils.makeFileSizeString(file.getMinimumFileInfo())+" "+ display;

@@ -103,7 +103,7 @@ public final class Link_UI_Factory {
         LinkActionsImpl actions = new LinkActionsImpl(linkGroup.getSession(),
                 lp.closeActionUIA, remover, mainComp, fileCreator, open);
         
-        addCallbacks(actions, open, lp, progress, changeDownloadMode, null);
+        addCallbacks(actions, open, lp, progress, changeDownloadMode, null, true);
         
         lp.initActions(new ExpandActionImpl(lp.expandActionUIA,ExpandActionImpl.Mode.SingleLinkType), 
                 open, actions.getClose(), actions.getDelete(), 
@@ -129,7 +129,7 @@ public final class Link_UI_Factory {
         LinkActionsImpl actions = new LinkActionsImpl(linkGroup.getSession(),
                 lp.closeActionUIA, remover, mainComp, fileCreator, open);
         
-        addCallbacks(actions, open, lp, progress, cdma, null);
+        addCallbacks(actions, open, lp, progress, cdma, null, true);
         actions.getReAdd().addCallBack(new VariantProgressProvider(lp.progressUIA,save,null,null,true));
                 
         lp.initActions(new ExpandActionImpl(lp.expandActionUIA,ExpandActionImpl.Mode.SplitLinkType),
@@ -155,7 +155,7 @@ public final class Link_UI_Factory {
         LinkActionsImpl actions = new LinkActionsImpl(linkGroup.getSession(),
                 lp.closeActionUIA, remover,mainComp, fileCreator,open);
         
-        addCallbacks(actions, open, lp, null, changeDownloadModeAction, vpp);
+        addCallbacks(actions, open, lp, null, changeDownloadModeAction, vpp, false);
         actions.getReAdd().addCallBack(vpp);
                 
         lp.initActions(new ExpandActionImpl(lp.expandActionUIA,ExpandActionImpl.Mode.MultiVariantType),
@@ -193,11 +193,11 @@ public final class Link_UI_Factory {
     private static void addCallbacks(LinkActionsImpl linkActionsImpl,
             ReAddAction.CallBack openActionImpl, GenericLinkPanel lp,
             ProgressImpl progress, ChangeDownloadModeAction changeDownloadModeAction,
-            ProgressProvider vpi){
+            ProgressProvider vpi, boolean initalizeProgress){
         linkActionsImpl.getReAdd().addCallBack(openActionImpl);
         linkActionsImpl.getReAdd().addCallBack(new ReAddActionCallBackImpl(lp.closeActionUIA, 
                 vpi==null?progress.progressProvider:vpi, 
-                changeDownloadModeAction,true));
+                changeDownloadModeAction,initalizeProgress));
     }
     
     private static RemoveFromUI defaultRemoveFromUI(

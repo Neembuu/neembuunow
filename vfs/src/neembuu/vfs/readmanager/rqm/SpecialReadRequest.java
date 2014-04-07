@@ -41,6 +41,11 @@ public class SpecialReadRequest implements ReadRequest {
     }
 
     @Override
+    public Completer getCompleter() {
+        return rr.getCompleter();
+    }
+    
+    @Override
     public void handleUnexpectedCompletion(Exception exception) {
         rr.handleUnexpectedCompletion(exception);
     }

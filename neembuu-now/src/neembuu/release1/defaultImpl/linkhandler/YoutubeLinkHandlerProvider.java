@@ -21,9 +21,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import neembuu.release1.StringUtils;
+import neembuu.release1.api.file.OnlineFile;
+import neembuu.release1.api.file.PropertyProvider;
 import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProvider;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
+import neembuu.release1.defaultImpl.file.BasicOnlineFile;
+import neembuu.release1.defaultImpl.file.BasicPropertyProvider;
 import neembuu.release1.httpclient.NHttpClient;
 import neembuu.release1.log.LoggerUtil;
 import neembuu.release1.httpclient.utils.NHttpClientUtils;
@@ -196,33 +200,61 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
             // neembuu.release1.ui.actions.LinkActionsImpl line 128
             // void reAddAction(boolean anotherThread) 
             
+            long c_duration = -1;
+            
             for (int i = 0; i < jSonArray.length(); i++) {
                 jSonObject = (JSONObject) jSonArray.get(i);
                 String fileName = jSonObject.getString("text");
                 System.out.println("Filename: " + fileName);
                 
-                final String type = jSonObject.getString("filetype").toLowerCase();
+                final String extension = jSonObject.getString("filetype").toLowerCase();
                 fileName = StringUtils.stringBetweenTwoStrings(fileName, ">", "<");
-                fileName = fileName + "." + type;
+                fileName = fileName + "." + extension;
                 
                 String singleUrl = jSonObject.getString("url");
                 singleUrl = singleUrl.substring(0, singleUrl.indexOf("#"));
                 
                 System.out.println("URL: " + singleUrl);
-
+                
                 long length = NHttpClientUtils.calculateLength(singleUrl);
                 //System.out.println("Length: " + length);
                 
                 if(length <= 0){ continue; /*skip this url*/ }
                 
-                /*System.out.println("{\n\turl="+singleUrl);
-                System.out.println("\tsize="+length);
-                System.out.println("\tfileName="+fileName+"\n}");*/
+                BasicOnlineFile.Builder fileBuilder = linkHandlerBuilder
+                        .createFile();
                 
-                linkHandlerBuilder.createFile()
-                        .setName(fileName)
-                        .setUrl(singleUrl)
-                        .setSize(i).next();
+                try{ // finding video/audio length
+                    String dur = StringUtils.stringBetweenTwoStrings(singleUrl, "dur=", "&");
+                    long duration = (int)(Double.parseDouble(dur)*1000);
+                    if(c_duration < 0 ){ c_duration = duration; }
+                    fileBuilder.putLongPropertyValue(PropertyProvider.LongProperty.MEDIA_DURATION_IN_MILLISECONDS, duration);
+                    System.out.println("dur="+dur);
+                }catch(Exception a){
+                    // ignore
+                }
+                
+                try{ // finding the quality short name
+                    String type = fileName.substring(fileName.indexOf("(")+1);
+                    type = type.substring(0,type.indexOf(")"));
+                    fileBuilder.putStringPropertyValue(PropertyProvider.StringProperty.VARIANT_DESCRIPTION, type);
+                    System.out.println("type="+type);
+                }catch(Exception a){
+                    a.printStackTrace();
+                }
+                
+                fileBuilder.setName(fileName)
+                    .setUrl(singleUrl)
+                    .setSize(length).next();
+            }
+            
+            for(OnlineFile of : linkHandlerBuilder.getFiles()){
+                long dur = of.getPropertyProvider().getLongPropertyValue(PropertyProvider.LongProperty.MEDIA_DURATION_IN_MILLISECONDS);
+                if(dur < 0 && c_duration > 0 && 
+                        of.getPropertyProvider() instanceof BasicPropertyProvider){
+                    ((BasicPropertyProvider)of.getPropertyProvider())
+                            .putLongPropertyValue(PropertyProvider.LongProperty.MEDIA_DURATION_IN_MILLISECONDS,c_duration);
+                }
             }
             
         } catch (Exception ex) {

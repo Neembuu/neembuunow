@@ -88,6 +88,7 @@ public final class Main {
         
         Opener.I.initMainComponent(nui.getMainComponent());
         
+        nui.getIndefiniteTaskUI();
         RestorePreviousSessionImpl rpsi = new RestorePreviousSessionImpl(diskManager, nui.getLinkGroupUICreator(),nui);
         rpsi.checkAndRestoreFromPrevious();
     }

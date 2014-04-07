@@ -80,8 +80,10 @@ public class MultiVariantOpenAction implements OpenAction, CallBack{
             }
         }
         
+        String sdef = idealFile.getPropertyProvider().getStringPropertyValue(PropertyProvider.StringProperty.VARIANT_DESCRIPTION);
+        if(sdef==null || sdef.length()==0){ sdef=idealFile.getMinimumFileInfo().getName(); }
         ChooseVariantTimeOut.Entry defaultOption = ChooseVariantTimeOut.newEntry(
-            idealFile.getPropertyProvider().getStringPropertyValue(PropertyProvider.StringProperty.VARIANT_DESCRIPTION), 
+            sdef, 
             idealFile.getMinimumFileInfo().getFileSize(),
             idealFile.getPropertyProvider().getLongPropertyValue(PropertyProvider.LongProperty.MEDIA_DURATION_IN_MILLISECONDS));
         
@@ -92,8 +94,10 @@ public class MultiVariantOpenAction implements OpenAction, CallBack{
             if(file==idealFile){
                 entries.add(defaultOption);
             }else {
+                String s = file.getPropertyProvider().getStringPropertyValue(PropertyProvider.StringProperty.VARIANT_DESCRIPTION);
+                if(s==null || s.length()==0){ s=file.getMinimumFileInfo().getName(); }
                 entries.add(ChooseVariantTimeOut.newEntry(
-                    file.getPropertyProvider().getStringPropertyValue(PropertyProvider.StringProperty.VARIANT_DESCRIPTION), 
+                    s, 
                     file.getMinimumFileInfo().getFileSize(),
                     file.getPropertyProvider().getLongPropertyValue(PropertyProvider.LongProperty.MEDIA_DURATION_IN_MILLISECONDS)));
             }
@@ -102,7 +106,9 @@ public class MultiVariantOpenAction implements OpenAction, CallBack{
 
         if(choice==null){return;}
         for (NeembuuFile file : files) {
-            if(choice.type().equalsIgnoreCase(file.getPropertyProvider().getStringPropertyValue(PropertyProvider.StringProperty.VARIANT_DESCRIPTION))){
+            String s = file.getPropertyProvider().getStringPropertyValue(PropertyProvider.StringProperty.VARIANT_DESCRIPTION);
+            if(s==null || s.length()==0){ s=file.getMinimumFileInfo().getName(); }
+            if(choice.type().equalsIgnoreCase( s )){
                 OpenActionImpl impl = new OpenActionImpl(realFileProvider, mainComponent);
                 impl.doneCreation(file);
                 try{

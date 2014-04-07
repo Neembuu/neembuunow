@@ -20,7 +20,6 @@ package neembuu.release1.defaultImpl.restore_previous;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
-import javax.swing.SwingUtilities;
 import neembuu.diskmanager.DiskManager;
 import neembuu.diskmanager.FindPreviousSessionCallback;
 import neembuu.diskmanager.Session;
@@ -28,6 +27,7 @@ import neembuu.release1.api.linkgroup.LinkGroup;
 import neembuu.release1.api.linkgroup.LinkGroupMakers;
 import neembuu.release1.api.ui.LinkGroupUICreator;
 import neembuu.release1.ui.NeembuuUI;
+import neembuu.release1.ui.NeembuuUI.AddUILock;
 
 /**
  *
@@ -37,14 +37,20 @@ public class RestorePreviousSessionImpl implements FindPreviousSessionCallback {
     private final DiskManager dm;
     private final NeembuuUI nui;
     private final LinkGroupUICreator linkGroupUICreator;
+    private final AddUILock addUILock;
 
     public RestorePreviousSessionImpl(DiskManager dm, LinkGroupUICreator linkGroupUICreator,NeembuuUI nui) {
         this.dm = dm; this.nui = nui;
-        this.linkGroupUICreator = linkGroupUICreator;
+        this.linkGroupUICreator = linkGroupUICreator; this.addUILock = nui.getAddUILock();
     }
-    
+
     
     public void checkAndRestoreFromPrevious(){
+        addUILock.lock(true);//no chance of race condition
+        // this is to prevent user from adding new links while
+        // we are scanning old session. The software WILL definitely
+        // confuse newly added session as an old session and try to restore
+        // it if user adds links while we are restoring old session.
         dm.findPreviousSessions(this);
     }
 
@@ -74,7 +80,7 @@ public class RestorePreviousSessionImpl implements FindPreviousSessionCallback {
             }
         }
         linkGroupUICreator.createUIFor(lgs);
-        
+        addUILock.lock(false);
     }
     
     private void deleteFailedSessions(Session s){

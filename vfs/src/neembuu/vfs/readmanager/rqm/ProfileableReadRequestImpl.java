@@ -20,6 +20,7 @@ package neembuu.vfs.readmanager.rqm;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import jpfm.operations.readwrite.AbstractRequestWrapper;
+import jpfm.operations.readwrite.Completer;
 import jpfm.operations.readwrite.ReadRequest;
 import jpfm.util.ProfileableReadRequest;
 import jpfm.util.PropertyCarryingReadRequest;
@@ -56,7 +57,7 @@ final class ProfileableReadRequestImpl
             addProperty(ReadRequestSplitType.SPECIAL_REQUEST);
         }
     }
-
+    
     @Override
     public final long getTotalDataRequestedTillThisRequest() {
         return totalDataRequestedTillThisRequest;

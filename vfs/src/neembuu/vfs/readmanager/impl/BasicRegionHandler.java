@@ -1075,12 +1075,8 @@ final class BasicRegionHandler
             // while to satisfy it, we might need to
             // read from more than one region
             ReadRequest read = it.next();requestsIteratedOver++;
-            try{
-                if(((Read)read).getCompleter()==null){
-                    read.setCompleter(this);
-                }
-            }catch(ClassCastException cce){
-                //ignore
+            if(read.getCompleter()==null){
+                read.setCompleter(this);
             }
             if(read.isCompleted()){
                 // this actually never happens

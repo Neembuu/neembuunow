@@ -62,6 +62,16 @@ public final class NeembuuUI {
         @Override public JButton neembuuVirtualFolderButton() {
             return mp.neembuuVirtualFolderButton; }};
     
+    public static interface AddUILock { 
+        void lock(boolean f);
+    }
+    
+    private final AddUILock lockAddUI = new AddUILock() {
+        @Override public void lock(boolean f) {
+            mp.getAddLinkUI().addLinksPanelEnable(!f);
+        }
+    };      
+    
     public NeembuuUI() {
         this.jf = makeJFrame();
         mainComponent = new MainComponentImpl(jf);
@@ -70,6 +80,10 @@ public final class NeembuuUI {
         lc.heightProperty().addListener(listener);
         ala = new AddLinkAction(this,mp);
         mp.neembuuVirtualFolderButton.setEnabled(false);
+    }
+
+    public AddUILock getAddUILock() {
+        return lockAddUI;
     }
 
     public LinkGroupUICreator getLinkGroupUICreator() {

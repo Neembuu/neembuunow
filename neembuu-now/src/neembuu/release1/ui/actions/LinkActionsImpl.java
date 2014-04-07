@@ -119,7 +119,9 @@ public class LinkActionsImpl {
             ui.contract();ui.openButton().setVisible(false);
             if(!onlyUI)closeActionProcess(false,false);
         }else /*open*/{
-            if(!createNewVirtualFile()){ //undo UI changes
+            boolean success;
+            try{success = createNewVirtualFile();}catch(Exception a){ a.printStackTrace(); success=false;}
+            if(!success){ //undo UI changes
                 closeAction(true, onlyUI);
                 ui.repaint();return;
             }

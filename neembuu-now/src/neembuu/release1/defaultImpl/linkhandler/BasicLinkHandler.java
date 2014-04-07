@@ -44,6 +44,8 @@ public final class BasicLinkHandler implements LinkHandler {
         public static Builder create() {
             return new Builder();
         }
+        
+        public List<OnlineFile> getFiles() { return linkHandler.files; }
 
         public Builder addFile(BasicOnlineFile bof) {
             linkHandler.files.add(bof); return this;
