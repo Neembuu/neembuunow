@@ -40,7 +40,6 @@ import jpfm.volume.VeryBigFile;
 import jpfm.volume.vector.VectorDirectory;
 import jpfm.volume.vector.VectorNode;
 import jpfm.volume.vector.VectorRootDirectory;
-import neembuu.config.GlobalTestSettings;
 import neembuu.util.logging.LoggerUtil;
 import neembuu.vfs.NeembuuVirtualFileSystem;
 import neembuu.vfs.file.ConstrainUtility;
@@ -117,8 +116,8 @@ public class MountManager {
                     "Pismo file mount might not be installed.\n"+
                     "Actual error message="+a.getMessage(),
                     "Error in initialize JPfm",
-                    javax.swing.JOptionPane.ERROR_MESSAGE
-                    ,GlobalTestSettings.ONION_EMOTIONS.I_AM_DEAD);
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+                    //,GlobalTestSettings.ONION_EMOTIONS.I_AM_DEAD);
             System.exit(-1);
         }
         return manager;

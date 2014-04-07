@@ -116,7 +116,7 @@ public final class ReadQueueManager {
     public final RangeArray<RegionHandler> getRegionHandlers() {
         return (RangeArray)handlers;
     }
-
+    
     private RegionHandler provideNew(long start, int size){
         return provideNew((long)start,(long)start+size-1);
     }

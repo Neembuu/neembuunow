@@ -25,4 +25,6 @@ import javax.swing.JFrame;
  */
 public interface MainComponent {
     JFrame getJFrame();
+    
+    Message newMessage();
 }

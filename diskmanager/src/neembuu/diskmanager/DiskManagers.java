@@ -16,6 +16,8 @@
  */
 package neembuu.diskmanager;
 
+import neembuu.diskmanager.impl.DefaultDiskManager;
+
 /**
  *
  * @author Shashank Tulsyan <shashaanktulsyan@gmail.com>

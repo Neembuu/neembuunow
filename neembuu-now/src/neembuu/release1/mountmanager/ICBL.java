@@ -16,12 +16,12 @@
  */
 package neembuu.release1.mountmanager;
 
-import javax.swing.JOptionPane;
-import neembuu.release1.Application;
+import java.nio.file.Files;
 import neembuu.release1.api.IndefiniteTask;
 import neembuu.release1.api.ui.IndefiniteTaskUI;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.pismo.InstallerCallbackListener;
+import neembuu.release1.pismo.PismoInstaller;
 import neembuu.release1.ui.InstallPermissionAndProgress;
 
 /**
@@ -60,7 +60,10 @@ public class ICBL implements InstallerCallbackListener {
             }
             installationTakingTooLong = indefiniteTaskUI.showIndefiniteProgress("Neembuu will quitting if it takes longer than 2mins to install this");
         } else if (c > 90) {
-            JOptionPane.showMessageDialog(mainComponent.getJFrame(), "Installation of Pismo failed or stuck.", "Application will exit", JOptionPane.ERROR_MESSAGE);
+            mainComponent.newMessage().error()
+                .setMessage("Installation of Pismo failed or stuck.")
+                .setTitle("Application will exit")
+                .show();
             System.exit(c);
         }
     }
@@ -76,19 +79,22 @@ public class ICBL implements InstallerCallbackListener {
     }
 
     @Override
-    public void installationFailed() {
-        java.io.File logFilePath = Application.getResource("install_logs.txt");
+    public void installationFailed(String stdOut) {
+        java.io.File logFilePath = PismoInstaller.installLogFileName(false).toFile();
         String logfileText = "The log file mentions the exact reason.";
+        
         try {
-            java.awt.Desktop.getDesktop().open(logFilePath);
+            if(logFilePath.exists())
+                java.awt.Desktop.getDesktop().open(logFilePath);
         } catch (Exception a) {
-            logfileText = logfileText + "\n" + logFilePath.getName();
+            //logfileText = logfileText + "\n" + logFilePath.getName();
         }
-        JOptionPane.showMessageDialog(mainComponent.getJFrame(),
-                "Your sandboxing or antivirus environment \n"
-                + "might be preventing installation.\n"
-                + logfileText,
-                "Installation failed. Neembuu will exit", JOptionPane.ERROR_MESSAGE);
+        mainComponent.newMessage().error()
+                .setMessage("Your sandboxing or antivirus environment \n"
+                    + "might be preventing installation.\n"
+                    + stdOut)
+                .setTitle("Installation failed. Neembuu will exit")
+                .show();
         System.exit(-1);
     }
 }

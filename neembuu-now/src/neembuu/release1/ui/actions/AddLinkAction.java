@@ -16,11 +16,15 @@
  */
 package neembuu.release1.ui.actions;
 
+import neembuu.release1.api.ui.LinkGroupUICreator;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import neembuu.release1.Main;
 import neembuu.release1.api.IndefiniteTask;
 import neembuu.release1.api.RealFileProvider;
+import neembuu.release1.api.linkgroup.LinkGroup;
+import neembuu.release1.api.linkgroup.LinkGroupMakers;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.linkgroup.TrialLinkGroup;
 import neembuu.release1.api.linkgroup.LinkGrouperResults;
@@ -36,14 +40,14 @@ import neembuu.release1.defaultImpl.LinkParserImpl;
 import neembuu.release1.ui.linkcontainer.LinksContainer;
 import neembuu.release1.ui.MainPanel;
 import neembuu.release1.ui.NeembuuUI;
-import neembuu.release1.ui.linkpanel.GLPFactory;
+import neembuu.release1.ui.linkpanel.Link_UI_Factory;
 import neembuu.vfs.progresscontrol.DownloadSpeedProvider;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public class AddLinkAction implements Runnable {
+public class AddLinkAction implements Runnable, LinkGroupUICreator {
     
     private Main main;
     private final IndefiniteTaskUI indefiniteTaskUI;
@@ -76,10 +80,15 @@ public class AddLinkAction implements Runnable {
     
     @Override
     public void run() {
+        final String linkParagraph = addLinkUI.getLinksText();
+        addLinkUI.setLinksText(null);//links would be re-entered in a short while
+        // if there are any failures. But before reshowing the UI
+        // old links must be removed, to prevent the operation being repeated
+        // if user pressed (+) twice
         addLinkUI.addLinksPanelEnable(true);
-        LinkParserImpl linkParserImpl = new LinkParserImpl(addLinkUI, indefiniteTaskUI, main.getLOGGER());
+        LinkParserImpl linkParserImpl = new LinkParserImpl(indefiniteTaskUI, main.getLOGGER());
         
-        LinkParserResult linkParserResult = linkParserImpl.process(addLinkUI.getLinksText());
+        LinkParserResult linkParserResult = linkParserImpl.process(linkParagraph);
 
         LinkGrouperResults grouperResults = null;
         
@@ -88,31 +97,52 @@ public class AddLinkAction implements Runnable {
             grouperResults = groupLinks(linkParserResult);
             makingFiles.done();
             
-            saveLinks(grouperResults);
+            List<LinkGroup> sessions = saveLinks(grouperResults,linkParserResult);
+            printState(grouperResults);
             
-            createUIFor(grouperResults);
+            createUIFor(sessions);
         }
         
     }
 
-    
-    private LinkGrouperResults groupLinks(LinkParserResult linkParserResult){
-        LinkGrouperImpl linkGrouper = new LinkGrouperImpl();
-        
-        LinkGrouperResults results = linkGrouper.group(linkParserResult);
-        
-        addLinkUI.setLinksText(makeResidualParagraph(results,linkParserResult));
+    private void residualLinks(LinkGrouperResults results,
+            LinkParserResult linkParserResult, List<TrialLinkGroup> failedSessionInit){
+        addLinkUI.setLinksText(makeResidualParagraph(results,linkParserResult,failedSessionInit));
         if(addLinkUI.getLinksText()!=null && addLinkUI.getLinksText().length()>0){
             addLinkUI.addLinkProgressSet("There are links which could not be added due to some error");
         }else{
             addLinkUI.addLinksPanelShow(false);
             addLinkUI.addLinkProgressSet("");
         }
-        
+    }
+    
+    private LinkGrouperResults groupLinks(LinkParserResult linkParserResult){
+        LinkGrouperImpl linkGrouper = new LinkGrouperImpl();
+        LinkGrouperResults results = linkGrouper.group(linkParserResult);
         return results;
     }
     
-    private void saveLinks(LinkGrouperResults results){
+    private List<LinkGroup> saveLinks(LinkGrouperResults results,LinkParserResult linkParserResult){
+        List<LinkGroup> lgs = new ArrayList<>();
+        List<TrialLinkGroup> failed = new ArrayList<>();
+        for (TrialLinkGroup tlg : results.complete_linkPackages()) {
+            try{
+                LinkGroup lg = LinkGroupMakers.make(tlg);
+                if(lg==null){throw new NullPointerException();}
+                lgs.add(lg);
+            }catch(Exception a){
+                a.printStackTrace();
+                failed.add(tlg);
+            }
+        }
+        
+        
+        residualLinks(results,linkParserResult,failed);
+        
+        return lgs;
+    }
+    
+    private void printState(LinkGrouperResults results){
         System.out.println("+++Saving feature yet to be implemented+++");
         System.out.println("+++done+++");
         for(TrialLinkGroup lg : results.complete_linkPackages()){
@@ -128,13 +158,15 @@ public class AddLinkAction implements Runnable {
         }
     }
     
-    private void createUIFor(LinkGrouperResults results){
-        for(TrialLinkGroup linkGroup :  results.complete_linkPackages()){
+    @Override
+    public void createUIFor(List<LinkGroup> sessions){
+        for(LinkGroup linkGroup :  sessions){
             
-            OpenableEUI openableEUI = GLPFactory.make(
+            OpenableEUI openableEUI = Link_UI_Factory.make(
                 luic1, mainComponent, realFileProvider, 
                 minimalistFileSystem,linkGroup,new DownloadSpeedProvider(){
-                    @Override public double getDownloadSpeed_KiBps(){return 256;}});
+                    @Override public double getDownloadSpeed_KiBps(){return 256;}},
+                this);
             
             if(openableEUI==null){return;}
             ((LinksContainer)luic1).addUI(openableEUI, 0);
@@ -144,9 +176,14 @@ public class AddLinkAction implements Runnable {
         }
     }
     
-    private String makeResidualParagraph(LinkGrouperResults grouperResults, LinkParserResult parserResult){
+    private String makeResidualParagraph(LinkGrouperResults grouperResults, 
+            LinkParserResult parserResult,List<TrialLinkGroup> failedSessionInit){
         List<String> links = new LinkedList<String>();
 
+        for(String line : parserResult.getFailedLines() ){
+            links.add(line);
+        }
+        
         for(TrialLinkHandler tlh : parserResult.getFailedLinks()){
             links.add(tlh.getReferenceLinkString());
         }
@@ -158,17 +195,40 @@ public class AddLinkAction implements Runnable {
                 links.add(tlh.getReferenceLinkString());
             }
         }
+        for (TrialLinkGroup lg: failedSessionInit) {
+            for (TrialLinkHandler tlh : lg.getAbsorbedLinks()) {
+                links.add(tlh.getReferenceLinkString());
+            }
+        }
         
+        links = removeDuplicatesFromResidualPara(links);
         
         String c = ""; int cnt=0;
         for(String l : links){
             if(cnt==0){
                 c=l;
-            }
-            c+="\n"+l; cnt++;
+            }else {
+                c+="\n"+l; 
+            }cnt++;
         }
         
         return c;
+    }
+    
+    private List<String> removeDuplicatesFromResidualPara(List<String> links){
+        List<String> links_non_dup = new LinkedList<>();
+        for (String link : links) {
+            boolean found = false;
+            for (String link_non_dup : links_non_dup) {
+                if(link_non_dup.trim().equals(link.trim())){
+                    found = true;
+                }
+            }
+            if(!found){
+                links_non_dup.add(link);
+            }
+        }
+        return links_non_dup;
     }
     
 }

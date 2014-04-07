@@ -18,20 +18,19 @@
 package neembuu.release1;
 
 import neembuu.release1.mountmanager.MountManager;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import jpfm.fs.FSUtils;
 import neembuu.diskmanager.DiskManager;
 import neembuu.diskmanager.DiskManagerParams;
 import neembuu.diskmanager.DiskManagers;
+import neembuu.release1.api.linkgroup.LinkGroupMakers;
 import neembuu.release1.api.linkhandler.LinkHandlerProviders;
+import neembuu.release1.defaultImpl.linkgroup.DefaultLinkGroupMaker;
+import neembuu.release1.defaultImpl.linkgroup.SplitsLinkGroupMaker;
 import neembuu.release1.defaultImpl.linkhandler.YoutubeLinkHandlerProvider;
 import neembuu.release1.defaultImpl.linkhandler.DirectLinkHandlerProvider;
+import neembuu.release1.defaultImpl.restore_previous.RestorePreviousSessionImpl;
+import neembuu.release1.open.Opener;
 import neembuu.release1.ui.InitLookAndFeel;
 import neembuu.release1.ui.NeembuuUI;
 import neembuu.vfs.file.TroubleHandler;
@@ -50,23 +49,19 @@ public final class Main {
     
     public Main() {
         this.nui = new NeembuuUI();
+        Application.setMainComponent(nui.getMainComponent());
         troubleHandler = new UnprofessionalTroubleHandler(nui.getMainComponent(),nui.getIndefiniteTaskUI());
 
-        String basePath = null;
-        try{
-            basePath = System.getProperty("java.io.tmpdir")+File.separator+"neembuu-release1";
-            System.err.println("BasePath="+basePath);
-            Files.createDirectory(Paths.get(basePath));
-        }catch(FileAlreadyExistsException faee){
-            logger.log(Level.INFO,"Temp location already exists");
-        }catch(IOException a){
-            throw new RuntimeException(a);
-        }
+        String basePath = Application.getResource(Application.Resource.TempStorage)
+                    .toAbsolutePath().toString();
         
         diskManager = DiskManagers.getDefaultManager(new DiskManagerParams.Builder()
             .setBaseStoragePath(basePath)
+            .useDefaultNomenclatureAndLoggerCreate()
             .build()
         );
+        
+        LinkGroupMakers.initDiskManager(diskManager);
         
         mountManager = new MountManager(
                 nui.getMainComponent(),
@@ -81,10 +76,20 @@ public final class Main {
         nui.initialize(this);
         mountManager.initialize();
         
+        // move out of this jar
         LinkHandlerProviders.registerProvider(new YoutubeLinkHandlerProvider());
         
         //DefaultLinkHandler is the default handler
         LinkHandlerProviders.registerDefaultProvider(new DirectLinkHandlerProvider());
+        
+        //Registering Link Group makers
+        LinkGroupMakers.registerDefaultMaker(new DefaultLinkGroupMaker());
+        LinkGroupMakers.registerMaker(new SplitsLinkGroupMaker());
+        
+        Opener.I.initMainComponent(nui.getMainComponent());
+        
+        RestorePreviousSessionImpl rpsi = new RestorePreviousSessionImpl(diskManager, nui.getLinkGroupUICreator(),nui);
+        rpsi.checkAndRestoreFromPrevious();
     }
 
     public TroubleHandler getTroubleHandler() {

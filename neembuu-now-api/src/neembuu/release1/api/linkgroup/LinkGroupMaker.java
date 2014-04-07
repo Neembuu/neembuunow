@@ -17,6 +17,8 @@
 
 package neembuu.release1.api.linkgroup;
 
+import neembuu.diskmanager.DiskManager;
+import neembuu.diskmanager.Session;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
 
 /**
@@ -25,4 +27,11 @@ import neembuu.release1.api.linkhandler.TrialLinkHandler;
  */
 public interface LinkGroupMaker {
     TrialLinkGroup tryMaking(TrialLinkHandler tlh);
+    
+    LinkGroup make(TrialLinkGroup tlg,DiskManager dm)throws Exception;
+    
+    LinkGroup restore(Session s)throws Exception;
+    
+    LinkGroup modify(Session s,TrialLinkGroup tlg, DiskManager dm)throws Exception;
+    
 }

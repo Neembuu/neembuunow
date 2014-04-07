@@ -28,6 +28,8 @@ import neembuu.release1.api.linkparser.LinkParserResult;
  */
 public class LinkParserResultImpl implements LinkParserResult{
     
+    final LinkedList<String> failedLines = new LinkedList<String>();
+    
     final LinkedList<TrialLinkHandler> result = new LinkedList<TrialLinkHandler>();
     
     final LinkedList<TrialLinkHandler> failedLinks = new LinkedList<TrialLinkHandler>();
@@ -46,6 +48,11 @@ public class LinkParserResultImpl implements LinkParserResult{
     @Override
     public List<TrialLinkHandler> getFailedLinks() {
         return failedLinks;
+    }
+
+    @Override
+    public List<String> getFailedLines() {
+        return failedLines;
     }
     
 }

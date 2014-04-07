@@ -29,16 +29,17 @@ import neembuu.release1.api.linkparser.LinkParserResult;
  * @author Shashank Tulsyan
  */
 public class LinkGrouperImpl {
-    static {
-        LinkGroupMakers.registerDefaultMaker(new DefaultLinkGroupMaker());
-        LinkGroupMakers.registerMaker(new SplitsLinkGroupMaker());
-    }
     
     public LinkGrouperResults group(LinkParserResult linkParserResult){
+        LinkGrouperResults results = group(linkParserResult.results());
+        return results;
+    }
+    
+    public LinkGrouperResults group(List<TrialLinkHandler> linkParserResult_results){
         LinkGrouperResultsImpl results = new LinkGrouperResultsImpl();
                 
         Outer_loop:
-        for (TrialLinkHandler trialLinkHandler : linkParserResult.results()) {
+        for (TrialLinkHandler trialLinkHandler : linkParserResult_results) {
             System.out.println("handling="+trialLinkHandler.tempDisplayName());
             Inner_loop:
             for (TrialLinkGroup linkPackage : results.complete_linkPackages) {
@@ -54,13 +55,11 @@ public class LinkGrouperImpl {
                 results.complete_linkPackages.add(res);
             }
         }
-        
-        checkFailure(results,linkParserResult);
-        
+        checkFailure(results);
         return results;
     }
     
-    private void checkFailure(LinkGrouperResultsImpl results,LinkParserResult linkParserResult){
+    private void checkFailure(LinkGrouperResultsImpl results){
         Outer_loop:
         for(TrialLinkGroup lp : results.complete_linkPackages){
             if(!lp.complete()){

@@ -17,11 +17,9 @@
 
 package neembuu.release1.ui.actions;
 
-import java.util.logging.Level;
-import javax.swing.JOptionPane;
-import neembuu.release1.Main;
 import neembuu.release1.api.RealFileProvider;
 import neembuu.release1.api.file.NeembuuFile;
+import neembuu.release1.api.open.Open;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.actions.OpenAction;
 import neembuu.release1.api.ui.actions.ReAddAction;
@@ -49,19 +47,37 @@ public class OpenActionImpl implements OpenAction, ReAddAction.CallBack{
     
     @Override public void actionPerformed() { 
         try{
-            openVirtualFile(); 
+            this.open = openVirtualFile(); 
         }catch(Exception a){
-            JOptionPane.showMessageDialog(mainComponent.getJFrame(),a.getMessage(),"Could not open file",JOptionPane.ERROR_MESSAGE);
-            Main.getLOGGER().log(Level.SEVERE,"Could not open file",a);
+            mainComponent.newMessage().error()
+                .setMessage(a.getMessage())
+                .setTitle("Cannot open file")
+                .show();
         }
     }
     
-    private void openVirtualFile()throws Exception{
+    public Open openVirtualFile()throws Exception{
         java.io.File f = realFileProvider.getRealFile(file.relativePathInVirtualFileSystem());
         if(f==null){
-            JOptionPane.showMessageDialog(mainComponent.getJFrame(),"This file is cannot be opened directly.","Cannot open file",JOptionPane.ERROR_MESSAGE);
-            return;
+            mainComponent.newMessage().error()
+                .setMessage("This file is cannot be opened directly.")
+                .setTitle("Cannot open file")
+                .show();
+            return null;
         }
-        java.awt.Desktop.getDesktop().open(f);
+        return neembuu.release1.open.Opener.I.open(f);
+    }
+    
+    private Open open = null;
+
+    @Override
+    public void close() {
+        if(open!=null){
+            try{
+                open.close();
+            }catch(Exception a){
+                
+            }
+        }
     }
 }

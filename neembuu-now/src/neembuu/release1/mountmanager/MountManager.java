@@ -19,6 +19,7 @@ package neembuu.release1.mountmanager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import jpfm.FormatterEvent;
@@ -31,13 +32,13 @@ import jpfm.mount.MountParamsBuilder;
 import jpfm.mount.Mounts;
 import jpfm.volume.CommonFileAttributesProvider;
 import jpfm.volume.vector.VectorRootDirectory;
-import neembuu.config.GlobalTestSettings;
 import neembuu.diskmanager.DiskManager;
 import neembuu.release1.Application;
 import neembuu.release1.Main;
 import neembuu.release1.api.RealFileProvider;
 import neembuu.release1.api.ui.IndefiniteTaskUI;
 import neembuu.release1.api.ui.MainComponent;
+import neembuu.release1.api.ui.Message;
 import neembuu.release1.api.ui.access.MinimalistFileSystem;
 import neembuu.release1.api.ui.access.MainUIA;
 import neembuu.release1.pismo.PismoInstaller;
@@ -87,21 +88,23 @@ public class MountManager {
     
     public void initialize(){
         try{
-            mount = mount(0, Application.getResource("NeembuuVirtualFolder").toString());
+            mount = mount(0, Application.getResource(Application.Resource.VirtualFolderMountLocation));
         }catch(Exception a){
             Main.getLOGGER().log(Level.SEVERE,"Could not create NeembuuVirtualFolder",a);
-            javax.swing.JOptionPane.showMessageDialog(mainComponent.getJFrame(),
-                    "Could not initialize Java pismo file mount\n"+
+            
+            mainComponent.newMessage().error()
+                .setMessage("Could not initialize Java pismo file mount\n"+
                     "Pismo file mount might not be installed.\n"+
-                    "Actual error message="+a.getMessage(),
-                    "Error in initialize JPfm",
-                    javax.swing.JOptionPane.ERROR_MESSAGE
-                    ,GlobalTestSettings.ONION_EMOTIONS.I_AM_DEAD);
+                    "Actual error message="+a.getMessage())
+                .setTitle("Error in initialize JPfm")
+                .setEmotion(Message.Emotion.I_AM_DEAD)
+                .show();
+            
             System.exit(-1);
         }
     }
     
-    private Mount mount(int attempt, String mntLoc) throws Exception {
+    private Mount mount(int attempt, Path mntLoc) throws Exception {
         Mount m = null;
         boolean retry = true;// false;
         if (attempt >= 0) { //1 for testing //0 for release
@@ -132,7 +135,7 @@ public class MountManager {
             if (attempt < 2) {
                 // TODO : show a gui message informing user that Pismo is being
                 // installed
-                PismoInstaller.tryInstallingPismoFileMount(false, new ICBL(mainComponent, indefiniteTaskUI));
+                PismoInstaller.tryInstallingPismoFileMount(mainComponent,false, new ICBL(mainComponent, indefiniteTaskUI));
                 return mount(attempt + 1, mntLoc);
             }
         }

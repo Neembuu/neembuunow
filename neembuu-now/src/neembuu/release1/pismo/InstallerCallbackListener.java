@@ -25,5 +25,5 @@ public interface InstallerCallbackListener {
     void informUserAboutInstallation();
     void installationTakingTooLong(int c);
     void installationSuccessful();
-    void installationFailed();
+    void installationFailed(String stdOut);
 }

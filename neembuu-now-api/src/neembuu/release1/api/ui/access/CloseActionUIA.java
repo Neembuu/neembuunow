@@ -17,18 +17,19 @@
 
 package neembuu.release1.api.ui.access;
 
+import java.awt.Color;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import neembuu.swing.TextBubbleBorder;
 
 /**
  *
  * @author Shashank Tulsyan
  */
 public interface CloseActionUIA {
-    JPanel overlay();
-    TextBubbleBorder border();
+    void overlay_setVisible(boolean show);
+    void indefiniteOverlay(boolean show);
+    void border_setColor(Color c);
     JPanel rightControlsPanel();
     JLabel fileNameLabel();
     OpenButton openButton();

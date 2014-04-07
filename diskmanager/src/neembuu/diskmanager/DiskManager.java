@@ -16,7 +16,7 @@
  */
 package neembuu.diskmanager;
 
-import java.util.LinkedList;
+import java.io.IOException;
 
 /**
  * 1 global disk manager is required. It supplies a {@link FileStorageManager} for each
@@ -26,9 +26,17 @@ import java.util.LinkedList;
  */
 public interface DiskManager {
     
-    FileStorageManager makeNewFileStorageManager(FileStorageManagerParams fsmp);
+    //FileStorageManager makeNewFileStorageManager(FileStorageManagerParams fsmp);
     
-    DiskManagerParams getDiskManagerParams();
+    //DiskManagerParams getDiskManagerParams();
     
-    LinkedList<java.util.logging.LogRecord> deleteFileStorage(String fileName);
+    void findPreviousSessions(FindPreviousSessionCallback callback);
+    
+    MakeSession makeSession(String type);
+    
+    MakeSession modifySession(Session source);
+    
+    Session createTestSession()throws IOException;
+    
+    //LinkedList<java.util.logging.LogRecord> deleteFileStorage(String fileName);
 }

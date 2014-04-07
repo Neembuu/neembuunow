@@ -4,7 +4,6 @@ package neembuu.release1.ui.linkpanel;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import neembuu.FakeConnectionProvider;
 import neembuu.release1.api.file.OnlineFile;
 import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProvider;

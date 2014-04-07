@@ -25,6 +25,8 @@ import neembuu.release1.api.linkhandler.TrialLinkHandler;
  * @author Shashank Tulsyan
  */
 public interface LinkParserResult {       
+    List<String> getFailedLines();
+    
     List<TrialLinkHandler> getFailedLinks();
     
     List<TrialLinkHandler> results();

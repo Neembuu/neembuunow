@@ -23,4 +23,5 @@ package neembuu.release1.api.ui.actions;
  */
 public interface OpenAction {
     void actionPerformed();
+    void close();
 }

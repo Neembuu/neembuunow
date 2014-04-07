@@ -21,11 +21,11 @@ import java.util.List;
 import java.util.logging.Level;
 import neembuu.release1.Main;
 import neembuu.release1.api.file.NeembuuFile;
-import neembuu.release1.api.linkgroup.TrialLinkGroup;
 import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProviders;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.file.NeembuuFileCreator;
+import neembuu.release1.api.linkgroup.LinkGroup;
 import neembuu.release1.api.ui.access.MinimalistFileSystem;
 import neembuu.vfs.file.SeekableConnectionFile;
 
@@ -35,14 +35,13 @@ import neembuu.vfs.file.SeekableConnectionFile;
  */
 public class SplitMergeNeembuuFileCreator implements NeembuuFileCreator {
 
-    private final TrialLinkGroup trialLinkGroup;
+    private final LinkGroup linkGroup;
     private final MinimalistFileSystem root;
 
     SplitGroupSession splitGroupSession = null;
     
-    public SplitMergeNeembuuFileCreator(TrialLinkGroup trialLinkGroup, MinimalistFileSystem root) {
-        this.trialLinkGroup = trialLinkGroup;
-        this.root = root;
+    public SplitMergeNeembuuFileCreator(LinkGroup linkGroup, MinimalistFileSystem root) {
+        this.linkGroup = linkGroup; this.root = root;
     }
     
     
@@ -61,7 +60,7 @@ public class SplitMergeNeembuuFileCreator implements NeembuuFileCreator {
         
         try {
             SplitGroupProcessor splitGroupProcessor = new SplitGroupProcessor();
-            splitGroupSession = splitGroupProcessor.handle(splits, root);
+            splitGroupSession = splitGroupProcessor.handle(splits, root, linkGroup.getSession());
         } catch (Exception a) {
             Main.getLOGGER().log(Level.INFO, "Could not handle splits", a);
         }
@@ -70,7 +69,7 @@ public class SplitMergeNeembuuFileCreator implements NeembuuFileCreator {
     }
     
     private void checkLinks(List<SeekableConnectionFile> connectionFiles)throws Exception{
-        for (TrialLinkHandler trialLinkHandler : trialLinkGroup.getAbsorbedLinks()) {
+        for (TrialLinkHandler trialLinkHandler : linkGroup.getAbsorbedLinks()) {
             SeekableConnectionFile scf = checkLink(trialLinkHandler);
             connectionFiles.add(scf);
         }
@@ -92,7 +91,7 @@ public class SplitMergeNeembuuFileCreator implements NeembuuFileCreator {
         
         neembuu.release1.api.file.OnlineFile f = linkHandler.getFiles().get(0);
         
-        return root.create(f);
+        return root.create(f,linkGroup.getSession());
     }
 
 }

@@ -17,7 +17,6 @@
 
 package neembuu.release1.defaultImpl.linkgroup;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import neembuu.release1.api.linkgroup.TrialLinkGroup;

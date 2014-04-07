@@ -17,6 +17,11 @@
 package neembuu.release1.log;
 
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.StandardOpenOption;
+import static java.nio.file.StandardOpenOption.*;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import neembuu.release1.Application;
@@ -35,18 +40,22 @@ public final class LoggerUtil {
     public static Logger getLogger(String name) {
         if (name == null) {
             try {
-                name = sun.reflect.Reflection.getCallerClass(2).getName();
+                name = sun.reflect.Reflection.getCallerClass(3).getName();
             } catch (Exception a) {
                 Main.getLOGGER().log(Level.SEVERE, "Problem in using fast class name getter", a);
-                name = Thread.currentThread().getStackTrace()[2].getClassName();
+                name = Thread.currentThread().getStackTrace()[3].getClassName();
             }
         }
         java.util.logging.Logger logger = null;
         try {
-            logger = neembuu.util.logging.LoggerUtil.getLightWeightHtmlLogger(name, Application.getHome(), 1024 * 1024);
+            SeekableByteChannel sbc = FileChannel.open(Application.getResource(
+                    Application.Resource.Logs,name+".log.html"), WRITE, CREATE, TRUNCATE_EXISTING);
+            logger = neembuu.util.logging.LoggerUtil.getLightWeightHtmlLogger(name, sbc, 1024 * 1024);
+            logger.addHandler(new ConsoleHandler());
         } catch (IOException ioe) {
             Main.getLOGGER().log(Level.SEVERE, "Could not create HTML logger",ioe);
-            logger = neembuu.util.logging.LoggerUtil.getLogger(name);
+            logger = Logger.getLogger(name);
+            //logger = neembuu.util.logging.LoggerUtil.getLogger(name);
         }
         logger.setLevel(Level.ALL);
         logger.setUseParentHandlers(true);

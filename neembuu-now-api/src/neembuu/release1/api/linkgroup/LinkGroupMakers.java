@@ -19,7 +19,10 @@ package neembuu.release1.api.linkgroup;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
+import neembuu.diskmanager.DiskManager;
+import neembuu.diskmanager.Session;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
 
 /**
@@ -62,5 +65,91 @@ public final class LinkGroupMakers {
         }return defaultLinkGroupMaker.tryMaking(tlh);
     }
     
+    public static void initDiskManager(DiskManager dm2){
+        if(dm!=null){throw new IllegalStateException("Already initialized"); }
+        dm = dm2;
+    }
+    
+    private static DiskManager dm;
+    
+    public static LinkGroup make(TrialLinkGroup tlg)throws Exception{
+        LinkGroup linkGroup = null; Exception ex = null;
+        synchronized (makers){
+            for(LinkGroupMaker maker : makers){
+                try{
+                    linkGroup = maker.make(tlg,dm);
+                }catch(Exception a){
+                    if(ex==null)ex = a;
+                    else ex.addSuppressed(a);
+                }
+                if(linkGroup!=null){ 
+                    return linkGroup;
+                }
+            }
+            
+            try{
+                linkGroup = defaultLinkGroupMaker.make(tlg,dm);
+            }catch(Exception a){
+                if(ex==null)ex = a;
+                else ex.addSuppressed(a);
+            }
+            if(linkGroup!=null){ 
+                return linkGroup;
+            }
+        }if(ex!=null) throw ex; 
+        return null;
+    }
+   
+    public static LinkGroup modify(Session s,TrialLinkGroup tlg)throws Exception{
+        LinkGroup linkGroup = null; Exception ex = null;
+        synchronized (makers){
+            for(LinkGroupMaker maker : makers){
+                try{
+                    linkGroup = maker.modify(s,tlg,dm);
+                }catch(Exception a){
+                    if(ex==null)ex = a;
+                    else ex.addSuppressed(a);
+                }
+                if(linkGroup!=null){ 
+                    return linkGroup;
+                }
+            }
+            try{
+                linkGroup = defaultLinkGroupMaker.modify(s,tlg,dm);
+            }catch(Exception a){
+                if(ex==null)ex = a;
+                else ex.addSuppressed(a);
+            }
+            if(linkGroup!=null){ 
+                return linkGroup;
+            }
+        }if(ex!=null) throw ex; return null;
+    }
+    
+    public static LinkGroup restore(Session s)throws Exception{
+        LinkGroup linkGroup = null; Exception ex = null;
+        synchronized (makers){
+            for(LinkGroupMaker maker : makers){
+                try{
+                    linkGroup = maker.restore(s);
+                }catch(Exception a){
+                    if(ex==null)ex = a;
+                    else ex.addSuppressed(a);
+                }
+                if(linkGroup!=null){ 
+                    return linkGroup;
+                }
+            }
+            try{
+                linkGroup = defaultLinkGroupMaker.restore(s);
+            }catch(Exception a){
+                if(ex==null)ex = a;
+                else ex.addSuppressed(a);
+            }
+            if(linkGroup!=null){ 
+                return linkGroup;
+            }
+        }if(ex!=null) throw ex; return null;
+    }
     
 }

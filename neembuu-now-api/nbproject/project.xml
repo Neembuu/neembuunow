@@ -16,14 +16,6 @@
         </libraries>
         <references xmlns="http://www.netbeans.org/ns/ant-project-references/1">
             <reference>
-                <foreign-project>Neembuu_Swing</foreign-project>
-                <artifact-type>jar</artifact-type>
-                <script>build.xml</script>
-                <target>jar</target>
-                <clean-target>clean</clean-target>
-                <id>jar</id>
-            </reference>
-            <reference>
                 <foreign-project>Virtual_FileSystem_for_Watch_as_you_Download</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
@@ -32,7 +24,7 @@
                 <id>jar</id>
             </reference>
             <reference>
-                <foreign-project>jpfm</foreign-project>
+                <foreign-project>diskmanager</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
                 <target>jar</target>
@@ -40,7 +32,7 @@
                 <id>jar</id>
             </reference>
             <reference>
-                <foreign-project>jpfm-fs</foreign-project>
+                <foreign-project>jpfm</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
                 <target>jar</target>

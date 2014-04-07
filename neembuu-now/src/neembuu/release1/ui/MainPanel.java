@@ -17,7 +17,6 @@
 
 package neembuu.release1.ui;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import neembuu.release1.Main;
@@ -378,7 +377,10 @@ public class MainPanel extends javax.swing.JPanel {
             //java.awt.Desktop.getDesktop().browse(new java.net.URI("http://neembuu.com/now/"));
             throw new Exception();
         }catch(Exception a){
-            JOptionPane.showMessageDialog(mainComponent.getJFrame(), "Please visit\nhttp://neembuu.com/now/", "Could not automatically open link", JOptionPane.INFORMATION_MESSAGE);
+            mainComponent.newMessage().info()
+                .setMessage("Please visit\nhttp://neembuu.com/now/")
+                .setTitle("Could not automatically open link")
+                .show();
         }
     }//GEN-LAST:event_aboutButtonActionPerformed
 
@@ -386,7 +388,10 @@ public class MainPanel extends javax.swing.JPanel {
         try{
             java.awt.Desktop.getDesktop().browse(new java.net.URI("http://neembuu.com/now/help/"));
         }catch(Exception a){
-            JOptionPane.showMessageDialog(mainComponent.getJFrame(), "Please visit\nhttp://neembuu.com/now/help/", "Could not automatically open link", JOptionPane.INFORMATION_MESSAGE);
+            mainComponent.newMessage().info()
+                .setMessage("Please visit\nhttp://neembuu.com/now/help/")
+                .setTitle("Could not automatically open link")
+                .show();
         }
     }//GEN-LAST:event_helpButtonActionPerformed
 

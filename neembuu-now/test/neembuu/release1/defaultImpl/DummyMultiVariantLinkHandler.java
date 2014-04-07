@@ -20,7 +20,7 @@ package neembuu.release1.defaultImpl;
 import neembuu.release1.defaultImpl.file.BasicOnlineFile;
 import java.util.ArrayList;
 import java.util.List;
-import neembuu.FakeConnectionProvider;
+import neembuu.release1.ui.linkpanel.FakeConnectionProvider;
 import neembuu.release1.api.file.OnlineFile;
 import neembuu.release1.api.file.PropertyProvider;
 import neembuu.release1.api.linkhandler.LinkHandler;

@@ -18,10 +18,7 @@ package neembuu.diskmanager;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channel;
 import java.nio.channels.WritableByteChannel;
-import java.util.logging.Logger;
-import neembuu.rangearray.Range;
 
 /**
  * Call from a single download thread, and dump all data here,
@@ -35,22 +32,15 @@ import neembuu.rangearray.Range;
  * Not thread safe. 
  * @author Shashank Tulsyan <shashaanktulsyan@gmail.com>
  */
-public interface RegionStorageManager extends Range,Channel {
-    FileStorageManager getFileStorageManager();
+public interface RegionStorageManager extends LoggerCreator, SeekableByteChannelCreator{
+    long startingOffset();
     int write(ByteBuffer src) throws IOException ;
     int write(ByteBuffer src,long absoulteFileOffset)throws IOException;
     int read(ByteBuffer src,long absoulteFileOffset)throws IOException;
     
-    void transferToReOpenIfRequired(WritableByteChannel wbc)throws IOException;
+    void transferTo_ReOpenIfRequired(WritableByteChannel wbc)throws IOException;
     
     public long endingByFileSize()throws IOException;
     
-    /**
-     * @return A logger which saves logs to a file for the download thread of this region.
-     */
-    Logger getDownloadThreadLogger();
-    /**
-     * @return A logger which saves logs to a file for the read dispatch handler thread of this region.
-     */
-    Logger getReadHandlerThreadLogger();
+    void close()throws Exception;    
 }

@@ -20,10 +20,9 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.logging.Formatter;
+import java.nio.channels.SeekableByteChannel;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 /**
  *
@@ -31,19 +30,14 @@ import java.util.logging.Logger;
  */
 final class CustomFileHandler extends Handler{
     
-    private final String path;
     private final long limit;
     private final boolean append;
-    
-    private final FileChannel fc;
+    private final /*FileChannel*/SeekableByteChannel fc;
 
-    public CustomFileHandler(String path, long limit, int count, boolean append) throws IOException{
-        this.path = path;
+    public CustomFileHandler(SeekableByteChannel fc, long limit, int count, boolean append) throws IOException{
         this.limit = limit;
         this.append = append;
-        
-        fc = new RandomAccessFile(path, "rwd").getChannel();
-        fc.position(fc.size());
+        this.fc = fc;
     }
     
     @Override
@@ -72,7 +66,11 @@ final class CustomFileHandler extends Handler{
     @Override
     public synchronized void flush() {
         try{
-            fc.force(true);
+            if(fc instanceof FileChannel){
+                ((FileChannel)fc).force(true);
+            }else {
+                // : (
+            }
         }catch(IOException ioe){
             ioe.printStackTrace(System.err);
         }
@@ -81,7 +79,7 @@ final class CustomFileHandler extends Handler{
     @Override
     public synchronized void close() throws SecurityException {
         try{
-            System.err.println("CustomFileHandler line:73 closing ->"+path);
+            System.err.println("CustomFileHandler line:73 closing ->");
             fc.close();
         }catch(IOException ioe){
             ioe.printStackTrace(System.err);

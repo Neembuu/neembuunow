@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import neembuu.release1.api.file.NeembuuFile;
 import jpfm.FileAttributesProvider;
+import neembuu.diskmanager.Session;
 import neembuu.release1.api.file.PropertyProvider;
 import neembuu.release1.api.ui.access.MinimalistFileSystem;
 import neembuu.release1.defaultImpl.file.BasicPropertyProvider;
@@ -47,12 +48,14 @@ public class MultiVariantSession implements NeembuuFile {
     public static final class Holder  { RequestPatternListener requestPatternListener; }
     private final Holder h = new Holder();
     
+    private final Session s;
+    
     private final BasicPropertyProvider bpp = new BasicPropertyProvider();
     
     public MultiVariantSession(List<NeembuuFile> connectionFiles,
             FileAttributesProvider folder,
-            MinimalistFileSystem root) {
-        this.connectionFiles = connectionFiles;
+            MinimalistFileSystem root, Session s) {
+        this.connectionFiles = connectionFiles; this.s = s;
         this.folder = folder; this.root = root;
     }
 
@@ -92,16 +95,6 @@ public class MultiVariantSession implements NeembuuFile {
             throw new IllegalStateException("Already completely closed");
         }if(!es.isEmpty()){
             throw new AggregateException("Could not closeCompletely some files", null, es.toArray(new Exception[es.size()]));
-        }}
-    
-    @Override
-    public void deleteSession()throws Exception {
-        List<Exception> es = new LinkedList<Exception>();
-        for (NeembuuFile file : connectionFiles) {
-            try{ file.deleteSession();}
-            catch(Exception a){ es.add(a);  }
-        }if(!es.isEmpty()){
-            throw new AggregateException("Could not deleteSession of some files", null, es.toArray(new Exception[es.size()]));
         }}
     
     @Override

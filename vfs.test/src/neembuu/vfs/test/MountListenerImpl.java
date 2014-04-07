@@ -22,7 +22,6 @@ import java.io.File;
 import javax.swing.JOptionPane;
 import jpfm.FormatterEvent;
 import jpfm.MountListener;
-import neembuu.config.GlobalTestSettings;
 
 /**
  *
@@ -50,8 +49,8 @@ public class MountListenerImpl implements MountListener{
                         + "\n Reasons : "
                             +ioe.getMessage()
                         ,"Could not open mount location"
-                        ,JOptionPane.ERROR_MESSAGE
-                        ,GlobalTestSettings.ONION_EMOTIONS.I_AM_DEAD);
+                        ,JOptionPane.ERROR_MESSAGE);
+                        //,GlobalTestSettings.ONION_EMOTIONS.I_AM_DEAD);
             }
         }
     }

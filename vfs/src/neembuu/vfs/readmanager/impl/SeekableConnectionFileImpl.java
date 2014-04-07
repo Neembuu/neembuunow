@@ -71,7 +71,7 @@ final class SeekableConnectionFileImpl // package private
         //super(name, INVALID_FILE_SIZE);
         super(scfp.getFileName(),scfp.getSize(), scfp.getParent());
         this.scfp = scfp;
-        readHandlerProvider = new NewReadHandlerProviderImpl(this,scfp.getDiskManager(),scfp.getThrottleFactory());
+        readHandlerProvider = new NewReadHandlerProviderImpl(this,scfp.getSession(),scfp.getThrottleFactory());
         readManager = readHandlerProvider.getReadQueueManager();
         
         LOGGER.log(Level.INFO, "quick url={0} for file={1}", new Object[]{scfp.getConnectionProvider(), scfp.getFileName()});

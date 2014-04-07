@@ -16,10 +16,8 @@
  */
 package neembuu.diskmanager;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
-import java.util.logging.Logger;
 
 /**
  * The function of {@link FileStorageManager} is to store downloaded data appropriately.
@@ -33,23 +31,14 @@ import java.util.logging.Logger;
  * and the overhead of virtual filesystem becomes significant.
  * @author Shashank Tulsyan <shashaanktulsyan@gmail.com>
  */
-public interface FileStorageManager {
-    DiskManager getDiskManager();
+public interface FileStorageManager extends LoggerCreator,SeekableByteChannelCreator{
+    
     RegionStorageManager getRegionStorageManagerFor(long startingOffset)throws IOException;
     
-    /**
-     * Watch as you download is highly prone to race-conditions, once in a million chance errors
-     * which are literally impossible to find. For this purpose we log rigorously.
-     * To ensure readability of logs we write them in different files. It is the job of 
-     * DiskManager to make a logger and save it's data to a file. The limit of log size is also
-     * decided by {@link FileStorageManager}
-     * @return 
-     */
-    Logger getReadQueueManagerThreadLogger();
-        
     void copyIfCompleteTo(SeekableByteChannel output, long fileSize)throws Exception;
     
-    void deleteSession()throws Exception;
+    boolean isOpen();
+    void close()throws Exception;
+    void delete()throws Exception;
     
-    void close() throws Exception;
 }

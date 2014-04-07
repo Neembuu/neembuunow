@@ -30,22 +30,8 @@ public final class GlobalTestSettings {
     private static final boolean DISABLE_ALL_LOGS = true; 
     private static final boolean STORE_PROFILEABLE_READ_REQUEST_PROPERTIES = true;
     
-    public static final class ONION_EMOTIONS {
-        public static final ImageIcon OBLIVIOUS 
-                = getQuestionImageIcon("efb50fe2.gif");
-        public static final ImageIcon RELAZED_WITH_A_FAN 
-                = getQuestionImageIcon("383.gif");
-        public static final ImageIcon SPOILED_BRAT
-                = getQuestionImageIcon("A_093.gif");
-        public static final ImageIcon SIMPLE_DOUBT 
-                = getQuestionImageIcon("Onion6.gif");
-        public static final ImageIcon I_AM_DEAD 
-                = getQuestionImageIcon("Onion16.gif");
-        public static final ImageIcon SMART_GUY_WITH_GLASSES 
-                = getQuestionImageIcon("suggestions.gif");
-        public static final ImageIcon THINKING_UNNCESSARILY 
-                = getQuestionImageIcon("200.gif");
-        private static ImageIcon getQuestionImageIcon(String iconName){
+    public static final class ONION_EMOTIONS {        
+        public static ImageIcon getQuestionImageIcon(String iconName){
             ImageIcon toRet = null;
 
             try{

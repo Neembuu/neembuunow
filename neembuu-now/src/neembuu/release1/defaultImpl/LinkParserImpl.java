@@ -34,12 +34,10 @@ import neembuu.release1.api.ui.IndefiniteTaskUI;
  * @author Shashank Tulsyan
  */
 public class LinkParserImpl {
-    private final AddLinkUI addLinkUI;
     private final IndefiniteTaskUI indefiniteTaskUI;
     private final Logger logger;
 
-    public LinkParserImpl(AddLinkUI addLinkUI, IndefiniteTaskUI indefiniteTaskUI, Logger logger) {
-        this.addLinkUI = addLinkUI;
+    public LinkParserImpl(IndefiniteTaskUI indefiniteTaskUI, Logger logger) {
         this.indefiniteTaskUI = indefiniteTaskUI;
         this.logger = logger;
     }
@@ -63,8 +61,7 @@ public class LinkParserImpl {
         return res;
     }
     
-    private void makeListFromText(String para,LinkParserResultImpl res){
-        String linksText = addLinkUI.getLinksText();
+    private void makeListFromText(String linksText,LinkParserResultImpl res){
         logger.info("Splitting links\n" + linksText);
 
         res.lnks = linksText.split("\n");
@@ -97,6 +94,7 @@ public class LinkParserImpl {
                     res.result.add(trialLinkHandler);
                 }
             } catch (MalformedURLException any) {
+                res.failedLines.add(lnk);
                 if (lastErrorMessage != null) {
                     lastErrorMessage.done();
                 }

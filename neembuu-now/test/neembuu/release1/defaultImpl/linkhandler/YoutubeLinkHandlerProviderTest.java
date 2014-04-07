@@ -17,8 +17,10 @@
 
 package neembuu.release1.defaultImpl.linkhandler;
 
+import neembuu.release1.Application;
 import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
+import neembuu.release1.ui.MainComponentImpl;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -77,6 +79,8 @@ public class YoutubeLinkHandlerProviderTest {
         
         YoutubeLinkHandlerProvider instance = new YoutubeLinkHandlerProvider();
         
+        instance.tryHandling(urls[0]);
+        
         //Valid
         for (String url : urls) {
             assertTrue(instance.tryHandling(url).canHandle());
@@ -93,7 +97,8 @@ public class YoutubeLinkHandlerProviderTest {
      */
     @Test
     public void testGetLinkHandler()throws Exception{
-        System.out.println("getLinkHandler");
+        //System.out.println("getLinkHandler");
+        Application.setMainComponent(new MainComponentImpl(new javax.swing.JFrame()));
         
         String urls[] = {
             "http://www.youtube.com/watch?v=N0fPuYR3I_k", //Normal
@@ -114,6 +119,11 @@ public class YoutubeLinkHandlerProviderTest {
             assertTrue(singleUrl + " foundSize() = " + fnas.getFiles().get(0).getFileSize(), fnas.getFiles().get(0).getFileSize() > -1 );
         }
         
+    }
+    
+    public static void main(String[] args) throws Exception{
+        YoutubeLinkHandlerProviderTest test = new YoutubeLinkHandlerProviderTest();
+        test.testGetLinkHandler();
     }
     
 }

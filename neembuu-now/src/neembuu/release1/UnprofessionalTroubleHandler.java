@@ -44,7 +44,10 @@ public final class UnprofessionalTroubleHandler implements TroubleHandler{
     
     @Override
     public void cannotCreateANewConnection(NewConnectionParams ncp, int numberOfRetries) {
-        JOptionPane.showMessageDialog(mainComponent.getJFrame(), ncp.toString(), "Internet problem : retries "+numberOfRetries+" times",JOptionPane.ERROR_MESSAGE);
+        mainComponent.newMessage().error()
+                .setMessage(ncp.toString())
+                .setTitle("Internet problem : retried "+numberOfRetries+" times")
+                .show();
     }
 
     private IndefiniteTask buffering = null;

@@ -16,6 +16,10 @@
  */
 package neembuu.util.logging;
 
+import java.nio.channels.FileChannel;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,8 +29,11 @@ import java.util.logging.Logger;
  */
 public class HtmlFormatterTest {
         public static void main(String[] args) throws Exception{
+            
+        SeekableByteChannel fc = FileChannel.open(Paths.get("j:\\neembuu\\heap\\test120k.rmvb_neembuu_download_data\\"), StandardOpenOption.WRITE,
+                StandardOpenOption.DSYNC,StandardOpenOption.CREATE);
         Logger l = LoggerUtil.getLightWeightHtmlLogger(
-                "l", "j:\\neembuu\\heap\\test120k.rmvb_neembuu_download_data\\",1024*100);
+                "l", fc,1024*100);
         
         l.log(Level.SEVERE, "Handlers	{\n"+
             "[0] BasicRegionHandler{0-->193535 ,authl=193535 isAlive=true ,size=193536 ,isMain=false}\n"+

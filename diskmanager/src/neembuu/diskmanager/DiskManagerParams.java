@@ -16,6 +16,9 @@
  */
 package neembuu.diskmanager;
 
+import neembuu.diskmanager.impl.DefaultNomenclature;
+import neembuu.diskmanager.impl.HtmlLoggerCreator;
+
 /**
  *
  * @author Shashank Tulsyan
@@ -23,34 +26,28 @@ package neembuu.diskmanager;
 
 
 public final class DiskManagerParams {
-    private final int maxReadQueueManagerThreadLogSize;
-    private final int maxDownloadThreadLogSize;
-    private final int maxReadHandlerThreadLogSize;
     private final String baseStoragePath;
     private final ResumeStateCallback resumeStateCallback;
+    private final Nomenclature nomenclature;
+    private final LoggerCreateSPI loggerCreateSPI;
 
     private DiskManagerParams(Builder b) {
-        this.maxReadQueueManagerThreadLogSize = b.maxReadQueueManagerThreadLogSize;
-        this.maxDownloadThreadLogSize = b.maxDownloadThreadLogSize;
-        this.maxReadHandlerThreadLogSize = b.maxReadHandlerThreadLogSize;
         this.baseStoragePath = b.baseStoragePath;
         this.resumeStateCallback = b.resumeStateCallback;
+        this.nomenclature = b.nomenclature;
+        this.loggerCreateSPI = b.loggerCreateSPI;
     }
 
-    public ResumeStateCallback getResumeStateCallback() {
-        return resumeStateCallback;
+    public LoggerCreateSPI getLoggerCreateSPI() {
+        return loggerCreateSPI;
+    }
+
+    public Nomenclature getNomenclature() {
+        return nomenclature;
     }
     
-    public int getMaxDownloadThreadLogSize() {
-        return maxDownloadThreadLogSize;
-    }
-
-    public int getMaxReadHandlerThreadLogSize() {
-        return maxReadHandlerThreadLogSize;
-    }
-
-    public int getMaxReadQueueManagerThreadLogSize() {
-        return maxReadQueueManagerThreadLogSize;
+    public ResumeStateCallback getResumeStateCallback() {
+        return resumeStateCallback;
     }
 
     public String getBaseStoragePath() {
@@ -58,35 +55,35 @@ public final class DiskManagerParams {
     }
     
     public static final class Builder {
-        private int maxReadQueueManagerThreadLogSize = 2*1024*1024;
-        private int maxDownloadThreadLogSize = 100*1024;
-        private int maxReadHandlerThreadLogSize = 100*1024;
         private String baseStoragePath = null;
         private ResumeStateCallback resumeStateCallback = null;
+        private Nomenclature nomenclature;
+        private LoggerCreateSPI loggerCreateSPI;
+        
+        public static Builder create(){
+            return new Builder();
+        }
 
+        public Builder setNomenclature(Nomenclature nomenclature) {
+            this.nomenclature = nomenclature; return this;
+        }
+        
+        public Builder useDefaultNomenclatureAndLoggerCreate(){
+            setNomenclature(new DefaultNomenclature());
+            setLoggerCreateSPI(new HtmlLoggerCreator());
+            return this;
+        }
+        
         public Builder setBaseStoragePath(String baseStoragePath) {
-            this.baseStoragePath = baseStoragePath;
-            return this;
-        }
-
-        public Builder setMaxDownloadThreadLogSize(int maxDownloadThreadLogSize) {
-            this.maxDownloadThreadLogSize = maxDownloadThreadLogSize;
-            return this;
-        }
-
-        public Builder setMaxReadHandlerThreadLogSize(int maxReadHandlerThreadLogSize) {
-            this.maxReadHandlerThreadLogSize = maxReadHandlerThreadLogSize;
-            return this;
-        }
-
-        public Builder setMaxReadQueueManagerThreadLogSize(int maxReadQueueManagerThreadLogSize) {
-            this.maxReadQueueManagerThreadLogSize = maxReadQueueManagerThreadLogSize;
-            return this;
+            this.baseStoragePath = baseStoragePath; return this;
         }
 
         public Builder setResumeStateCallback(ResumeStateCallback resumeStateCallback) {
-            this.resumeStateCallback = resumeStateCallback;
-            return this;
+            this.resumeStateCallback = resumeStateCallback; return this;
+        }
+
+        public Builder setLoggerCreateSPI(LoggerCreateSPI loggerCreateSPI) {
+            this.loggerCreateSPI = loggerCreateSPI; return this;
         }
         
         public DiskManagerParams build(){
@@ -94,6 +91,11 @@ public final class DiskManagerParams {
             java.io.File f = new java.io.File(baseStoragePath);
             if(!f.exists())throw new IllegalArgumentException("Base path does not exist");
             if(!f.isDirectory())throw new IllegalArgumentException("Base path is not a directory");
+            if(nomenclature==null){
+                throw new IllegalArgumentException("Nomenclature not specified");
+            }if(loggerCreateSPI==null){
+                throw new IllegalArgumentException("Logger create service provider not specified");
+            }
             return new DiskManagerParams(this);
         }
     }

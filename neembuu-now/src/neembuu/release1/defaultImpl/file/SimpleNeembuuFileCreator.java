@@ -21,10 +21,9 @@ import neembuu.release1.Main;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProviders;
-import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.file.NeembuuFileCreator;
+import neembuu.release1.api.linkgroup.LinkGroup;
 import neembuu.release1.api.ui.access.MinimalistFileSystem;
-import neembuu.release1.mountmanager.NeembuuFileWrapSCF;
 
 /**
  *
@@ -32,12 +31,12 @@ import neembuu.release1.mountmanager.NeembuuFileWrapSCF;
  */
 public class SimpleNeembuuFileCreator implements NeembuuFileCreator{
 
-    private final TrialLinkHandler trialLinkHandler;
+    private final LinkGroup linkGroup;
     private final MinimalistFileSystem minimalistFileSystem;
 
-    public SimpleNeembuuFileCreator(TrialLinkHandler trialLinkHandler, 
+    public SimpleNeembuuFileCreator(LinkGroup linkGroup, 
             MinimalistFileSystem minimalistFileSystem) {
-        this.trialLinkHandler = trialLinkHandler;
+        this.linkGroup = linkGroup;
         this.minimalistFileSystem = minimalistFileSystem;
     }
     
@@ -46,7 +45,7 @@ public class SimpleNeembuuFileCreator implements NeembuuFileCreator{
     @Override
     public NeembuuFile create() throws Exception{
         LinkHandler linkHandler = 
-            LinkHandlerProviders.getHandler(trialLinkHandler);
+            LinkHandlerProviders.getHandler(linkGroup.getAbsorbedLinks().get(0));
         if(linkHandler==null){
 
             throw new Exception("It seems this website is not\n"
@@ -61,7 +60,8 @@ public class SimpleNeembuuFileCreator implements NeembuuFileCreator{
         neembuu.release1.api.file.OnlineFile f = linkHandler.getFiles().get(0);
         
         NeembuuFileWrapSCF fileWrapSCF = new NeembuuFileWrapSCF(
-                minimalistFileSystem.create(f), minimalistFileSystem);
+                minimalistFileSystem.create(f,linkGroup.getSession()), 
+                minimalistFileSystem,linkGroup.getSession());
         
         return fileWrapSCF;
     }

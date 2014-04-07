@@ -16,6 +16,7 @@
  */
 package neembuu.release1.mountmanager;
 
+import java.nio.file.StandardOpenOption;
 import jpfm.DirectoryStream;
 import jpfm.FileAttributesProvider;
 import jpfm.JPfmMutableContainable;
@@ -25,10 +26,17 @@ import jpfm.mount.BasicCascadeMount;
 import jpfm.util.UniversallyValidFileName;
 import jpfm.volume.vector.VectorRootDirectory;
 import neembuu.diskmanager.DiskManager;
+import neembuu.diskmanager.Session;
 import neembuu.release1.api.RealFileProvider;
+import neembuu.release1.api.file.OnlineFile;
 import neembuu.release1.api.ui.access.MinimalistFileSystem;
+import neembuu.vfs.connection.NewConnectionProvider;
+import neembuu.vfs.file.AskResume;
 import neembuu.vfs.file.SeekableConnectionFile;
+import neembuu.vfs.file.SeekableConnectionFileParams;
 import neembuu.vfs.file.TroubleHandler;
+import neembuu.vfs.progresscontrol.ThrottleFactory;
+import neembuu.vfs.readmanager.impl.SeekableConnectionFileImplBuilder;
 
 /**
  *
@@ -52,8 +60,23 @@ public class MinimalistFileSystem_Root implements MinimalistFileSystem {
     
     
     @Override
-    public SeekableConnectionFile create(neembuu.release1.api.file.OnlineFile f)throws Exception {
-        return createImpl(f);
+    public SeekableConnectionFile create(final OnlineFile f,Session s)throws Exception {
+        String fileName = getSuitableFileName(f.getName(), volume);
+        
+        SeekableConnectionFile connectionFile
+                = SeekableConnectionFileImplBuilder.build(new SeekableConnectionFileParams.Builder()
+                        .setFileSize(f.getFileSize())
+                        .setSession(s)
+                        .setParent(volume)
+                        .setNewConnectionProvider(f.getConnectionProvider())
+                        .setTroubleHandler(troubleHandler)
+                        .setFileName(fileName)
+                        .setAskResume(new AskResumeImpl(f.getConnectionProvider()))
+                        .setThrottleFactory(ThrottleFactory.General.SINGLETON)
+                        .build()
+                );
+        
+        return connectionFile;
     }
 
     @Override public RealFileProvider getRealFileProvider() {
@@ -98,24 +121,29 @@ public class MinimalistFileSystem_Root implements MinimalistFileSystem {
         }
         return filename;
     }
-    
-    private SeekableConnectionFile createImpl(neembuu.release1.api.file.OnlineFile f)throws Exception{
-        String fileName = getSuitableFileName(f.getName(), volume);
-        final SeekableConnectionFile connectionFile
-                = SeekableConnectionFile_1to1.create(
-                        f.getName(),
-                        f.getFileSize(),
-                        f.getConnectionProvider(),
-                        diskManager,
-                        troubleHandler, 
-                        volume);        
-        
-        return connectionFile;
-    }
 
     @Override
     public BasicCascadeMount cascadeMount(BasicCascadableProvider basicCascadable)  {
         return fs.cascadeMount(basicCascadable);
     }
     
+    
+    private static final class AskResumeImpl implements AskResume {
+        private final NewConnectionProvider ncp;
+
+        public AskResumeImpl(NewConnectionProvider ncp) {
+            this.ncp = ncp;
+        }
+        
+        @Override public boolean resume() {
+            if (ncp.estimateCreationTime(1) >= Integer.MAX_VALUE) {
+                return false;
+            }
+            // for rapidshare type of links clean the
+            // download directory and start fresh
+
+            // retain stuff for others
+            return true;
+        }
+    };
 }

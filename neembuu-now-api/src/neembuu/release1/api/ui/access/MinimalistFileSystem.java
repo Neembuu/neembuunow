@@ -20,6 +20,7 @@ package neembuu.release1.api.ui.access;
 import jpfm.FileAttributesProvider;
 import jpfm.fs.BasicCascadableProvider;
 import jpfm.mount.BasicCascadeMount;
+import neembuu.diskmanager.Session;
 import neembuu.release1.api.file.OnlineFile;
 import neembuu.release1.api.RealFileProvider;
 import neembuu.vfs.file.SeekableConnectionFile;
@@ -32,7 +33,7 @@ public interface MinimalistFileSystem {
     void remove(FileAttributesProvider vf);
     void add(FileAttributesProvider vf);
     
-    SeekableConnectionFile create(OnlineFile f)throws Exception;
+    SeekableConnectionFile create(OnlineFile f,Session s)throws Exception;
     
     RealFileProvider getRealFileProvider();
     

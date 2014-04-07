@@ -20,7 +20,7 @@ package neembuu.release1.ui.actions;
 import java.awt.Color;
 import java.util.LinkedList;
 import java.util.logging.Level;
-import javax.swing.JOptionPane;
+import neembuu.diskmanager.Session;
 import neembuu.release1.Main;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.ui.MainComponent;
@@ -48,6 +48,8 @@ public class LinkActionsImpl {
     
     private final NeembuuFileCreator neembuuFileCreator;
     private final OpenAction openAction;
+    
+    private final Session s;
 
     private final DeleteAction delete = new DeleteAction() {@Override public void actionPerformed() {
             delete();
@@ -74,9 +76,9 @@ public class LinkActionsImpl {
 
     private final LinkedList<CallBack> callBacks = new LinkedList<CallBack>();
     
-    public LinkActionsImpl(CloseActionUIA ui, RemoveFromUI removeFromUI, 
+    public LinkActionsImpl(Session s,CloseActionUIA ui, RemoveFromUI removeFromUI, 
             MainComponent mainComponent, NeembuuFileCreator neembuuFileCreator, OpenAction oa) {
-        this.ui = ui;this.removeFromUI = removeFromUI;openAction = oa;
+        this.ui = ui;this.removeFromUI = removeFromUI;openAction = oa;this.s=s;
         this.mainComponent = mainComponent; this.neembuuFileCreator = neembuuFileCreator;}
     
     public DeleteAction getDelete() {return delete;}
@@ -87,9 +89,10 @@ public class LinkActionsImpl {
 
     
     public void delete(){
-        int x;
-        x = JOptionPane.showConfirmDialog(mainComponent.getJFrame(),"Are you sure you want to delete this file","Delete",JOptionPane.YES_NO_OPTION);
-        if(x == JOptionPane.YES_OPTION){
+        boolean userSaidYes = mainComponent.newMessage()
+                .setMessage("Are you sure you want to delete this file")
+                .setTitle("Delete").ask();
+        if(userSaidYes){
             deleteAction();
             removeFromUI.remove();
         }
@@ -99,7 +102,7 @@ public class LinkActionsImpl {
     void reAddAction(boolean anotherThread){
         if(!anotherThread)closeAction(false, false);
         else {
-            ui.overlay().setVisible(false); // to prevent clicks on re-add 2 twice
+            ui.overlay_setVisible(false); // to prevent clicks on re-add 2 twice
             new Thread("ReAddAction{"+ui.fileNameLabel().getText()+"}"){
                 @Override public void run() { closeAction(false, false);  }
             }.start();
@@ -107,35 +110,39 @@ public class LinkActionsImpl {
     }
     
     void closeAction(boolean closeOrOpen,boolean onlyUI){
-        ui.rightControlsPanel().setVisible(!closeOrOpen);
-        ui.overlay().setVisible(closeOrOpen);
+        ui.overlay_setVisible(closeOrOpen);
+        ui.indefiniteOverlay(!closeOrOpen);
         if(closeOrOpen){
-            ui.border().setColor(Color.WHITE);
+            ui.rightControlsPanel().setVisible(false);
+            ui.border_setColor(Color.WHITE);
             ui.fileNameLabel().setForeground(Colors.BORDER);
             ui.contract();ui.openButton().setVisible(false);
             if(!onlyUI)closeActionProcess(false,false);
         }else /*open*/{
             if(!createNewVirtualFile()){ //undo UI changes
                 closeAction(true, onlyUI);
-                ui.repaint();return;}
-            ui.border().setColor(Colors.BORDER);ui.repaint();
+                ui.repaint();return;
+            }
+            ui.border_setColor(Colors.BORDER);ui.repaint();
             ui.fileNameLabel().setForeground(Color.BLACK);
             ui.fileNameLabel().setText(connectionFile.getMinimumFileInfo().getName());
             ui.openButton().setVisible(true);
             
-            
             connectionFile.addToFileSystem();
-            
+
+            ui.indefiniteOverlay(false);
+            ui.rightControlsPanel().setVisible(true);
             openAction.actionPerformed();
             if(onlyUI){ throw new IllegalStateException("Will never happen"); }
         }
     }
-    
+        
     void closeActionProcess(boolean ignoreError,boolean calledFromDelete){
         if(connectionFile==null){ // virtual file has not been created so it cannot be closed
             return;
         }
         try{
+            openAction.close();
             connectionFile.removeFromFileSystem();
         }catch(Exception a){
             if(!ignoreError)
@@ -157,15 +164,13 @@ public class LinkActionsImpl {
         NeembuuFile v = connectionFile; //closeActionProcess sets v = null, so making a copy
         closeActionProcess(false,true);
         try{
-            if(v==null){
-                throw new UnsupportedOperationException("File removed, but could not find and delete temporary data");
-            }else {
-                //connectionFile.getFileStorageManager().completeSession(null, connectionFile.getFileSize());
-                connectionFile.deleteSession();
-            }
+            s.delete();
         }catch(Exception a){
             Main.getLOGGER().log(Level.SEVERE, "Could not delete file",a);
-            JOptionPane.showMessageDialog(mainComponent.getJFrame(), a.getMessage(),"Could not delete file", JOptionPane.ERROR_MESSAGE);
+            mainComponent.newMessage().error()
+                .setMessage(a.getMessage())
+                .setTitle("Could not delete file")
+                .show();
         }
     }
     
@@ -183,11 +188,12 @@ public class LinkActionsImpl {
         try{
             connectionFile = neembuuFileCreator.create();
         }catch(Exception a){
-            JOptionPane.showMessageDialog(mainComponent.getJFrame(), 
-                    "Sorry! There is nothing you \n"
+            mainComponent.newMessage().error()
+                .setMessage("Sorry! There is nothing you \n"
                     + "can do about it.\n"
-                    + "Reason : "+a.getMessage(), 
-                    "Could not make virtual file", JOptionPane.ERROR_MESSAGE);
+                    + "Reason : "+a.getMessage())
+                .setTitle("Could not make virtual file")
+                .show();
             a.printStackTrace();
             return false;
         }

@@ -27,6 +27,5 @@ public interface TrialLinkHandler {
     boolean containsMultipleLinks();
     String tempDisplayName();
     String getReferenceLinkString();
-    
 //    LinkHandlerProvider getLinkHandlerProvider();
 }

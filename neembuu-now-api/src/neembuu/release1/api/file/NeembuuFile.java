@@ -31,8 +31,6 @@ public interface NeembuuFile extends Saveable{
 
     void closeCompletely()throws Exception;
 
-    void deleteSession()throws Exception;
-
     FileBeingDownloaded fileBeingDownloaded();
 
     void removeFromFileSystem() throws Exception;

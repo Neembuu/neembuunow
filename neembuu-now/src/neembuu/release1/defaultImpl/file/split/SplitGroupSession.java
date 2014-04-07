@@ -17,7 +17,6 @@
 
 package neembuu.release1.defaultImpl.file.split;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SeekableByteChannel;
@@ -30,11 +29,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import neembuu.release1.api.file.NeembuuFile;
 import jpfm.FileAttributesProvider;
 import jpfm.mount.BasicCascadeMount;
+import neembuu.diskmanager.Session;
 import neembuu.rangearray.RangeArrayFactory;
 import neembuu.rangearray.UIRangeArrayAccess;
 import neembuu.release1.api.file.PropertyProvider;
 import neembuu.release1.defaultImpl.file.BasicPropertyProvider;
-import neembuu.release1.mountmanager.NeembuuFileWrapSCF;
+import neembuu.release1.defaultImpl.file.NeembuuFileWrapSCF;
 import neembuu.vfs.file.AutoCompleteControls;
 import neembuu.vfs.file.FileBeingDownloaded;
 import neembuu.vfs.file.MinimumFileInfo;
@@ -50,6 +50,7 @@ import neembuu.vfs.readmanager.TotalFileReadStatistics;
 public class SplitGroupSession implements NeembuuFile {
     private final BasicCascadeMount bcm;
     private final List<SeekableConnectionFile> connectionFiles;
+    private final Session s;
     
     private final FileAttributesProvider fap;   
     private final UIRangeArrayAccess<ReadRequestState> totalRegion;
@@ -62,9 +63,10 @@ public class SplitGroupSession implements NeembuuFile {
     
     private final BasicPropertyProvider bpp = new BasicPropertyProvider();
     
+    
     public SplitGroupSession(BasicCascadeMount bcm,
-             List<SeekableConnectionFile> connectionFiles) {
-        this.bcm = bcm;
+             List<SeekableConnectionFile> connectionFiles,Session s) {
+        this.bcm = bcm; this.s = s;
         this.connectionFiles = connectionFiles;
         
         fap = bcm.getFileSytem().list(bcm.getFileSytem().getRootAttributes().getFileDescriptor().getFileId())
@@ -85,7 +87,7 @@ public class SplitGroupSession implements NeembuuFile {
     @Override public List<NeembuuFile> getVariants() {
         final ArrayList<NeembuuFile> neembuuFiles = new ArrayList<>();
         for (SeekableConnectionFile seekableConnectionFile : connectionFiles) {
-            neembuuFiles.add(new NeembuuFileWrapSCF(seekableConnectionFile, null, null,null));
+            neembuuFiles.add(new NeembuuFileWrapSCF(seekableConnectionFile, null, null/*s*/, null,null));
         } return neembuuFiles;
     }
 
@@ -106,16 +108,6 @@ public class SplitGroupSession implements NeembuuFile {
             throw new IllegalStateException("Already completely closed");
         }if(!es.isEmpty()){
             throw new AggregateException("Could not closeCompletely some files", null, es.toArray(new Exception[es.size()]));
-        }}
-    
-    @Override
-    public void deleteSession()throws Exception {
-        List<Exception> es = new LinkedList<Exception>();
-        for (SeekableConnectionFile file : connectionFiles) {
-            try{ file.getFileStorageManager().deleteSession();}
-            catch(Exception a){ es.add(a);  }
-        }if(!es.isEmpty()){
-            throw new AggregateException("Could not deleteSession of some files", null, es.toArray(new Exception[es.size()]));
         }}
     
     @Override

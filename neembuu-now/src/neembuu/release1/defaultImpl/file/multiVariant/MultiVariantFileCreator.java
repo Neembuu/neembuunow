@@ -23,13 +23,13 @@ import jpfm.volume.vector.VectorDirectory;
 import neembuu.release1.Main;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.file.OnlineFile;
-import neembuu.release1.api.linkgroup.TrialLinkGroup;
+import neembuu.release1.api.linkgroup.LinkGroup;
 import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProviders;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.file.NeembuuFileCreator;
 import neembuu.release1.api.ui.access.MinimalistFileSystem;
-import neembuu.release1.mountmanager.NeembuuFileWrapSCF;
+import neembuu.release1.defaultImpl.file.NeembuuFileWrapSCF;
 import neembuu.vfs.file.ConstrainUtility;
 import neembuu.vfs.file.SeekableConnectionFile;
 
@@ -39,13 +39,13 @@ import neembuu.vfs.file.SeekableConnectionFile;
  */
 public class MultiVariantFileCreator implements NeembuuFileCreator {
 
-    private final TrialLinkGroup trialLinkGroup;
+    private final LinkGroup linkGroup;
     private final MinimalistFileSystem root;
 
     MultiVariantSession session = null;
     
-    public MultiVariantFileCreator(TrialLinkGroup trialLinkGroup, MinimalistFileSystem root) {
-        this.trialLinkGroup = trialLinkGroup;
+    public MultiVariantFileCreator(LinkGroup linkGroup, MinimalistFileSystem root) {
+        this.linkGroup = linkGroup;
         this.root = root;
 
         
@@ -64,7 +64,7 @@ public class MultiVariantFileCreator implements NeembuuFileCreator {
         VectorDirectory vd = checkLinks(variants);
         
         try {
-            session = new MultiVariantSession(variants, vd, root);
+            session = new MultiVariantSession(variants, vd, root, linkGroup.getSession());
         } catch (Exception a) {
             Main.getLOGGER().log(Level.INFO, "Could not handle splits", a);
         }
@@ -73,7 +73,7 @@ public class MultiVariantFileCreator implements NeembuuFileCreator {
     }
     
     private VectorDirectory checkLinks(List<NeembuuFile> connectionFiles)throws Exception{
-        TrialLinkHandler trialLinkHandler = trialLinkGroup.getAbsorbedLinks().get(0);
+        TrialLinkHandler trialLinkHandler = linkGroup.getAbsorbedLinks().get(0);
         LinkHandler linkHandler = 
             LinkHandlerProviders.getHandler(trialLinkHandler);
         if(linkHandler==null){
@@ -91,9 +91,9 @@ public class MultiVariantFileCreator implements NeembuuFileCreator {
         }
         
         for (OnlineFile f  : linkHandler.getFiles()) {
-            SeekableConnectionFile scf = root.create(f);
+            SeekableConnectionFile scf = root.create(f,linkGroup.getSession());
             vd.add(scf);
-            connectionFiles.add(new NeembuuFileWrapSCF(scf, root, f.getPropertyProvider(),new String[]{vd.getName()}));
+            connectionFiles.add(new NeembuuFileWrapSCF(scf, root, null, f.getPropertyProvider(),new String[]{vd.getName()}));
         }
         
         //<editor-fold defaultstate="collapsed" desc="Why use contraint utility? Explanation : ">

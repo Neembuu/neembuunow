@@ -25,6 +25,7 @@ import jpfm.DirectoryStream;
 import jpfm.FileAttributesProvider;
 import jpfm.fs.splitfs.CascadableSplitFS;
 import jpfm.mount.BasicCascadeMount;
+import neembuu.diskmanager.Session;
 import neembuu.release1.api.ui.access.MinimalistFileSystem;
 import neembuu.vfs.file.ConstrainUtility;
 import neembuu.vfs.file.SeekableConnectionFile;
@@ -62,7 +63,7 @@ public class SplitGroupProcessor  {
     }
 
     public SplitGroupSession handle(List<SeekableConnectionFile> splitVirtualFiles,
-            MinimalistFileSystem minimalistFileSystem
+            MinimalistFileSystem minimalistFileSystem,Session s
             ) {
         
         List<SeekableConnectionFile> sessions_ = canHandle(splitVirtualFiles);
@@ -109,7 +110,8 @@ public class SplitGroupProcessor  {
                 //vf.getUI().deactivateOpenButton(true);
             }
         }
-        SplitGroupSession sgs = new SplitGroupSession(bcm, splitVirtualFiles);
+        
+        SplitGroupSession sgs = new SplitGroupSession(bcm, splitVirtualFiles,s);
         return sgs;
     }
     

@@ -129,8 +129,8 @@ final class BasicRegionHandler
         if(this.range.ending()>this.range.starting()){RAEendRepaired = true;}
         else RAEendRepaired = false;
         
-        readHandlerLogger = rsm.getReadHandlerThreadLogger();
-        downloadThreadLogger = rsm.getDownloadThreadLogger();
+        readHandlerLogger = rsm.createLogger("ReadHandlerThread") /*getReadHandlerThreadLogger()*/;
+        downloadThreadLogger = rsm.createLogger("DownloadThread") /*getDownloadThreadLogger()*/;
     }
 
     /*final void setThrottle(Throttle throttle){
@@ -297,6 +297,15 @@ final class BasicRegionHandler
             myLock.notifyAll();
         }
     }
+    
+    protected boolean fixAuthorityLimit(RangeArray rangeArray){
+        synchronized(rangeArray.getModLock()){
+            long oldAuth = authorityLimit;
+            changeAuthorityLimit(rangeArray, ending());
+            long newAuth = authorityLimit;
+            return oldAuth!=newAuth;
+        }
+    }
 
     /**
      * Please see {@link #authorityLimit() } first. <br/>
@@ -321,11 +330,16 @@ final class BasicRegionHandler
         assert(newAuthorityLimit>=this.ending());
         assert(newAuthorityLimit>authorityLimit);
 
-        synchronized(rangeArray.getModLock()){ ///safe since authority limit is
-            // not published through the gui
-            // the difference between ending and authoritylimit is so small
-            // that this is unlikely to be visible to the user even if we painted 
-            // it on the range array progress bar/component
+        changeAuthorityLimit(rangeArray, newAuthorityLimit);
+    }
+    
+    ///safe since authority limit is
+    // not published through the gui
+    // the difference between ending and authoritylimit is so small
+    // that this is unlikely to be visible to the user even if we painted 
+    // it on the range array progress bar/component
+    private void changeAuthorityLimit(RangeArray rangeArray, long newAuthorityLimit){
+        synchronized(rangeArray.getModLock()){
             if(newAuthorityLimit < this.ending())
                 throw new IllegalArgumentException("Attempting contraction instead of expansion.\n" +
                         "For new end = "+newAuthorityLimit +
@@ -333,22 +347,22 @@ final class BasicRegionHandler
             if(newAuthorityLimit == this.ending() ){
                 authorityLimit = newAuthorityLimit;
             }
+            
+            
             Range next = null;
-            //synchronized(rangeArray.getModLock()){
-                int myindex = rangeArray.indexOf(this.starting());
-                if(myindex + 1 < rangeArray.size() )
-                    next = rangeArray.get(myindex+1);
-                if(next !=null ){
-                    if(newAuthorityLimit >= next.starting()){
-                        newAuthorityLimit = next.starting() - 1;
-                        throw new IllegalArgumentException(
-                            "Use expandCarefullyAlongWithAuthorityLimit instead, and check the return value. "
-                            + "newAuthorityLimit >= next.starting() ."
-                            + "newAuthorityLimit="+newAuthorityLimit+" next.starting()="+next.starting());
-                    }                    
-                }
-                authorityLimit = newAuthorityLimit;
-            //}
+            int myindex = rangeArray.indexOf(this.starting());
+            if(myindex + 1 < rangeArray.size() )
+                next = rangeArray.get(myindex+1);
+            if(next !=null ){
+                if(newAuthorityLimit >= next.starting()){
+                    newAuthorityLimit = next.starting() - 1;
+                    throw new IllegalArgumentException(
+                        "Use expandCarefullyAlongWithAuthorityLimit instead, and check the return value. "
+                        + "newAuthorityLimit >= next.starting() ."
+                        + "newAuthorityLimit="+newAuthorityLimit+" next.starting()="+next.starting());
+                }                    
+            }
+            authorityLimit = newAuthorityLimit;
         }
     }
 

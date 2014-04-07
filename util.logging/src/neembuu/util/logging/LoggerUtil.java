@@ -18,6 +18,7 @@
 package neembuu.util.logging;
 
 import java.io.IOException;
+import java.nio.channels.SeekableByteChannel;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Filter;
@@ -56,8 +57,8 @@ public final class LoggerUtil {
     }
     
     public static java.util.logging.Logger getLightWeightHtmlLogger(
-            String name, 
-            String store_path,
+            String name,
+            SeekableByteChannel fc,
             int limit)throws IOException{
         Logger logger = LoggerUtil.getLightWeightLogger(name);
         Handler[]hs=logger.getHandlers();
@@ -69,7 +70,7 @@ public final class LoggerUtil {
         java.util.logging.Handler fh = 
                 //new java.util.logging.FileHandler(
                 new CustomFileHandler(
-                    store_path + java.io.File.separator + name+"_log.html",
+                    fc,
                     limit,
                     1,
                     true
@@ -80,20 +81,6 @@ public final class LoggerUtil {
         logger.getHandlers()[0].setLevel(Level.ALL);
         logger.setLevel(Level.ALL);
         logger.setUseParentHandlers(false);
-        
-        /*if(!exists){
-            LogRecord lr = new LogRecord(Level.SEVERE, "<html>\n"
-                    + "<script type=\"text/javascript\">\n"+
-                "function toggle(id) {\n"+
-                  "var e = document.getElementById(id);\n"+
-                  "if (e.style.display == \'\')\n"+
-                    "e.style.display = \'none\';\n"+
-                  "else\n"+
-                    "e.style.display = \'\';\n}\n"+
-            "</script>\n<body>");
-            lr.setThrown(new FakeThrowable());
-            logger.log(lr);
-        }*/
         return logger;
     }
 

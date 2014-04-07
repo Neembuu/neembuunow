@@ -17,7 +17,7 @@
 package neembuu.vfs.file;
 
 import jpfm.DirectoryStream;
-import neembuu.diskmanager.DiskManager;
+import neembuu.diskmanager.Session;
 import neembuu.vfs.connection.NewConnectionProvider;
 import neembuu.vfs.progresscontrol.ThrottleFactory;
 
@@ -30,7 +30,7 @@ public final class SeekableConnectionFileParams {
     private final long size;
     private final DirectoryStream parent;
     private final NewConnectionProvider connectionProvider;
-    private final DiskManager diskManager;
+    private final /*DiskManager*/ Session session;
     private final ThrottleFactory throttleFactory;
     private final TroubleHandler troubleHandler;
     private final AskResume askResume;
@@ -41,7 +41,7 @@ public final class SeekableConnectionFileParams {
         this.size = b.size;
         this.parent = b.parent;
         this.connectionProvider = b.connectionProvider;
-        this.diskManager = b.diskManager;
+        this.session = b.s;
         this.throttleFactory = b.throttleFactory;
         this.troubleHandler = b.troubleHandler;
         this.askResume = b.askResume;
@@ -55,8 +55,8 @@ public final class SeekableConnectionFileParams {
         return connectionProvider;
     }
 
-    public DiskManager getDiskManager() {
-        return diskManager;
+    public Session getSession() {
+        return session;
     }
 
     public String getFileName() {
@@ -84,7 +84,7 @@ public final class SeekableConnectionFileParams {
         private long size;
         private DirectoryStream parent;
         private NewConnectionProvider connectionProvider;
-        private DiskManager diskManager;
+        private /*DiskManager*/Session s;
         private ThrottleFactory throttleFactory;
         private TroubleHandler troubleHandler;
         private AskResume askResume;
@@ -99,8 +99,8 @@ public final class SeekableConnectionFileParams {
             return this;
         }
 
-        public Builder setDiskManager(DiskManager diskManager) {
-            this.diskManager = diskManager;
+        public Builder setSession(Session session) {
+            this.s = session;
             return this;
         }
 
@@ -137,7 +137,7 @@ public final class SeekableConnectionFileParams {
             }if(throttleFactory==null){
                 throw new IllegalArgumentException("Throttle factory is a compulsary parameter. "
                         + "Try using GeneralThrottle");
-            }if(diskManager==null){
+            }if(s==null){
                 throw new IllegalArgumentException("DiskManager is a compulsary parameter. "
                         + "Try using DiskManagers.getDefaultManager");
             }if(parent==null){

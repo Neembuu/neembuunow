@@ -17,13 +17,12 @@
 
 package neembuu.vfs.readmanager.impl;
 
-import java.lang.reflect.Field;
-import java.util.List;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
+import static java.nio.file.StandardOpenOption.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import neembuu.config.GlobalTestSettings;
 import neembuu.diskmanager.*;
 import neembuu.rangearray.Range;
 import neembuu.rangearray.RangeUtils;
@@ -48,8 +47,8 @@ final class NewReadHandlerProviderImpl
     private final ResumeStateCallbackImpl rsc;
     
     public NewReadHandlerProviderImpl(
-            SeekableConnectionFileImpl seekableHttpFile,
-            DiskManager diskManager,ThrottleFactory throttleFactory) {
+            SeekableConnectionFileImpl seekableHttpFile,Session s
+            /*DiskManager diskManager*/,ThrottleFactory throttleFactory) {
         this.seekableHttpFile = seekableHttpFile;
         this.throttleFactory = throttleFactory;
         
@@ -61,11 +60,54 @@ final class NewReadHandlerProviderImpl
         FileStorageManagerParams fsmp = new FileStorageManagerParams.Builder()
                 .setFileName(seekableHttpFile.getName())
                 .setResumeStateCallback(rsc)
+                .setEstimatedFileSize(seekableHttpFile.getFileSize())
                 .build();
-        fsm = diskManager.makeNewFileStorageManager(fsmp);
+        fsm = /*diskManager*/s.makeNewFileStorageManager(fsmp);
         readQueueManager.initLogger();
+        
+        String failureReason = checkOrUpdateFileSize();
+        if(failureReason!=null){throw new IllegalStateException(failureReason); }
+        
+        // file name cannot be checked, because different file name
+        // results in creation of a different FileStorageManager.
+        // If filename is different it is assumed to be a different file.
     }
-
+    
+    private String checkOrUpdateFileSize(){
+        try{
+            SeekableByteChannel sbc = fsm.getOrCreateResource("filesize",WRITE,READ,CREATE);
+            if(sbc.size()==0 || sbc.size() > 1024 ){//empty file or file nonsense data
+                fixFileSizeMetaData(sbc); return null;
+            }else { 
+                ByteBuffer bb = ByteBuffer.allocate((int)(sbc.size()));
+                int r = sbc.read(bb);
+                if(r<sbc.size()){return "Could not read filesize meta data";}
+                try{
+                    long sz = Long.parseLong(new String(bb.array()));
+                    long old = seekableHttpFile.getFileSize();
+                    if(sz!=old){
+                        return "Filesize changed. Earlier when you played this file\n"
+                                + "filesize was = "+old+" this time it is ="+sz+"\n"
+                                + "The link might have expired.\n"
+                                + "You can try updating the link using the \"Edit links\" option.";
+                    }
+                }catch(Exception a){
+                    a.printStackTrace();
+                    fixFileSizeMetaData(sbc); return null;
+                }
+            }
+        }catch(Exception a){
+            a.printStackTrace();
+        }return null;
+    }
+    
+    private void fixFileSizeMetaData(SeekableByteChannel sbc)throws IOException{
+        sbc.position(0);
+        sbc.write(ByteBuffer.wrap(Long.toString(
+                seekableHttpFile.getFileSize()).getBytes()));
+        sbc.close(); 
+    }
+    
     @Override
     public final FileStorageManager getFileStorageManager() {
         return fsm;
@@ -83,9 +125,14 @@ final class NewReadHandlerProviderImpl
         return seekableHttpFile.getTroubleHandler();
     }
 
+    private Logger rQMLogger = null;
+    
     @Override
     public final Logger getReadQueueManagerThreadLogger(){
-        return fsm.getReadQueueManagerThreadLogger();
+        if(rQMLogger==null){
+            rQMLogger = fsm.createLogger("ReadQueueManagerThread");
+        }
+        return rQMLogger;
     }    
     
     @Override

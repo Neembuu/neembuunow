@@ -37,6 +37,7 @@ import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.access.MainUIA;
 import neembuu.release1.api.ui.actions.AddLinksAction;
 import neembuu.release1.ui.actions.AddLinkAction;
+import neembuu.release1.api.ui.LinkGroupUICreator;
 
 /**
  *
@@ -51,8 +52,7 @@ public final class NeembuuUI {
     private Main main;
     private final LinkedList<IndefiniteTask> indefiniteTasks = new LinkedList<IndefiniteTask>();
     
-    private final MainComponent mainComponent = new MainComponent() {
-        @Override public JFrame getJFrame() { return jf; }};
+    private final MainComponent mainComponent;
     
     private final IndefiniteTaskUI indefiniteTaskUI = new IndefiniteTaskUI() {
         @Override public IndefiniteTask showIndefiniteProgress(String message) {
@@ -64,11 +64,16 @@ public final class NeembuuUI {
     
     public NeembuuUI() {
         this.jf = makeJFrame();
+        mainComponent = new MainComponentImpl(jf);
         this.mp = new MainPanel(addLinksAction,mainComponent,listener);
         this.lc = new LinksContainer(mp,mp.linksPanel);
         lc.heightProperty().addListener(listener);
         ala = new AddLinkAction(this,mp);
         mp.neembuuVirtualFolderButton.setEnabled(false);
+    }
+
+    public LinkGroupUICreator getLinkGroupUICreator() {
+        return ala;
     }
     
     public void initialize(Main main){

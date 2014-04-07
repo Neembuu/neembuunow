@@ -25,17 +25,22 @@ package neembuu.diskmanager;
 public final class FileStorageManagerParams {
     private final String fileName;
     private final ResumeStateCallback resumeStateCallback;
+    private final long estimatedFileSize;
     //private final String ID;
 
     private FileStorageManagerParams(Builder b) {
         this.fileName = b.fileName;
         this.resumeStateCallback = b.resumeStateCallback;
+        this.estimatedFileSize = b.estimatedFileSize;
         //this.ID = b.ID;
     }
 
     /*public String getID() {
-        return ID;
+    return ID;
     }*/
+    public long getEstimatedFileSize() {
+        return estimatedFileSize;
+    }
 
     public String getFileName() {
         return fileName;
@@ -49,10 +54,18 @@ public final class FileStorageManagerParams {
         private String fileName;
         private ResumeStateCallback resumeStateCallback;
         private String ID;
+        private long estimatedFileSize = 0;
 
         public Builder() {
         }
 
+        public Builder setEstimatedFileSize(long estimatedFileSize) {
+            this.estimatedFileSize = estimatedFileSize;
+            return this;
+        }
+
+        
+        
         public Builder setID(String ID) {
             this.ID = ID;
             return this;
@@ -74,6 +87,8 @@ public final class FileStorageManagerParams {
             }
             if(this.resumeStateCallback==null){
                 throw new IllegalArgumentException("Resume callback not specified");
+            }if(this.estimatedFileSize==0){
+                throw new IllegalArgumentException("File size not specified");
             }
             return new FileStorageManagerParams(this);
         }

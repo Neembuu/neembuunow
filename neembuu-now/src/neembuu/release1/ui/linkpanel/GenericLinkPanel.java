@@ -16,6 +16,7 @@
  */
 package neembuu.release1.ui.linkpanel;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -42,6 +43,7 @@ import neembuu.release1.api.ui.actions.CloseAction;
 import neembuu.release1.api.ui.actions.DeleteAction;
 import neembuu.release1.api.ui.actions.ExpandAction;
 import neembuu.release1.api.ui.actions.ConnectionActions;
+import neembuu.release1.api.ui.actions.EditLinksAction;
 import neembuu.release1.api.ui.actions.OpenAction;
 import neembuu.release1.api.ui.actions.ReAddAction;
 import neembuu.release1.api.ui.actions.SaveAction;
@@ -61,6 +63,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     
     private final int ht_smallest = 50;
     private final int ht_medium = 80;
+    private final int pad_for_extra_progress_bar = 30;
     private final int ht_tallest = 300;
     
     private final RightControlsPanel rightControlsPanel = 
@@ -76,6 +79,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     private ReAddAction reAddAction;
     private ChangeDownloadModeAction  changeDownloadModeAction;
     private ConnectionActions connectionActions;
+    private EditLinksAction editLinksAction;
     
     private final String downloadFullFileToolTip = "<html>"
                 + "<b>Download entire file mode</b><br/>"
@@ -114,11 +118,12 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     void initActions(
             ExpandAction expandAction, OpenAction openAction, 
             CloseAction closeAction, DeleteAction deleteAction, 
-            ReAddAction reAddAction, SaveAction saveAction, 
+            ReAddAction reAddAction, SaveAction saveAction, EditLinksAction editLinksAction,
             ConnectionActions connectionActions, ChangeDownloadModeAction  changeDownloadModeAction) {
         this.expandAction = expandAction;
         this.deleteAction = deleteAction;
         this.reAddAction = reAddAction;
+        this.editLinksAction = editLinksAction;
         this.connectionActions = connectionActions;
         this.changeDownloadModeAction = changeDownloadModeAction;
         rightControlsPanel.initActions(expandAction, saveAction, closeAction);
@@ -140,9 +145,12 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         layeredPane = new javax.swing.JLayeredPane();
+        indefiniteProgress = new javax.swing.JLabel();
         overlay = new javax.swing.JPanel();
-        reEnableButton = HiddenBorderButton.make("images/small+.png", "images/small+_s.png", false);
+        editLinksButton = HiddenBorderButton.make("images/edit_link.png", "images/edit_link_s.png", false);
+        rightOverlayElements = new javax.swing.JPanel();
         delete = HiddenBorderButton.make("images/delete.png", "images/delete_s.png", false);
+        reEnableButton = HiddenBorderButton.make("images/small+.png", "images/small+_s.png", false);
         actualContentsPanel = new javax.swing.JPanel();
         vlcPane = getFileIconPanelWithButton();
         fileNamePane = new javax.swing.JPanel();
@@ -164,24 +172,28 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         nextConnectionButton = new javax.swing.JButton();
         killConnectionButton = new javax.swing.JButton();
         changeDownloadModeButton = new javax.swing.JToggleButton();
-        linkEditButton = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setBorder(border);
+
+        indefiniteProgress.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/Animation.gif"))); // NOI18N
+        indefiniteProgress.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.indefiniteProgress.text")); // NOI18N
 
         overlay.setBackground(Colors.OVERLAY);
         overlay.setOpaque(false);
         overlay.setPreferredSize(new java.awt.Dimension(40, 40));
 
-        reEnableButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/small+.png"))); // NOI18N
-        reEnableButton.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.reEnableButton.text")); // NOI18N
-        reEnableButton.setToolTipText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.reEnableButton.toolTipText")); // NOI18N
-        reEnableButton.setContentAreaFilled(false);
-        reEnableButton.addActionListener(new java.awt.event.ActionListener() {
+        editLinksButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/edit_link.png"))); // NOI18N
+        editLinksButton.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.editLinksButton.text")); // NOI18N
+        editLinksButton.setToolTipText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.editLinksButton.toolTipText")); // NOI18N
+        editLinksButton.setContentAreaFilled(false);
+        editLinksButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                reEnableButtonActionPerformed(evt);
+                editLinksButtonActionPerformed(evt);
             }
         });
+
+        rightOverlayElements.setBackground(new java.awt.Color(255, 255, 255));
 
         delete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/delete.png"))); // NOI18N
         delete.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.delete.text")); // NOI18N
@@ -193,25 +205,57 @@ final class GenericLinkPanel extends javax.swing.JPanel {
             }
         });
 
+        reEnableButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/small+.png"))); // NOI18N
+        reEnableButton.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.reEnableButton.text")); // NOI18N
+        reEnableButton.setToolTipText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.reEnableButton.toolTipText")); // NOI18N
+        reEnableButton.setContentAreaFilled(false);
+        reEnableButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reEnableButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout rightOverlayElementsLayout = new javax.swing.GroupLayout(rightOverlayElements);
+        rightOverlayElements.setLayout(rightOverlayElementsLayout);
+        rightOverlayElementsLayout.setHorizontalGroup(
+            rightOverlayElementsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(rightOverlayElementsLayout.createSequentialGroup()
+                .addGap(7, 7, 7)
+                .addComponent(delete, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(reEnableButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(36, Short.MAX_VALUE))
+        );
+        rightOverlayElementsLayout.setVerticalGroup(
+            rightOverlayElementsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(rightOverlayElementsLayout.createSequentialGroup()
+                .addGap(0, 0, 0)
+                .addGroup(rightOverlayElementsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(reEnableButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(delete, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, 0))
+        );
+
         javax.swing.GroupLayout overlayLayout = new javax.swing.GroupLayout(overlay);
         overlay.setLayout(overlayLayout);
         overlayLayout.setHorizontalGroup(
             overlayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, overlayLayout.createSequentialGroup()
-                .addContainerGap(298, Short.MAX_VALUE)
-                .addComponent(delete, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(reEnableButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(10, 10, 10))
+                .addGap(2, 2, 2)
+                .addComponent(editLinksButton, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 244, Short.MAX_VALUE)
+                .addComponent(rightOverlayElements, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         overlayLayout.setVerticalGroup(
             overlayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(overlayLayout.createSequentialGroup()
-                .addGap(2, 2, 2)
-                .addGroup(overlayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(reEnableButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(delete, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 119, Short.MAX_VALUE))
+                .addComponent(editLinksButton, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 135, Short.MAX_VALUE))
+            .addGroup(overlayLayout.createSequentialGroup()
+                .addGap(0, 0, 0)
+                .addComponent(rightOverlayElements, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         actualContentsPanel.setBackground(new java.awt.Color(255, 255, 255));
@@ -444,31 +488,18 @@ final class GenericLinkPanel extends javax.swing.JPanel {
             }
         });
 
-        linkEditButton.setFont(Fonts.MyriadPro.deriveFont(10f)
-        );
-        linkEditButton.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.linkEditButton.text")); // NOI18N
-        linkEditButton.setToolTipText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.linkEditButton.toolTipText")); // NOI18N
-        linkEditButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        linkEditButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                linkEditButtonActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout connectionControlPaneLayout = new javax.swing.GroupLayout(connectionControlPane);
         connectionControlPane.setLayout(connectionControlPaneLayout);
         connectionControlPaneLayout.setHorizontalGroup(
             connectionControlPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(connectionControlPaneLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(previousConnectionButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(previousConnectionButton, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(nextConnectionButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(nextConnectionButton, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(killConnectionButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(linkEditButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(killConnectionButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(changeDownloadModeButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
@@ -480,8 +511,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
                     .addComponent(previousConnectionButton, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(nextConnectionButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(killConnectionButton, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(changeDownloadModeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(linkEditButton, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(changeDownloadModeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(2, 2, 2))
         );
 
@@ -544,6 +574,11 @@ final class GenericLinkPanel extends javax.swing.JPanel {
                     .addGap(4, 4, 4)
                     .addComponent(overlay, javax.swing.GroupLayout.DEFAULT_SIZE, 391, Short.MAX_VALUE)
                     .addGap(10, 10, 10)))
+            .addGroup(layeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layeredPaneLayout.createSequentialGroup()
+                    .addContainerGap(1, Short.MAX_VALUE)
+                    .addComponent(indefiniteProgress)
+                    .addContainerGap(1, Short.MAX_VALUE)))
         );
         layeredPaneLayout.setVerticalGroup(
             layeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -556,7 +591,13 @@ final class GenericLinkPanel extends javax.swing.JPanel {
                     .addGap(0, 0, 0)
                     .addComponent(overlay, javax.swing.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE)
                     .addGap(0, 0, 0)))
+            .addGroup(layeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layeredPaneLayout.createSequentialGroup()
+                    .addContainerGap(1, Short.MAX_VALUE)
+                    .addComponent(indefiniteProgress)
+                    .addContainerGap(1, Short.MAX_VALUE)))
         );
+        layeredPane.setLayer(indefiniteProgress, javax.swing.JLayeredPane.DEFAULT_LAYER);
         layeredPane.setLayer(overlay, javax.swing.JLayeredPane.DEFAULT_LAYER);
         layeredPane.setLayer(actualContentsPanel, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
@@ -591,10 +632,6 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         connectionActions.previous(evt);
     }//GEN-LAST:event_previousConnectionButtonActionPerformed
 
-    private void linkEditButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_linkEditButtonActionPerformed
-        throw new UnsupportedOperationException();
-    }//GEN-LAST:event_linkEditButtonActionPerformed
-
     private void deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteActionPerformed
         deleteAction.actionPerformed();
     }//GEN-LAST:event_deleteActionPerformed
@@ -606,6 +643,10 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     private void comboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxActionPerformed
         variantSelector.actionPerformed();
     }//GEN-LAST:event_comboBoxActionPerformed
+
+    private void editLinksButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editLinksButtonActionPerformed
+        editLinksAction.actionPerformed();
+    }//GEN-LAST:event_editLinksButtonActionPerformed
 
     private JPanel getFileIconPanelWithButton(){
         return fileIconPanel.getJPanel();
@@ -622,22 +663,33 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     }
 
     private void overlayInit(){
+        indefiniteProgress.setVisible(false);
         overlay.setVisible(false);
         delete.setVisible(false);
+        editLinksButton.setVisible(false);
         reEnableButton.setVisible(false);
+        
+        javax.swing.GroupLayout layout = (javax.swing.GroupLayout)rightOverlayElements.getLayout();
+        layout.setHonorsVisibility(delete, Boolean.FALSE);
+        layout.setHonorsVisibility(reEnableButton, Boolean.FALSE);
+        
         MouseAdapter ma = new  MouseAdapter() {
             @Override public void mouseEntered(MouseEvent e) {
                 delete.setVisible(true);
                 reEnableButton.setVisible(true);
+                editLinksButton.setVisible(true);
             }
             @Override public void mouseExited(MouseEvent e) {
                 delete.setVisible(false);
                 reEnableButton.setVisible(false);
+                editLinksButton.setVisible(false);
             }
         };
         overlay.addMouseListener(ma);
         delete.addMouseListener(ma);
         reEnableButton.addMouseListener(ma);
+        editLinksButton.addMouseListener(ma);
+        rightOverlayElements.addMouseListener(ma);
     }
     
     private void hiddenPaneInit(){
@@ -646,7 +698,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         
         nextConnectionButton.setBackground(Colors.BUTTON_TINT);
         previousConnectionButton.setBackground(Colors.BUTTON_TINT);
-        linkEditButton.setBackground(Colors.BUTTON_TINT);
+        //linkEditButton.setBackground(Colors.BUTTON_TINT);
         killConnectionButton.setBackground(Colors.BUTTON_TINT);
         
         MouseAdapter ma = new MouseAdapter() {
@@ -680,14 +732,15 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     private javax.swing.JToggleButton changeDownloadModeButton;
     private javax.swing.JPanel connectionControlPane;
     private javax.swing.JButton delete;
+    private javax.swing.JButton editLinksButton;
     private javax.swing.JLabel fileNameLabel;
     private javax.swing.JPanel fileNamePane;
     private javax.swing.JLabel fileSizeLabel;
     private javax.swing.JPanel graphPanel;
     private javax.swing.JPanel hiddenStatsPane;
+    private javax.swing.JLabel indefiniteProgress;
     private javax.swing.JButton killConnectionButton;
     private javax.swing.JLayeredPane layeredPane;
-    private javax.swing.JButton linkEditButton;
     private javax.swing.JButton nextConnectionButton;
     private javax.swing.JPanel overlay;
     private javax.swing.JButton previousConnectionButton;
@@ -697,6 +750,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     private javax.swing.JLabel progressPercetLabel_lower;
     private javax.swing.JButton reEnableButton;
     private javax.swing.JPanel rightCtrlPane;
+    private javax.swing.JPanel rightOverlayElements;
     private javax.swing.JLabel selectedConnectionLabel;
     private javax.swing.JPanel sizeAndProgressPane;
     private javax.swing.JPanel sizeAndProgressPane_lower;
@@ -723,8 +777,9 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         @Override public void repaintProgressBar() {progress.progress().repaint(); } };
     
     final CloseActionUIA closeActionUIA = new CloseActionUIA() {
-        @Override public JPanel overlay() { return overlay; }
-        @Override public TextBubbleBorder border() { return border; }
+        @Override public void overlay_setVisible(boolean show) { overlay.setVisible(show); }
+        @Override public void indefiniteOverlay(boolean show) {indefiniteProgress.setVisible(show);}
+        @Override public void border_setColor(Color c) {border.setColor(c);}
         @Override public JPanel rightControlsPanel() { return rightCtrlPane; }
         @Override public JLabel fileNameLabel() { return fileNameLabel; }
         @Override public OpenButton openButton() { return openButton; }
@@ -742,8 +797,8 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         @Override public void initGraph(boolean findFirst) { graph.initGraph(null, findFirst); }
         @Override public void initVariants() { v.init(); } 
         @Override public short ht_smallest() { return ht_smallest; }
-        @Override public short ht_medium() { return ht_medium; }
-        @Override public short ht_tallest() { return ht_tallest; }
+        @Override public short ht_medium() { return (short)(ht_medium + extraPaddingIfRequired()); }
+        @Override public short ht_tallest() { return (short)(ht_tallest + extraPaddingIfRequired()); }
         @Override public HeightProperty getHeight() { return heightProperty; } 
         @Override public void setVisibleVariantProgress(boolean b){ sizeAndProgressPane_lower.setVisible(b);}};
     
@@ -765,6 +820,12 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     final OpenableEUI openableEUI = new OpenableEUI() {
         @Override public JComponent getJComponent() { return GenericLinkPanel.this; }
         @Override public HeightProperty heightProperty() { return heightProperty; }
-        @Override public void open(){ reAddAction.actionPerformed(false); }
+        @Override public void open(){ reAddAction.actionPerformed(true); }
     };
+    
+    private short extraPaddingIfRequired(){
+        if(sizeAndProgressPane.isVisible() && sizeAndProgressPane_lower.isVisible())
+            return pad_for_extra_progress_bar;
+        return 0;
+    }
 }

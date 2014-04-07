@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 import neembuu.release1.api.RealFileProvider;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.file.PropertyProvider;
+import neembuu.release1.api.open.Open;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.actions.OpenAction;
 import neembuu.release1.api.ui.actions.ReAddAction.CallBack;
@@ -104,13 +105,33 @@ public class MultiVariantOpenAction implements OpenAction, CallBack{
             if(choice.type().equalsIgnoreCase(file.getPropertyProvider().getStringPropertyValue(PropertyProvider.StringProperty.VARIANT_DESCRIPTION))){
                 OpenActionImpl impl = new OpenActionImpl(realFileProvider, mainComponent);
                 impl.doneCreation(file);
-                impl.actionPerformed(); 
-                return;
+                try{
+                    open = impl.openVirtualFile();
+                    return;
+                }catch(Exception a){
+                    
+                }
             }
         }
         
-        JOptionPane.showMessageDialog(mainComponent.getJFrame(), "Could not find type."+choice.type(), "Cannot open file", JOptionPane.ERROR_MESSAGE);
+        mainComponent.newMessage().error()
+            .setMessage("Could not find type."+choice.type())
+            .setTitle("Cannot open file")
+            .show();
         
+    }
+    
+    private Open open = null;
+
+    @Override
+    public void close() {
+        if(open!=null){
+            try{
+                open.close();
+            }catch(Exception a){
+                
+            }
+        }
     }
     
 }

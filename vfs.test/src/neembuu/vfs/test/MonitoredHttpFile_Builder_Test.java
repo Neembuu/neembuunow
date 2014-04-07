@@ -25,8 +25,10 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import jpfm.util.UniversallyValidFileName;
 import neembuu.config.GlobalTestSettings;
+import neembuu.diskmanager.DiskManager;
 import neembuu.diskmanager.DiskManagerParams;
 import neembuu.diskmanager.DiskManagers;
+import neembuu.diskmanager.Session;
 import neembuu.util.logging.LoggerUtil;
 import neembuu.vfs.connection.NewConnectionProvider;
 import neembuu.vfs.connection.sampleImpl.DownloadManager;
@@ -136,12 +138,17 @@ public class MonitoredHttpFile_Builder_Test {
             throw new IllegalArgumentException("Storage path does not exists");
         }
 
+        DiskManager dm = 
+            DiskManagers.getDefaultManager(new DiskManagerParams.Builder().setBaseStoragePath(storagePath).build());
+        
+        Session s = dm.createTestSession();
+        
         SeekableConnectionFileParams fileParams = new SeekableConnectionFileParams.Builder()
                 .setFileName(fileName)
                 .setFileSize(fileSize)
                 .setParent(parent)
                 .setNewConnectionProvider(newConnectionProvider)
-                .setDiskManager(DiskManagers.getDefaultManager(new DiskManagerParams.Builder().setBaseStoragePath(storagePath).build()))
+                .setSession(s)
                 .setThrottleFactory(ThrottleFactory.General.SINGLETON)
                 .setTroubleHandler(troubleHandler)
                 .setAskResume(new UnprofessionalAskResume(fileName))
@@ -190,9 +197,8 @@ public class MonitoredHttpFile_Builder_Test {
                         + "This will save some of your time.\n",
                         "Should I continue from where I left?",
                         JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE,
-                        GlobalTestSettings.ONION_EMOTIONS.SIMPLE_DOUBT
-                    );
+                        JOptionPane.QUESTION_MESSAGE);
+                        //GlobalTestSettings.ONION_EMOTIONS.SIMPLE_DOUBT
                 if(i==JOptionPane.OK_OPTION){
                     return true;
                 }else {

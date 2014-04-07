@@ -17,17 +17,15 @@
 
 package neembuu.vfs.readmanager.impl;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import neembuu.config.GlobalTestSettings;
 import neembuu.diskmanager.RegionStorageManager;
 import neembuu.diskmanager.ResumeStateCallback;
 import neembuu.rangearray.Range;
+import neembuu.rangearray.UnsyncRangeArrayCopy;
 import neembuu.vfs.progresscontrol.ThrottleFactory;
+import neembuu.vfs.readmanager.RegionHandler;
 import neembuu.vfs.readmanager.rqm.ReadQueueManager;
 
 /**
@@ -67,20 +65,35 @@ final class ResumeStateCallbackImpl implements ResumeStateCallback{
        for(RegionStorageManager regionStorageManager : previouslyDownloadedData) {
            resumeStateForRegion(regionStorageManager);
        }
+       fixAuthorityLimits();
+    }
+    
+    private void fixAuthorityLimits(){
+        synchronized (readQueueManager.getRegionHandlers().getModLock()){
+            UnsyncRangeArrayCopy<RegionHandler> urac = readQueueManager.getRegionHandlers().tryToGetUnsynchronizedCopy();
+            for (int i = 0; i < urac.size(); i++) {
+                RegionHandler me = urac.get(i).getProperty();
+                if( me instanceof BasicRegionHandler){
+                    boolean changed = ((BasicRegionHandler)me).fixAuthorityLimit(readQueueManager.getRegionHandlers());
+                    if(changed)
+                        Logger.getLogger(BasicRegionHandler.class.getName()).log(Level.INFO,"authority limit fixed for element->"+me);
+                }
+            }
+        }
     }
     
     private void resumeStateForRegion(RegionStorageManager regionStorageManager){
        BasicRegionHandler channel = null;
         try{
             Range region = readQueueManager.getRegionHandlers().addElement(
-                    regionStorageManager.starting(),
-                    regionStorageManager.ending(), null);
+                    regionStorageManager.startingOffset(),
+                    regionStorageManager.endingByFileSize(), null);
             channel = new BasicRegionHandler(
                     seekableHttpFile,
                     region,
                     regionStorageManager,
                     throttleFactory.createNewThrottle(),
-                    regionStorageManager.ending()
+                    regionStorageManager.endingByFileSize()
                 );
             
             Range newRegion = readQueueManager.getRegionHandlers().setProperty(region, channel);

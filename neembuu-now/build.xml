@@ -70,4 +70,13 @@
     nbproject/build-impl.xml file. 
 
     -->
+    <target name="-post-jar">
+        <copy todir="${dist.jar.dir}/lib">
+            <fileset dir="../vfs.test/resources" includes="**"/>
+        </copy>        
+        <echo>MY TARGET: PACKAGING neembuu-test SOURCES</echo>
+        <delete file="dist/neembuu-test.src.zip"/>
+        <zip destfile="dist/neembuu-test.src.zip" basedir="src"
+                includes="**/*.java"/>
+    </target>
 </project>

@@ -920,13 +920,6 @@ is divided into following sections:
         </propertyfile>
         <antcall target="-maybe-call-dep">
             <param name="call.built.properties" value="${built-jar.properties}"/>
-            <param location="${project.Neembuu_Swing}" name="call.subproject"/>
-            <param location="${project.Neembuu_Swing}/build.xml" name="call.script"/>
-            <param name="call.target" value="jar"/>
-            <param name="transfer.built-jar.properties" value="${built-jar.properties}"/>
-        </antcall>
-        <antcall target="-maybe-call-dep">
-            <param name="call.built.properties" value="${built-jar.properties}"/>
             <param location="${project.Virtual_FileSystem_for_Watch_as_you_Download}" name="call.subproject"/>
             <param location="${project.Virtual_FileSystem_for_Watch_as_you_Download}/build.xml" name="call.script"/>
             <param name="call.target" value="jar"/>
@@ -934,15 +927,15 @@ is divided into following sections:
         </antcall>
         <antcall target="-maybe-call-dep">
             <param name="call.built.properties" value="${built-jar.properties}"/>
-            <param location="${project.jpfm}" name="call.subproject"/>
-            <param location="${project.jpfm}/build.xml" name="call.script"/>
+            <param location="${project.diskmanager}" name="call.subproject"/>
+            <param location="${project.diskmanager}/build.xml" name="call.script"/>
             <param name="call.target" value="jar"/>
             <param name="transfer.built-jar.properties" value="${built-jar.properties}"/>
         </antcall>
         <antcall target="-maybe-call-dep">
             <param name="call.built.properties" value="${built-jar.properties}"/>
-            <param location="${project.jpfm-fs}" name="call.subproject"/>
-            <param location="${project.jpfm-fs}/build.xml" name="call.script"/>
+            <param location="${project.jpfm}" name="call.subproject"/>
+            <param location="${project.jpfm}/build.xml" name="call.script"/>
             <param name="call.target" value="jar"/>
             <param name="transfer.built-jar.properties" value="${built-jar.properties}"/>
         </antcall>
@@ -1444,13 +1437,6 @@ is divided into following sections:
         </propertyfile>
         <antcall target="-maybe-call-dep">
             <param name="call.built.properties" value="${built-clean.properties}"/>
-            <param location="${project.Neembuu_Swing}" name="call.subproject"/>
-            <param location="${project.Neembuu_Swing}/build.xml" name="call.script"/>
-            <param name="call.target" value="clean"/>
-            <param name="transfer.built-clean.properties" value="${built-clean.properties}"/>
-        </antcall>
-        <antcall target="-maybe-call-dep">
-            <param name="call.built.properties" value="${built-clean.properties}"/>
             <param location="${project.Virtual_FileSystem_for_Watch_as_you_Download}" name="call.subproject"/>
             <param location="${project.Virtual_FileSystem_for_Watch_as_you_Download}/build.xml" name="call.script"/>
             <param name="call.target" value="clean"/>
@@ -1458,15 +1444,15 @@ is divided into following sections:
         </antcall>
         <antcall target="-maybe-call-dep">
             <param name="call.built.properties" value="${built-clean.properties}"/>
-            <param location="${project.jpfm}" name="call.subproject"/>
-            <param location="${project.jpfm}/build.xml" name="call.script"/>
+            <param location="${project.diskmanager}" name="call.subproject"/>
+            <param location="${project.diskmanager}/build.xml" name="call.script"/>
             <param name="call.target" value="clean"/>
             <param name="transfer.built-clean.properties" value="${built-clean.properties}"/>
         </antcall>
         <antcall target="-maybe-call-dep">
             <param name="call.built.properties" value="${built-clean.properties}"/>
-            <param location="${project.jpfm-fs}" name="call.subproject"/>
-            <param location="${project.jpfm-fs}/build.xml" name="call.script"/>
+            <param location="${project.jpfm}" name="call.subproject"/>
+            <param location="${project.jpfm}/build.xml" name="call.script"/>
             <param name="call.target" value="clean"/>
             <param name="transfer.built-clean.properties" value="${built-clean.properties}"/>
         </antcall>

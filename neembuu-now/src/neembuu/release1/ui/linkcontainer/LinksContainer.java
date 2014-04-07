@@ -19,9 +19,7 @@ package neembuu.release1.ui.linkcontainer;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import javax.swing.GroupLayout;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import neembuu.release1.api.ui.linkpanel.ExpandableUI;
 import neembuu.release1.api.ui.HeightProperty;
@@ -64,6 +62,7 @@ public final class LinksContainer implements ExpandableUIContainer {
         }
         lpI.heightProperty().addListener(listener_of_height_of_individual_linkuis);
         updateLayout();
+        listener_of_height_of_individual_linkuis.changed(lpI.heightProperty(), 0, lpI.heightProperty().getValue());
     }
     
     private void updateLayout(){        
@@ -85,7 +84,7 @@ public final class LinksContainer implements ExpandableUIContainer {
     
     private final int left = 25;
     private final int right = 40;
-    final int bottom = 20;
+    final int bottom = 10;
     
     private void adjustHeightOfLinksSection(double f){
         GroupLayout linksPanelLayout = (GroupLayout)linksPanel.getLayout();

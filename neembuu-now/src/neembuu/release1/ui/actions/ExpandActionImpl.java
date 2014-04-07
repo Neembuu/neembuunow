@@ -121,7 +121,7 @@ public class ExpandActionImpl implements ExpandAction{
         ui.connectionControlPane().setVisible(true);
         
         ui.getHeight().setValue(ui.ht_tallest());
-        
+                
         state = 3;
     }
     

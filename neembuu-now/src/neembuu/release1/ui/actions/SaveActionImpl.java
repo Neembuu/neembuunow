@@ -47,7 +47,10 @@ public class SaveActionImpl implements SaveAction{
         try{
             connectionFile.saveACopy(outputFilePath);
         }catch(Exception a){
-            JOptionPane.showMessageDialog(mainComponent.getJFrame(), a.getMessage(),"Could not save file", JOptionPane.ERROR_MESSAGE);
+            mainComponent.newMessage().error()
+                .setMessage(a.getMessage())
+                .setTitle("Could not save file")
+                .show();
             Main.getLOGGER().log(Level.SEVERE, "Could not save file",a);
         }
     }

@@ -18,9 +18,7 @@ package neembuu.vfs.progresscontrol;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import neembuu.config.GlobalTestSettings;
 import neembuu.rangearray.UnsyncRangeArrayCopy;
-import neembuu.util.logging.LoggerUtil;
 import neembuu.vfs.annotations.DownloadThread;
 import neembuu.vfs.annotations.ReadHandlerThread;
 import neembuu.vfs.annotations.ReadQueueManagerThread;

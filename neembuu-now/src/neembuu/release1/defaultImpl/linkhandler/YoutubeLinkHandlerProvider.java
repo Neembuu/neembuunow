@@ -49,7 +49,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
     public TrialLinkHandler tryHandling(final String url) {
         return new YT_TLH(url);
     }
-
+    
     @Override
     public LinkHandler getLinkHandler(TrialLinkHandler tlh) throws Exception {
         if( !(tlh instanceof YT_TLH) || !tlh.canHandle()){return null;}

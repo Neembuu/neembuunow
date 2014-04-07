@@ -18,6 +18,8 @@
 
 package neembuu.release1.defaultImpl.linkhandler;
 
+import java.nio.ByteBuffer;
+import java.nio.channels.WritableByteChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
@@ -43,7 +45,7 @@ public class DirectLinkHandlerProvider implements LinkHandlerProvider {
         try{
             DefaultHttpClient httpClient = NHttpClient.getInstance();
             HttpGet request = new HttpGet(url);
-
+            System.out.println("url="+url);
             HttpResponse response = httpClient.execute(request);
 
             //resp.setHeader("Content-Disposition", "attachment; filename=" + fileName );
@@ -131,7 +133,7 @@ public class DirectLinkHandlerProvider implements LinkHandlerProvider {
     public LinkHandler getLinkHandler(TrialLinkHandler trialLinkHandler) throws Exception{
         return getDirectLinkHandler(trialLinkHandler.getReferenceLinkString());
     }
-    
-    
+
+        
 }
 
