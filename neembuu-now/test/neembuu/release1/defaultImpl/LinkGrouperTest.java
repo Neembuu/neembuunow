@@ -40,6 +40,7 @@ public class LinkGrouperTest {
         LinkGrouperResults results =  grouperImpl.group(new LinkParserResult() {
             @Override public List<TrialLinkHandler> getFailedLinks() { return null; }
             @Override public List<TrialLinkHandler> results() { return trialLinkHandlers; }
+            @Override public List<String> getFailedLines() { return null; }
         });
         
         System.out.println("+++done+++");

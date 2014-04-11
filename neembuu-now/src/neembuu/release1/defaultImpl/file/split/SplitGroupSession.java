@@ -90,6 +90,10 @@ public class SplitGroupSession implements NeembuuFile {
             neembuuFiles.add(new NeembuuFileWrapSCF(seekableConnectionFile, null, null/*s*/, null,null));
         } return neembuuFiles;
     }
+    
+    @Override public Session getSession() {
+        return s;
+    }
 
     @Override public PropertyProvider getPropertyProvider() { return bpp; }
     

@@ -117,7 +117,7 @@ public final class UnprofessionalTroubleHandler implements TroubleHandler{
         if(ret==JOptionPane.CANCEL_OPTION){
             for (ReadRequest rr : pendingReadRequest) {
                 try{
-                    rr.complete(JPfmError.SUCCESS);
+                    rr.complete(JPfmError.SUCCESS, rr.getByteBuffer().capacity(), rr.getCompleter());
                 }catch(AlreadyCompleteException ace){
                     ace.printStackTrace(System.err);
                 }

@@ -18,8 +18,6 @@
 
 package neembuu.release1.defaultImpl.linkhandler;
 
-import java.nio.ByteBuffer;
-import java.nio.channels.WritableByteChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
@@ -108,7 +106,7 @@ public class DirectLinkHandlerProvider implements LinkHandlerProvider {
         return new TrialLinkHandler() {
 
             @Override public boolean canHandle() {
-                return url.startsWith("http://"); 
+                return url.startsWith("http://") || url.startsWith("https://"); 
             }
 
             @Override public String getErrorMessage() {

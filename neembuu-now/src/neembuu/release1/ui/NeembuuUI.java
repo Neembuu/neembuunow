@@ -31,6 +31,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import neembuu.release1.Main;
 import neembuu.release1.api.IndefiniteTask;
+import neembuu.release1.api.ui.AddLinkUI;
 import neembuu.release1.api.ui.HeightProperty;
 import neembuu.release1.api.ui.IndefiniteTaskUI;
 import neembuu.release1.api.ui.MainComponent;
@@ -62,16 +63,6 @@ public final class NeembuuUI {
         @Override public JButton neembuuVirtualFolderButton() {
             return mp.neembuuVirtualFolderButton; }};
     
-    public static interface AddUILock { 
-        void lock(boolean f);
-    }
-    
-    private final AddUILock lockAddUI = new AddUILock() {
-        @Override public void lock(boolean f) {
-            mp.getAddLinkUI().addLinksPanelEnable(!f);
-        }
-    };      
-    
     public NeembuuUI() {
         this.jf = makeJFrame();
         mainComponent = new MainComponentImpl(jf);
@@ -82,8 +73,8 @@ public final class NeembuuUI {
         mp.neembuuVirtualFolderButton.setEnabled(false);
     }
 
-    public AddUILock getAddUILock() {
-        return lockAddUI;
+    public AddLinkUI getAddLinkUI(){
+        return mp.getAddLinkUI();
     }
 
     public LinkGroupUICreator getLinkGroupUICreator() {

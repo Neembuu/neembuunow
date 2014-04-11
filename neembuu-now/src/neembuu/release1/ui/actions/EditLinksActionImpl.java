@@ -33,7 +33,6 @@ import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.ui.LinkGroupUICreator;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.access.RemoveFromUI;
-import neembuu.release1.api.ui.actions.CloseAction;
 import neembuu.release1.api.ui.actions.EditLinksAction;
 import neembuu.release1.defaultImpl.linkgroup.LinkGrouperImpl;
 import neembuu.release1.log.LoggerUtil;

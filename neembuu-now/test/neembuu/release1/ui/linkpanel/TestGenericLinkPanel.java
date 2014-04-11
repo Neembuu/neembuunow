@@ -111,17 +111,18 @@ public class TestGenericLinkPanel {
         
         LinkOrganizerImplTest.TrialLinkHandlerDummy  trialLinkHandlerDummy =
                 LinkOrganizerImplTest.make("XYZ EP - 09, When Aliens came to planet earth.rmvb");
-        
+
         SimpleNeembuuFileCreator fileCreator = new SimpleNeembuuFileCreator(
-                trialLinkHandlerDummy, null);
+                /*trialLinkHandlerDummy*/null, null);
         OpenAction openAction = new OpenAction() {
+            @Override public void close() {}
             @Override public void actionPerformed() {
                 if(Math.random()>0.5d){
                     lp.closeActionUIA.openButton().setCaption("420p");
                 }else {
                     lp.closeActionUIA.openButton().setCaption(null);
                 }}};
-        linkActionsImpl = new LinkActionsImpl(
+        linkActionsImpl = new LinkActionsImpl(null,
                 lp.closeActionUIA, removeFromUI, mainComponent, fileCreator, openAction);
         
         linkActionsImpl.getReAdd().addCallBack(new ReAddActionCallBackImpl(
@@ -131,7 +132,7 @@ public class TestGenericLinkPanel {
         
         lp.initActions(expandAction, openAction, linkActionsImpl.getClose(), 
                 linkActionsImpl.getDelete(), linkActionsImpl.getReAdd(), 
-                linkActionsImpl.getSave(), connectionActions, changeDownloadModeAction);
+                linkActionsImpl.getSave(), null, connectionActions, changeDownloadModeAction);
         
         lp.closeActionUIA.fileNameLabel().setText(trialLinkHandlerDummy.tempDisplayName());
         
@@ -163,7 +164,7 @@ public class TestGenericLinkPanel {
         
         SaveAction_forVariants saveAction_forVariants = new SaveAction_forVariants(mainComponent, lp.progressUIA);
         OpenActionImpl openActionImpl = new OpenActionImpl(realFileProviderForSplit, mainComponent);
-        linkActionsImpl = new LinkActionsImpl(
+        linkActionsImpl = new LinkActionsImpl(null,
                 lp.closeActionUIA, removeFromUI, mainComponent, fileCreator, openActionImpl);
         
         linkActionsImpl.getReAdd().addCallBack(openActionImpl);
@@ -173,7 +174,7 @@ public class TestGenericLinkPanel {
                 
         lp.initActions(expandAction, openActionImpl, linkActionsImpl.getClose(), 
                 linkActionsImpl.getDelete(), linkActionsImpl.getReAdd(), 
-                saveAction_forVariants/*plugging in customization : D*/, 
+                saveAction_forVariants/*plugging in customization : D*/, null,
                 connectionActions, changeDownloadModeAction);
         
         lp.closeActionUIA.fileNameLabel().setText("<Test merge link>");
@@ -211,7 +212,7 @@ public class TestGenericLinkPanel {
         MultiVariantOpenAction openAction = new MultiVariantOpenAction(realFileProviderMultiVariant, mainComponent, 
             new DownloadSpeedProvider(){@Override public double getDownloadSpeed_KiBps(){return 256;}});
 
-        linkActionsImpl = new LinkActionsImpl(
+        linkActionsImpl = new LinkActionsImpl(null,
                 lp.closeActionUIA, removeFromUI, mainComponent, fileCreator,openAction);
         
         linkActionsImpl.getReAdd().addCallBack(openAction);
@@ -221,7 +222,7 @@ public class TestGenericLinkPanel {
                 
         lp.initActions(expandAction, openAction, linkActionsImpl.getClose(), 
                 linkActionsImpl.getDelete(), linkActionsImpl.getReAdd(), 
-                saveAction_forVariants/*plugging in customization : D*/, 
+                saveAction_forVariants/*plugging in customization : D*/, null,
                 connectionActions, changeDownloadModeAction);
         
         lp.closeActionUIA.fileNameLabel().setText("<Test merge link>");
@@ -255,9 +256,10 @@ public class TestGenericLinkPanel {
         LinkGrouperResults results =  grouperImpl.group(new LinkParserResult() {
             @Override public List<TrialLinkHandler> getFailedLinks() { return null; }
             @Override public List<TrialLinkHandler> results() { return tlh; }
+            @Override public List<String> getFailedLines() {return null;}
         });
 
-        return new MultiVariantFileCreator(results.complete_linkPackages().get(0), arffs);
+        return new MultiVariantFileCreator(null/*results.complete_linkPackages().get(0)*/, arffs);
     }
     
     MinimalistFileSystem arffs = createFSforTest();
@@ -267,7 +269,7 @@ public class TestGenericLinkPanel {
         TrialLinkGroup trialLinkGroup = createSplitLinksForTest();        
     
         SplitMergeNeembuuFileCreator fileCreator = new SplitMergeNeembuuFileCreator(
-                trialLinkGroup, arffs);
+                /*trialLinkGroup*/null, arffs);
         return fileCreator;
     }
     
@@ -282,6 +284,7 @@ public class TestGenericLinkPanel {
         LinkGrouperResults results =  grouperImpl.group(new LinkParserResult() {
             @Override public List<TrialLinkHandler> getFailedLinks() { return null; }
             @Override public List<TrialLinkHandler> results() { return tlh; }
+            @Override public List<String> getFailedLines() { return null; }
         });
         
         return results.complete_linkPackages().get(0);

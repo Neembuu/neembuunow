@@ -17,6 +17,7 @@
 
 package neembuu.release1.defaultImpl;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
@@ -67,6 +68,7 @@ public class LinkOrganizerImplTest {
         List<TrialLinkHandler> results;
         @Override public List<TrialLinkHandler> results() { return results; }
         @Override public List<TrialLinkHandler> getFailedLinks() {return null; }
+        @Override public List<String> getFailedLines() { return Collections.EMPTY_LIST; }
     };
     
     public static final class TrialLinkHandlerDummy implements TrialLinkHandler{

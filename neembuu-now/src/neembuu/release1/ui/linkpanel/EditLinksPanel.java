@@ -18,6 +18,7 @@
 package neembuu.release1.ui.linkpanel;
 
 import javax.swing.JTextArea;
+import neembuu.release1.ui.ContextMenuMouseListener;
 import neembuu.release1.ui.actions.EditLinksActionImpl;
 
 /**
@@ -31,6 +32,7 @@ public class EditLinksPanel extends javax.swing.JPanel {
      */
     public EditLinksPanel() {
         initComponents();
+        textArea.addMouseListener(new ContextMenuMouseListener());
     }
     
     public void initAction(EditLinksActionImpl.Actions actions){

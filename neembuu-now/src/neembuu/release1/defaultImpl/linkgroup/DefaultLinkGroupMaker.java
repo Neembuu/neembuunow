@@ -89,7 +89,9 @@ public class DefaultLinkGroupMaker implements LinkGroupMaker {
             }
         }catch(Exception a){ throw a;}
         TrialLinkGroup tlg = tryMaking(tlh);
-        BasicLinkGroup blg = new BasicLinkGroup(tlg.getAbsorbedLinks(), tlg.tempDisplayName(), s);
+        String dp = Utils.restoreDisplayName(s);
+        if(dp==null) { dp=tlg.tempDisplayName(); }
+        BasicLinkGroup blg = new BasicLinkGroup(tlg.getAbsorbedLinks(), dp, s);
         return blg;
     }
 

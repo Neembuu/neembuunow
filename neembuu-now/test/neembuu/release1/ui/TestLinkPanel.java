@@ -21,6 +21,7 @@ import neembuu.release1.ui.linkpanel.FakeLinkHandlerProvider;
 import javax.swing.JFrame;
 import neembuu.release1.api.linkhandler.LinkHandlerProviders;
 import neembuu.release1.api.ui.MainComponent;
+import neembuu.release1.api.ui.Message;
 import neembuu.release1.ui.linkcontainer.LinksContainer;
 import neembuu.release1.ui.linkpanel.TestGenericLinkPanel;
 
@@ -32,6 +33,12 @@ public class TestLinkPanel {
     LinksContainer lc;
     final MainComponent mainComponent = new MainComponent() {
             @Override public JFrame getJFrame() { return frame; }
+
+            @Override
+            public Message newMessage() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+            
         };
     
     public TestLinkPanel() {

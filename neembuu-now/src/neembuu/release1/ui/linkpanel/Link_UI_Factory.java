@@ -17,9 +17,14 @@
 
 package neembuu.release1.ui.linkpanel;
 
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.StandardOpenOption;
+import neembuu.diskmanager.Session;
 import neembuu.release1.defaultImpl.file.split.SplitMergeNeembuuFileCreator;
 import neembuu.release1.defaultImpl.file.SimpleNeembuuFileCreator;
 import neembuu.release1.api.RealFileProvider;
+import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.linkgroup.LinkGroup;
 import neembuu.release1.api.ui.ExpandableUIContainer;
 import neembuu.release1.api.ui.LinkGroupUICreator;
@@ -29,10 +34,10 @@ import neembuu.release1.api.ui.linkpanel.OpenableEUI;
 import neembuu.release1.api.ui.access.MinimalistFileSystem;
 import neembuu.release1.api.ui.access.RemoveFromUI;
 import neembuu.release1.api.ui.actions.ChangeDownloadModeAction;
-import neembuu.release1.api.ui.actions.CloseAction;
 import neembuu.release1.api.ui.actions.ReAddAction;
 import neembuu.release1.api.ui.linkpanel.ProgressProvider;
 import neembuu.release1.defaultImpl.file.multiVariant.MultiVariantFileCreator;
+import neembuu.release1.defaultImpl.linkgroup.Utils;
 import neembuu.release1.ui.actions.ChangeDownloadModeActionImpl;
 import neembuu.release1.ui.actions.ConnectionActionsImpl;
 import neembuu.release1.ui.actions.EditLinksActionImpl;
@@ -198,6 +203,7 @@ public final class Link_UI_Factory {
         linkActionsImpl.getReAdd().addCallBack(new ReAddActionCallBackImpl(lp.closeActionUIA, 
                 vpi==null?progress.progressProvider:vpi, 
                 changeDownloadModeAction,initalizeProgress));
+        linkActionsImpl.getReAdd().addCallBack(Utils.makeDisplayNameSaver());
     }
     
     private static RemoveFromUI defaultRemoveFromUI(

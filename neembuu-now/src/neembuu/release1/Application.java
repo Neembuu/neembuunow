@@ -39,6 +39,10 @@ public class Application {
     public enum Resource {
         Home, Installation, Logs, ExternalPlugins, TempStorage, VirtualFolderMountLocation
     }
+    
+    public enum Runtime {
+        Jar, Development
+    }
 
     private static MainComponent mainComponent;
 
@@ -152,7 +156,16 @@ public class Application {
         System.out.println(getResource());
     }
 
+    public static Runtime getRuntime() {
+        if(runtime==null)getInstallationRoot();
+        return runtime;
+    }
+    
+    private static Path installationRoot = null;
+    private static Runtime runtime = null;
+    
     private static Path getInstallationRoot() {
+        if(installationRoot!=null)return installationRoot;
         try {
             // todo :
             InputStream prof = null;
@@ -173,13 +186,15 @@ public class Application {
                     urlpth = urlpth.substring(0, urlpth.lastIndexOf('/') + 1);
                     urlpth = urlpth + "release1_development_environment/";
                     Logger.getGlobal().log(Level.INFO, "Running in development mode, using properties = " + urlpth);
-                    return Paths.get(new URL(urlpth).toURI());
+                    runtime = Runtime.Development;
+                    return installationRoot=Paths.get(new URL(urlpth).toURI());
                 } else if (src.getLocation().toString().endsWith(".jar")) {
                     String urlpth = src.getLocation().toString();
                     urlpth = urlpth.substring(0, urlpth.lastIndexOf('/') + 1);
                     //urlpth = urlpth + "neembuu.properties";
                     Logger.getGlobal().log(Level.INFO, "Running from jar, using properties = " + urlpth);
-                    return Paths.get(new URL(urlpth).toURI());
+                    runtime = Runtime.Jar;
+                    return installationRoot=Paths.get(new URL(urlpth).toURI());
                 } else {
                     Logger.getGlobal().log(Level.INFO, "Asumming because code source=" + src.getLocation().toString());
                     throw new NullPointerException();

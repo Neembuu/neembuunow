@@ -15,36 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neembuu.release1.api.file;
-
-import java.util.List;
-import neembuu.diskmanager.Session;
-import neembuu.vfs.file.AutoCompleteControls;
-import neembuu.vfs.file.FileBeingDownloaded;
+package neembuu.release1.api.clipboardmonitor;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface NeembuuFile extends Saveable{
+public interface ClipboardMonitor {
 
-    AutoCompleteControls autoCompleteControls();
+    void addListener(ClipboardListener cl);
 
-    void closeCompletely()throws Exception;
+    void removeListener(ClipboardListener cl);
 
-    FileBeingDownloaded fileBeingDownloaded();
+    void startService();
 
-    void removeFromFileSystem() throws Exception;
+    void stopService();
     
-    void addToFileSystem() ;
-    
-    String[] relativePathInVirtualFileSystem();
-    
-    boolean isCompletelyClosed();
-    
-    List<NeembuuFile> getVariants();  
-    
-    PropertyProvider getPropertyProvider();
-    
-    Session getSession();
 }

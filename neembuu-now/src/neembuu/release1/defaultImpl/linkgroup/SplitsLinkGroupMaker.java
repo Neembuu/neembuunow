@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import neembuu.diskmanager.DiskManager;
@@ -155,8 +156,11 @@ public class SplitsLinkGroupMaker implements LinkGroupMaker{
         if(!tlg.complete()){
             throw new IllegalStateException("Some links missing");
         }
+        
+        String dp = Utils.restoreDisplayName(s);
+        if(dp==null) { dp=tlg.tempDisplayName(); }
 
-        BasicLinkGroup blg = new BasicLinkGroup(tlg.getAbsorbedLinks(), tlg.tempDisplayName(), s);
+        BasicLinkGroup blg = new BasicLinkGroup(tlg.getAbsorbedLinks(), dp, s);
         return blg;
     }    
     

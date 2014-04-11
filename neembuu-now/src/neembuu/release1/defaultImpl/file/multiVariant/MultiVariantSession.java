@@ -59,6 +59,11 @@ public class MultiVariantSession implements NeembuuFile {
         this.folder = folder; this.root = root;
     }
 
+    @Override
+    public Session getSession() {
+        return s;
+    }
+
     @Override public List<NeembuuFile> getVariants() {
         return connectionFiles;
     }

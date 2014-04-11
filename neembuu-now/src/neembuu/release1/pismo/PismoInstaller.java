@@ -47,10 +47,9 @@ public final class PismoInstaller {
     
     public static void tryInstallingPismoFileMount(MainComponent mainComp, boolean uninstall, InstallerCallbackListener listener) throws Exception {
         PismoInstaller pi = new PismoInstaller(mainComp, uninstall, listener);
-        if (SystemUtils.IS_OS_WINDOWS && false){
+        if (SystemUtils.IS_OS_WINDOWS){
             new win(pi).install();
-        }
-        if (SystemUtils.IS_OS_MAC) {
+        }else if (SystemUtils.IS_OS_MAC) {
             //pismoInstallerDirectory = pismoInstallerDirectory.resolve("mac");
             throw new IllegalStateException("Macintosh support in not included with this package");
         }else { // assume linux

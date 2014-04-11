@@ -17,14 +17,18 @@
 
 package neembuu.release1;
 
+import java.io.PrintStream;
 import neembuu.release1.mountmanager.MountManager;
 import java.util.logging.Logger;
 import jpfm.fs.FSUtils;
 import neembuu.diskmanager.DiskManager;
 import neembuu.diskmanager.DiskManagerParams;
 import neembuu.diskmanager.DiskManagers;
+import neembuu.release1.api.clipboardmonitor.ClipboardMonitor;
 import neembuu.release1.api.linkgroup.LinkGroupMakers;
 import neembuu.release1.api.linkhandler.LinkHandlerProviders;
+import neembuu.release1.clipboard.AddLinksFromClipboardImpl;
+import neembuu.release1.clipboard.ClipboardMonitorImpl;
 import neembuu.release1.defaultImpl.linkgroup.DefaultLinkGroupMaker;
 import neembuu.release1.defaultImpl.linkgroup.SplitsLinkGroupMaker;
 import neembuu.release1.defaultImpl.linkhandler.YoutubeLinkHandlerProvider;
@@ -42,14 +46,16 @@ import neembuu.vfs.file.TroubleHandler;
 public final class Main {
 
     private final NeembuuUI nui;
-    private final Logger logger = initLogger();
+    private final Logger logger;
     private final TroubleHandler troubleHandler;
     private final MountManager mountManager;
     private final DiskManager diskManager;
+    private final ClipboardMonitor clipboardMonitor;
     
     public Main() {
         this.nui = new NeembuuUI();
         Application.setMainComponent(nui.getMainComponent());
+        logger = initLogger();
         troubleHandler = new UnprofessionalTroubleHandler(nui.getMainComponent(),nui.getIndefiniteTaskUI());
 
         String basePath = Application.getResource(Application.Resource.TempStorage)
@@ -70,9 +76,12 @@ public final class Main {
                 troubleHandler,
                 diskManager
         );
+        
+        clipboardMonitor = new ClipboardMonitorImpl();
     }
     
     private void initialize(){
+        clipboardMonitor.startService();
         nui.initialize(this);
         mountManager.initialize();
         
@@ -91,6 +100,8 @@ public final class Main {
         nui.getIndefiniteTaskUI();
         RestorePreviousSessionImpl rpsi = new RestorePreviousSessionImpl(diskManager, nui.getLinkGroupUICreator(),nui);
         rpsi.checkAndRestoreFromPrevious();
+        
+        new AddLinksFromClipboardImpl(nui.getAddLinkUI(),clipboardMonitor);
     }
 
     public TroubleHandler getTroubleHandler() {
@@ -115,6 +126,15 @@ public final class Main {
     }
     
     private Logger initLogger(){
+        try{
+            if(Application.getRuntime() != Application.Runtime.Development){
+                java.io.File stdout = Application.getResource(Application.Resource.Logs, "std.out.txt").toFile();
+                System.setOut(new PrintStream(stdout));
+                System.setErr(new PrintStream(stdout));
+            }
+        }catch(Exception a){
+            a.printStackTrace();
+        }
         //return neembuu.release1.log.LoggerUtil.getLogger("Main");
         return neembuu.util.logging.LoggerUtil.getLogger();
     }

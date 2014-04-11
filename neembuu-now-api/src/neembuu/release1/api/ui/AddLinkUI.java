@@ -27,4 +27,11 @@ public interface AddLinkUI {
     void addLinksPanelEnable(boolean enable);
     String getLinksText();
     void setLinksText(String a);
+    
+    Lock getLock();
+    
+    public static interface Lock { 
+        void lock(boolean f);
+        void lockForAWhile(int timeout);
+    }
 }

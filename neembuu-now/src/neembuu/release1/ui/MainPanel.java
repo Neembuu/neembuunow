@@ -17,13 +17,17 @@
 
 package neembuu.release1.ui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import neembuu.release1.Main;
 import neembuu.release1.api.ui.AddLinkUI;
 import neembuu.release1.api.ui.HeightProperty;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.actions.AddLinksAction;
+import static neembuu.release1.ui.ContextMenuMouseListener.Actions.*;
 import neembuu.swing.TextBubbleBorder;
 
 /**
@@ -43,6 +47,10 @@ public class MainPanel extends javax.swing.JPanel {
         this.listener = listener;
         this.mainComponent = mainComponent;
         initComponents();
+        
+        listOfLinks.addMouseListener(new ContextMenuMouseListener(
+                COPY,DELETE,PASTE,SELECT_ALL,CLEAR_ALL ));
+        
         progressAnimated.setVisible(false);
         statusLabel.setVisible(false);
         initStyle();
@@ -462,6 +470,21 @@ public class MainPanel extends javax.swing.JPanel {
         @Override public void addLinksPanelEnable(boolean enable) { MainPanel.this.addLinksPanelEnable(enable); } 
         @Override public String getLinksText() { return MainPanel.this.getLinksText(); }  
         @Override public void setLinksText(String a) { MainPanel.this.setLinksText(a); }
+        @Override public AddLinkUI.Lock getLock() { return lockAddUI; }
+        private final Lock lockAddUI = new Lock() { 
+            @Override public void lock(boolean f) {
+                getAddLinkUI().addLinksPanelEnable(!f);
+            }
+            @Override public void lockForAWhile(int timeout) {
+                getAddLinkUI().addLinksPanelEnable(false);
+                Timer t = new Timer(timeout, new ActionListener() {
+                    @Override public void actionPerformed(ActionEvent e) {
+                        ((Timer)e.getSource()).stop();
+                        lockAddUI.lock(false);
+                    }
+                });t.start();
+            }
+        };      
     };
 
     public final AddLinkUI getAddLinkUI() {

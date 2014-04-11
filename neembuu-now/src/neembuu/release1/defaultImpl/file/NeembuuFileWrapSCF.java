@@ -58,6 +58,11 @@ public class NeembuuFileWrapSCF implements NeembuuFile {
     public SeekableConnectionFile getSeekableConnectionFile() {
         return file;
     }
+
+    @Override
+    public Session getSession() {
+        return s;
+    }
     
     @Override
     public AutoCompleteControls autoCompleteControls() {
