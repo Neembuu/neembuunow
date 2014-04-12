@@ -32,7 +32,7 @@ public class ImagePanel extends JPanel{
     
     public ImagePanel(URL imageFileUrl, HttpContext httpContext){
         try {                
-            HttpClient httpClient = NHttpClient.getInstance();
+            HttpClient httpClient = NHttpClient.getNewInstance();
             HttpGet httpGet = new HttpGet(imageFileUrl.toURI());
             HttpResponse httpresponse = httpClient.execute(httpGet, httpContext);
             byte[] imageInByte = EntityUtils.toByteArray(httpresponse.getEntity());

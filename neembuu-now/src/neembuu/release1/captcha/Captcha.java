@@ -7,10 +7,10 @@ package neembuu.release1.captcha;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import neembuu.release1.StringUtils;
+import neembuu.release1.httpclient.NHttpClient;
 import neembuu.release1.httpclient.utils.NHttpClientUtils;
 import org.apache.http.protocol.HttpContext;
 
@@ -134,7 +134,7 @@ public class Captcha{
             return null;
         }
         
-        String body =  NHttpClientUtils.getData(kCaptchaUrl, httpContext);
+        String body =  NHttpClientUtils.getData(kCaptchaUrl,httpContext,NHttpClient.getNewInstance());
         
         //CommonUploaderTasks.saveInFile("Recaptcha.html", body);
         
