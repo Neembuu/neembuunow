@@ -309,50 +309,6 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
             
             final String redirect = jSonObject.getString("redirect");
             final String url = "http://www.clipconverter.cc" + redirect;
-            final DefaultHttpClient httpClient = NHttpClient.getInstance();
-            
-            //Get the captcha code
-            Captcha captcha = new Captcha();
-            captcha.setFormTitle("Captcha for Youtube.com");
-            if (captcha.findCCaptchaUrlFromK(K_CHALLENGE_URL + K_CHALLENGE_CODE) != null) {
-                captcha.findCaptchaImageURL();
-                final String captchaString = captcha.getCaptchaString();
-
-                HttpPost httpPost = new HttpPost(url);
-                List<NameValuePair> formparams = new ArrayList<>();
-                formparams.add(new BasicNameValuePair("recaptcha_challenge_field", captcha.getCCaptchaUrl()));
-                formparams.add(new BasicNameValuePair("recaptcha_response_field", captchaString));
-
-                UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, "UTF-8");
-                httpPost.setEntity(entity);
-                HttpResponse httpResponse = httpClient.execute(httpPost);
-                final String responseString = EntityUtils.toString(httpResponse.getEntity());
-                return !responseString.contains("Invalid captcha!");
-            } else {
-                throw new Exception("Captcha generic error");
-            }
-        } catch (JSONException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        
-        return false;
-        
-    }
-    
-    
-    /**
-     * Handle the captcha string.
-     * @param jSonObject The JSONObject with the redirect url.
-     * @return Returns true if the captcha is correct, false otherwise.
-     */
-    private boolean handleCaptcha(JSONObject jSonObject) {
-        try {
-            System.out.println("Handling captcha.");
-            
-            final String redirect = jSonObject.getString("redirect");
-            final String url = "http://www.clipconverter.cc" + redirect;
             final DefaultHttpClient httpClient = NHttpClient.getNewInstance();
             
             //Get the captcha code
@@ -385,7 +341,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
         
     }
     
-    
+       
     static final class YT_TLH implements TrialLinkHandler {
 
         private final String url;
