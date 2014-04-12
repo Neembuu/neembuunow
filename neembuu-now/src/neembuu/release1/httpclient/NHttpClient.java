@@ -42,92 +42,97 @@ import org.apache.http.protocol.HttpContext;
 
 /**
  * Neembuu HttpClient.
+ *
  * @author davidepastore
  */
 public class NHttpClient {
-    
+
     private static DefaultHttpClient httpClient = null;
-    
-    private NHttpClient(){
-        
+
+    private NHttpClient() {
+
     }
-    
+
     /**
      * Get the instance
+     *
      * @return HttpClient instance.
      */
-    public static DefaultHttpClient getInstance(){
-        //Initializes the instance.
-        if(httpClient == null){
-            httpClient = new DefaultHttpClient();
-            GlobalTestSettings.ProxySettings proxySettings 
-                            = GlobalTestSettings.getGlobalProxySettings();
-            HttpContext context = new BasicHttpContext();
-            SchemeRegistry schemeRegistry = new SchemeRegistry();
-
-            schemeRegistry.register(new Scheme("http", new PlainSocketFactory(), 80));
-
-            try{
-                KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                schemeRegistry.register(new Scheme("https", new SSLSocketFactory(keyStore), 8080));
-            }catch(Exception a){
-                a.printStackTrace(System.err);
-            }
-
-            context.setAttribute(
-                    ClientContext.SCHEME_REGISTRY,
-                    schemeRegistry);
-            context.setAttribute(
-                    ClientContext.AUTHSCHEME_REGISTRY,
-                    new BasicScheme()/*file.httpClient.getAuthSchemes()*/);
-
-
-            context.setAttribute(
-                    ClientContext.COOKIESPEC_REGISTRY,
-                    httpClient.getCookieSpecs()/*file.httpClient.getCookieSpecs()*/
-                    );
-
-            BasicCookieStore basicCookieStore = new BasicCookieStore();
-
-            context.setAttribute(
-                    ClientContext.COOKIE_STORE,
-                    basicCookieStore/*file.httpClient.getCookieStore()*/);
-            context.setAttribute(
-                    ClientContext.CREDS_PROVIDER,
-                    new BasicCredentialsProvider()/*file.httpClient.getCredentialsProvider()*/);
-
-            HttpConnection hc = new DefaultHttpClientConnection();
-            context.setAttribute(
-                    ExecutionContext.HTTP_CONNECTION,
-                    hc);
-
-            //System.out.println(file.httpClient.getParams().getParameter("http.useragent"));
-            HttpParams httpParams = new BasicHttpParams();
-
-            if(proxySettings!=null){
-                AuthState as = new AuthState();
-                as.setCredentials(new UsernamePasswordCredentials(proxySettings.userName, proxySettings.password));
-                as.setAuthScope(AuthScope.ANY);
-                as.setAuthScheme(new BasicScheme());
-                httpParams.setParameter(ClientContext.PROXY_AUTH_STATE,as);
-                httpParams.setParameter("http.proxy_host", new HttpHost(proxySettings.host, proxySettings.port));
-            }
-
-            httpClient = new DefaultHttpClient(new SingleClientConnManager(
-                    httpParams/*file.httpClient.getParams()*/,
-                    schemeRegistry),
-                    httpParams/*file.httpClient.getParams()*/);
-
-
-            if(proxySettings!=null){
-                httpClient.getCredentialsProvider().setCredentials(
-                    AuthScope.ANY,
-                    new UsernamePasswordCredentials(proxySettings.userName, proxySettings.password));
-            }
-        
-        
+    private static DefaultHttpClient getInstance() {
+        if(true)throw new IllegalStateException("This http client cannot be used in a"
+                + " multithreaded environment. This code needs to be fixed.");
+        if (httpClient == null) {
+            httpClient = getNewInstance();
         }
         return httpClient;
     }
-    
+
+    public static DefaultHttpClient getNewInstance() {
+        DefaultHttpClient new_httpClient = null;
+        new_httpClient = new DefaultHttpClient();
+        GlobalTestSettings.ProxySettings proxySettings
+                = GlobalTestSettings.getGlobalProxySettings();
+        HttpContext context = new BasicHttpContext();
+        SchemeRegistry schemeRegistry = new SchemeRegistry();
+
+        schemeRegistry.register(new Scheme("http", new PlainSocketFactory(), 80));
+
+        try {
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            schemeRegistry.register(new Scheme("https", new SSLSocketFactory(keyStore), 8080));
+        } catch (Exception a) {
+            a.printStackTrace(System.err);
+        }
+
+        context.setAttribute(
+                ClientContext.SCHEME_REGISTRY,
+                schemeRegistry);
+        context.setAttribute(
+                ClientContext.AUTHSCHEME_REGISTRY,
+                new BasicScheme()/*file.httpClient.getAuthSchemes()*/);
+
+        context.setAttribute(
+                ClientContext.COOKIESPEC_REGISTRY,
+                new_httpClient.getCookieSpecs()/*file.httpClient.getCookieSpecs()*/
+        );
+
+        BasicCookieStore basicCookieStore = new BasicCookieStore();
+
+        context.setAttribute(
+                ClientContext.COOKIE_STORE,
+                basicCookieStore/*file.httpClient.getCookieStore()*/);
+        context.setAttribute(
+                ClientContext.CREDS_PROVIDER,
+                new BasicCredentialsProvider()/*file.httpClient.getCredentialsProvider()*/);
+
+        HttpConnection hc = new DefaultHttpClientConnection();
+        context.setAttribute(
+                ExecutionContext.HTTP_CONNECTION,
+                hc);
+
+        //System.out.println(file.httpClient.getParams().getParameter("http.useragent"));
+        HttpParams httpParams = new BasicHttpParams();
+
+        if (proxySettings != null) {
+            AuthState as = new AuthState();
+            as.setCredentials(new UsernamePasswordCredentials(proxySettings.userName, proxySettings.password));
+            as.setAuthScope(AuthScope.ANY);
+            as.setAuthScheme(new BasicScheme());
+            httpParams.setParameter(ClientContext.PROXY_AUTH_STATE, as);
+            httpParams.setParameter("http.proxy_host", new HttpHost(proxySettings.host, proxySettings.port));
+        }
+
+        new_httpClient = new DefaultHttpClient(new SingleClientConnManager(
+                httpParams/*file.httpClient.getParams()*/,
+                schemeRegistry),
+                httpParams/*file.httpClient.getParams()*/);
+
+        if (proxySettings != null) {
+            new_httpClient.getCredentialsProvider().setCredentials(
+                    AuthScope.ANY,
+                    new UsernamePasswordCredentials(proxySettings.userName, proxySettings.password));
+        }
+
+        return new_httpClient;
+    }
 }
