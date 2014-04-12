@@ -26,6 +26,7 @@ import neembuu.release1.api.file.PropertyProvider;
 import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProvider;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
+import neembuu.release1.captcha.Captcha;
 import neembuu.release1.defaultImpl.file.BasicOnlineFile;
 import neembuu.release1.defaultImpl.file.BasicPropertyProvider;
 import neembuu.release1.httpclient.NHttpClient;
@@ -39,6 +40,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.openide.util.Exceptions;
 
@@ -48,6 +50,9 @@ import org.openide.util.Exceptions;
  */
 public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
     private static final Logger LOGGER = LoggerUtil.getLogger();
+    
+    private final String K_CHALLENGE_URL = "https://www.google.com/recaptcha/api/challenge?k=";
+    private final String K_CHALLENGE_CODE = "6LcVessSAAAAAH73irTtpZYKknjeBvN3nuUzJ2G3";
     
     @Override
     public TrialLinkHandler tryHandling(final String url) {
@@ -185,6 +190,18 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
             
             JSONObject jSonObject = new JSONObject(responseString);
             //System.out.println(jSonObject);
+            
+            if(jSonObject.has("redirect")){
+                int count = retryCount;
+                
+                //If captcha is incorrect, add a count
+                if(!handleCaptcha(jSonObject)){
+                    count++;
+                }
+                
+                return clipConverterExtraction(tlh, count);
+            }
+            
             JSONArray jSonArray = jSonObject.getJSONArray("url");
             
             System.out.println("urls: " + jSonArray);
@@ -278,6 +295,50 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
             System.out.println(url);
         }
         System.out.println("***** END PRINTING YOUTUBE URLS *****\n");
+    }
+
+
+    /**
+     * Handle the captcha string.
+     * @param jSonObject The JSONObject with the redirect url.
+     * @return Returns true if the captcha is correct, false otherwise.
+     */
+    private boolean handleCaptcha(JSONObject jSonObject) {
+        try {
+            System.out.println("Handling captcha.");
+            
+            final String redirect = jSonObject.getString("redirect");
+            final String url = "http://www.clipconverter.cc" + redirect;
+            final DefaultHttpClient httpClient = NHttpClient.getInstance();
+            
+            //Get the captcha code
+            Captcha captcha = new Captcha();
+            captcha.setFormTitle("Captcha for Youtube.com");
+            if (captcha.findCCaptchaUrlFromK(K_CHALLENGE_URL + K_CHALLENGE_CODE) != null) {
+                captcha.findCaptchaImageURL();
+                final String captchaString = captcha.getCaptchaString();
+
+                HttpPost httpPost = new HttpPost(url);
+                List<NameValuePair> formparams = new ArrayList<>();
+                formparams.add(new BasicNameValuePair("recaptcha_challenge_field", captcha.getCCaptchaUrl()));
+                formparams.add(new BasicNameValuePair("recaptcha_response_field", captchaString));
+
+                UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, "UTF-8");
+                httpPost.setEntity(entity);
+                HttpResponse httpResponse = httpClient.execute(httpPost);
+                final String responseString = EntityUtils.toString(httpResponse.getEntity());
+                return !responseString.contains("Invalid captcha!");
+            } else {
+                throw new Exception("Captcha generic error");
+            }
+        } catch (JSONException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        
+        return false;
+        
     }
     
     
