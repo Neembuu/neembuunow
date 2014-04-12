@@ -382,8 +382,7 @@ public class MainPanel extends javax.swing.JPanel {
     private void aboutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutButtonActionPerformed
         // TODO add your handling code here:
         try{
-            //java.awt.Desktop.getDesktop().browse(new java.net.URI("http://neembuu.com/now/"));
-            throw new Exception();
+            java.awt.Desktop.getDesktop().browse(new java.net.URI("http://neembuu.com/now/"));
         }catch(Exception a){
             mainComponent.newMessage().info()
                 .setMessage("Please visit\nhttp://neembuu.com/now/")
