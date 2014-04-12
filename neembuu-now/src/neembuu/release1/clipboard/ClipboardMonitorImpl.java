@@ -23,6 +23,7 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -62,7 +63,10 @@ public class ClipboardMonitorImpl implements ClipboardMonitor {
         }
         
         while(alive.get()){
-            try{workImpl();}catch(Exception a){a.printStackTrace();}
+            try{workImpl();}catch(Exception a){
+                a.printStackTrace();
+                trySleep(2000);
+            }
             trySleep(200);
         }
     }
@@ -76,10 +80,17 @@ public class ClipboardMonitorImpl implements ClipboardMonitor {
     private void workImpl()throws Exception{
         if(listeners.isEmpty())return;
         Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-        Transferable t = c.getContents(null);
+        Transferable t;
+        try{
+            t = c.getContents(null);
+        }catch(Exception a){
+            return;
+        }
         if(isIgnorable(t)) return;
         
-        String para = (String)t.getTransferData(DataFlavor.stringFlavor);
+        String para;
+        try{para = (String)t.getTransferData(DataFlavor.stringFlavor);}
+        catch(UnsupportedFlavorException ufe){return; }
         if(para.equalsIgnoreCase(old))return;
         old = para;
         List<String> links = Util.pullLinks(para);

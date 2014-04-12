@@ -25,6 +25,7 @@ import jpfm.operations.readwrite.ReadRequest;
 import neembuu.release1.api.IndefiniteTask;
 import neembuu.release1.api.ui.IndefiniteTaskUI;
 import neembuu.release1.api.ui.MainComponent;
+import neembuu.release1.api.ui.Message;
 import neembuu.vfs.connection.NewConnectionParams;
 import neembuu.vfs.file.TroubleHandler;
 
@@ -42,12 +43,24 @@ public final class UnprofessionalTroubleHandler implements TroubleHandler{
         this.indefiniteTaskUI = indefiniteTaskUI;
     }
     
+    
+    private volatile Message cannotCreateNewConnectionMessage = null;
+    
     @Override
     public void cannotCreateANewConnection(NewConnectionParams ncp, int numberOfRetries) {
-        mainComponent.newMessage().error()
-                .setMessage(ncp.toString())
-                .setTitle("Internet problem : retried "+numberOfRetries+" times")
-                .show();
+        Message m = cannotCreateNewConnectionMessage ; // avoid race
+        if(m==null){
+            m = cannotCreateNewConnectionMessage = mainComponent.newMessage().error()
+                .editable()
+                .setMessage(" There is some problem in your internet connection "+ncp.toString())
+                .setTitle("Internet problem : retried "+numberOfRetries+" times");
+            m.show();
+            cannotCreateNewConnectionMessage = null;
+            return;
+        }else { 
+            m.setMessage(" There is some problem in your internet connection "+ncp.toString());
+        }
+        
     }
 
     private IndefiniteTask buffering = null;

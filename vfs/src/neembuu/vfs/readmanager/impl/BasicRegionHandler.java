@@ -1076,7 +1076,10 @@ final class BasicRegionHandler
             // read from more than one region
             ReadRequest read = it.next();requestsIteratedOver++;
             if(read.getCompleter()==null){
-                read.setCompleter(this);
+                try{read.setCompleter(this);}catch(Exception a){
+                    a.printStackTrace();
+                    readHandlerLogger.log(Level.SEVERE,"problem in setting completer",a);
+                }
             }
             if(read.isCompleted()){
                 // this actually never happens

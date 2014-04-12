@@ -63,13 +63,13 @@ public class Utils {
         String suffix;
         if (sz < 1000) {
             suffix = " B";
-        } else if (sz < 1000 * 1000) {
+        } else if (sz < 1000000) {
             suffix = " KB";
             sz /= 1024;
-        } else if (sz < 1000 * 1000 * 1000) {
+        } else if (sz < 1000000000) {
             suffix = " MB";
             sz /= 1024 * 1024;
-        } else if (sz < 1000 * 1000 * 1000 * 1000) {
+        } else if (sz < 1000000000000L) {
             suffix = " GB";
             sz /= 1024 * 1024 * 1024;
         } else {

@@ -102,8 +102,15 @@ public final class JDHTTPConnection extends AbstractConnection{
             b[0]=(byte)firstByte;
             read = is.read(b,1,b.length-1);
             if(read!=-1)read+=1;
+            
+            int i = 1;
+            
             while(read!=-1){
                 write(b,0,read);
+                while(i<10){
+                    i++;
+                    b=new byte[1024*i];
+                }
                 read=is.read(b);
             }
         }catch(Exception e){

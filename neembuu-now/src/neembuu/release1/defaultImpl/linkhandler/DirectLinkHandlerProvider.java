@@ -41,7 +41,7 @@ public class DirectLinkHandlerProvider implements LinkHandlerProvider {
         String fileName = url.substring(url.lastIndexOf('/')+1);
         
         try{
-            DefaultHttpClient httpClient = NHttpClient.getInstance();
+            DefaultHttpClient httpClient = NHttpClient.getNewInstance();
             HttpGet request = new HttpGet(url);
             System.out.println("url="+url);
             HttpResponse response = httpClient.execute(request);
@@ -70,6 +70,9 @@ public class DirectLinkHandlerProvider implements LinkHandlerProvider {
                 }
             }
             
+            if(fileName.length() ==0 ){
+                fileName = jpfm.util.UniversallyValidFileName.makeUniversallyValidFileName(url);
+            }
             
             long length = response.getEntity().getContentLength();
             request.abort();

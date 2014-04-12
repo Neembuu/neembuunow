@@ -37,6 +37,7 @@ import neembuu.release1.defaultImpl.restore_previous.RestorePreviousSessionImpl;
 import neembuu.release1.open.Opener;
 import neembuu.release1.ui.InitLookAndFeel;
 import neembuu.release1.ui.NeembuuUI;
+import neembuu.release1.versioning.CheckUpdate;
 import neembuu.vfs.file.TroubleHandler;
 
 /**
@@ -102,6 +103,9 @@ public final class Main {
         rpsi.checkAndRestoreFromPrevious();
         
         new AddLinksFromClipboardImpl(nui.getAddLinkUI(),clipboardMonitor);
+        
+        //Finally start the update checking thread.
+        new CheckUpdate(nui.getMainComponent(),nui.getAddLinkUI()).start();
     }
 
     public TroubleHandler getTroubleHandler() {

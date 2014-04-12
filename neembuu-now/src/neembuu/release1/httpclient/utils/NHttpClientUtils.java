@@ -18,7 +18,6 @@
 package neembuu.release1.httpclient.utils;
 
 import java.io.IOException;
-import neembuu.release1.httpclient.NHttpClient;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -35,11 +34,12 @@ public class NHttpClientUtils {
     /**
      * Calculate the length
      * @param url
+     * @param httpClient
      * @return the length
      */
-    public static long calculateLength(String url) {
+    public static long calculateLength(String url,DefaultHttpClient httpClient) {
         try {
-            DefaultHttpClient httpClient = NHttpClient.getInstance();
+            //DefaultHttpClient httpClient = NHttpClient.getInstance();
             HttpGet httpGet = new HttpGet(url);
             HttpResponse response = httpClient.execute(httpGet);
             long length = response.getEntity().getContentLength();
@@ -57,9 +57,9 @@ public class NHttpClientUtils {
      * @param url
      * @return the content type.
      */
-    public static String getContentType(String url) {
+    public static String getContentType(String url,DefaultHttpClient httpClient) {
         try {
-            DefaultHttpClient httpClient = NHttpClient.getInstance();
+            //DefaultHttpClient httpClient = NHttpClient.getInstance();
             HttpGet httpGet = new HttpGet(url);
             HttpResponse response = httpClient.execute(httpGet);
             String contentType = response.getEntity().getContentType().getValue();
@@ -79,9 +79,9 @@ public class NHttpClientUtils {
      * @return the String content of the page
      * @throws Exception 
      */
-    public static String getData(String url) throws Exception {
+    public static String getData(String url,DefaultHttpClient httpClient) throws Exception {
         HttpGet httpGet = new HttpGet(url);
-        HttpResponse httpResponse = NHttpClient.getInstance().execute(httpGet);
+        HttpResponse httpResponse = httpClient.execute(httpGet);
         return EntityUtils.toString(httpResponse.getEntity());
     }
     
@@ -92,9 +92,9 @@ public class NHttpClientUtils {
      * @return the String content of the page
      * @throws Exception 
      */
-    public static String getData(String url, HttpContext httpContext) throws Exception {
+    public static String getData(String url, HttpContext httpContext,DefaultHttpClient httpClient) throws Exception {
         HttpGet httpGet = new HttpGet(url);
-        HttpResponse httpResponse = NHttpClient.getInstance().execute(httpGet, httpContext);
+        HttpResponse httpResponse = httpClient.execute(httpGet, httpContext);
         return EntityUtils.toString(httpResponse.getEntity());
     }
     

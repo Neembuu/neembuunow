@@ -30,7 +30,7 @@ import neembuu.vfs.readmanager.RegionHandler;
  */
 public interface MainDirectionThread_RQMAccess {
     List<DownloadConstrainHandler> constraintedWith();
-    Logger rqmLogger();
+    Logger logger();
     String provider_getName();
     
     long lastExternalRequestTime();

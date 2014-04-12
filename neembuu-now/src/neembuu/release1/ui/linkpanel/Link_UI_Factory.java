@@ -47,6 +47,7 @@ import neembuu.release1.ui.actions.MultiVariantOpenAction;
 import neembuu.release1.ui.actions.OpenActionImpl;
 import neembuu.release1.ui.actions.ReAddActionCallBackImpl;
 import neembuu.release1.ui.actions.SaveAction_forVariants;
+import neembuu.release1.user_analytics.UserAnalytics;
 import neembuu.vfs.progresscontrol.DownloadSpeedProvider;
 
 /**
@@ -203,7 +204,8 @@ public final class Link_UI_Factory {
         linkActionsImpl.getReAdd().addCallBack(new ReAddActionCallBackImpl(lp.closeActionUIA, 
                 vpi==null?progress.progressProvider:vpi, 
                 changeDownloadModeAction,initalizeProgress));
-        linkActionsImpl.getReAdd().addCallBack(Utils.makeDisplayNameSaver());
+        linkActionsImpl.getReAdd().addCallBack(Utils.newDisplayNameSaver());
+        linkActionsImpl.getReAdd().addCallBack(UserAnalytics.newReportHandler());
     }
     
     private static RemoveFromUI defaultRemoveFromUI(

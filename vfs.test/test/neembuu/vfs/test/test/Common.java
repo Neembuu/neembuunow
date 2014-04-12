@@ -30,6 +30,8 @@ import javax.swing.JOptionPane;
 import jpfm.util.ContentPeek;
 import neembuu.rangearray.RangeUtils;
 import static junit.framework.Assert.*;
+import neembuu.diskmanager.Nomenclature;
+import neembuu.diskmanager.impl.DefaultNomenclature;
 import neembuu.vfs.test.Main;
 import neembuu.vfs.test.MountManagerService;
 
@@ -45,7 +47,12 @@ public final class Common {
     public static  final int allowance = 5*KB;
     
     public static  void emptyTemporarySplitStorageDirectory()throws IOException{
-        File storageDirectory =new File("j:\\neembuu\\heap\\test120k.rmvb_neembuu_download_data");
+        emptyTemporarySplitStorageDirectory("test120k.rmvb");
+    }
+    public static  void emptyTemporarySplitStorageDirectory(String fn)throws IOException{
+        File storageDirectory =new File("j:\\neembuu\\heap\\"
+                + fn
+                + ".neembuu_file");
         
         File[]files = storageDirectory.listFiles();
         for (int i = 0; i < files.length; i++) {
@@ -72,13 +79,16 @@ public final class Common {
             SeekableByteChannel /*FileChannel*/ fc_real_file,
             RangeArray<Range> regions,
             String filename) throws IOException{
-        File storageDirectory =new File("j:\\neembuu\\heap\\"
-                + filename
-                + "_neembuu_download_data");
+        Nomenclature n = new DefaultNomenclature();
+        File storageDirectory =new File("j:\\neembuu\\heap\\"+
+                n.getFileStorage().makeName(filename));
+        
+        
         
         for(Range element : regions){
             System.out.println(element.starting()+"-->"+element.ending());
-            File region = new File(storageDirectory, Math.random()+"_0x"+Long.toHexString(element.starting())+".partial");
+
+            File region = new File(storageDirectory, n.getRegionStorage().makeName(element.starting(), fc_real_file.size()) );
             region.createNewFile();
             FileChannel fc_split_file = new FileOutputStream(region).getChannel();
             
@@ -96,12 +106,16 @@ public final class Common {
     
     
     public static SeekableByteChannel createNew_FC_Virtual_File(boolean cascade)throws Exception{
+        return createNew_FC_Virtual_File(cascade, "test120k.rmvb");
+    }
+    
+    public static SeekableByteChannel createNew_FC_Virtual_File(boolean cascade, String n)throws Exception{
         if(!cascade)
-            return createNew_FC_Virtual_File("test120k.rmvb");
+            return createNew_FC_Virtual_File(n);
         else {
             Main.main(new String[]{"cascadeMount"});
             MountManagerService mm = Main.mountManagerService;
-            return mm.get("test120k.rmvb");
+            return mm.get(n);
         }
     }
     

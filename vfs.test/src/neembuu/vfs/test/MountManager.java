@@ -252,6 +252,7 @@ public class MountManager {
     
     private SeekableConnectionFile findSCF(String name){
         for(FileAttributesProvider fap : volume){
+            System.out.println(fap+" finding "+name);
             if(fap.getName().equals(name) && fap.getFileType()==FileType.FILE){
                 return (SeekableConnectionFile)fap;
             }

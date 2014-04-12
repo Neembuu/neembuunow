@@ -17,6 +17,9 @@
 
 package neembuu.vfs.readmanager.rqm;
 
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.StandardOpenOption;
 import neembuu.vfs.file.DownloadCompletedListener;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,6 +72,9 @@ public final class ReadQueueManager {
     
     private final NewReadHandlerProvider provider;
     private Logger rqmLogger;
+    private Logger mainThreadLogger;
+    
+    private SeekableByteChannel listOfRequests = null;
 
     private volatile boolean autoCompleteEnabled = true;
     
@@ -110,6 +116,17 @@ public final class ReadQueueManager {
         synchronized (handlers.getModLock()){
             if(rqmLogger!=null)throw new IllegalStateException("Already initialized");
             rqmLogger = provider.getReadQueueManagerThreadLogger();
+            
+            try{
+                listOfRequests = provider.getFileStorageManager().getOrCreateResource(
+                    "listOfRequests.txt", StandardOpenOption.WRITE,StandardOpenOption.CREATE,
+                        StandardOpenOption.TRUNCATE_EXISTING);
+                
+                mainThreadLogger = provider.getFileStorageManager().createLogger(
+                        "MainDirectionThread");
+            }catch(Exception a){
+                rqmLogger.log(Level.SEVERE,"could not make list of requests file",  a);
+            }
         }
     }
     
@@ -183,6 +200,7 @@ public final class ReadQueueManager {
         
     @NonBlocking(usesJava1_7NIOClasses=false,usesOneThreadPerContinuousChannel=true,usesOneThreadPerRequest=false)
     public final void read(ReadRequest read){
+        logToText_ReadRequest(read);
         mainDirectionThread.reportMostRecentRequest(read);
         
         readImpl(read);
@@ -667,7 +685,10 @@ public final class ReadQueueManager {
         @Override public boolean message_requiredConnectionAtZero() {
             return myDch.message_requiredConnectionAtZero();}
         
-        @Override public Logger rqmLogger() { return rqmLogger; }
+        @Override public Logger logger() { 
+            if(mainThreadLogger==null)return rqmLogger; 
+            return mainThreadLogger;
+        }
         @Override public String provider_getName() { return provider.getName(); }
         @Override public long lastExternalRequestTime() { return myDch.lastExternalRequestTime(); }
         @Override public boolean autoCompleteEnabled() { return autoCompleteEnabled; }
@@ -696,4 +717,17 @@ public final class ReadQueueManager {
     @Deprecated
     private volatile boolean disabled = false;
     
+    private void logToText_ReadRequest(ReadRequest rr){
+        if(listOfRequests!=null){
+            try{
+                String st = rr.getCreationTime()+"\t" 
+                        + rr.getFileOffset()+"\t"
+                        + (rr.getFileOffset()+rr.getByteBuffer().capacity()-1)
+                        +"\n";
+                listOfRequests.write(ByteBuffer.wrap(st.getBytes()));
+            }catch(Exception a){
+                
+            }
+        }
+    }
 }

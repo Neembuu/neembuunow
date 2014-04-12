@@ -60,7 +60,7 @@ public final class Utils {
         return null;
     }
     
-    public static ReAddAction.CallBack makeDisplayNameSaver(){
+    public static ReAddAction.CallBack newDisplayNameSaver(){
         return new DisplayNameSaver();
     }
     

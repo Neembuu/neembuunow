@@ -62,6 +62,7 @@ public final class Main {
             heapLocation = "J:\\neembuu\\heap\\";
             filesToMount=new String[]{
                 "http://neembuu.com/test_videos/test120k.rmvb",
+                //"http://neembuu.com/test_videos/bigbuckbunny(200v+64a)kbps.mkv"
             };
         }else if(SystemUtils.IS_OS_LINUX){
             mountLocation = "/media/j/neembuu/virtual/monitored14/";
@@ -79,9 +80,6 @@ public final class Main {
                 "/Volumes/MIDS/Videos/Requiem_for_a_Duel.mkv"
             };
         }
-
-        final String ml = mountLocation;
-        final String hl = heapLocation;
         
         FrameProvider fp = fp();
         

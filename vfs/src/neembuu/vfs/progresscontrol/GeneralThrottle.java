@@ -126,8 +126,11 @@ final class GeneralThrottle implements Throttle {
                 synchronized(cp.getThrottlingLock()){
                     long actualWait = normalizeWaitTime((long)millisec, nanosec);
                     if(actualWait>0){
+                        if(actualWait > maxWait*3) { /*throw new RuntimeException("Killing for optimization");*/ }
                         cp.getThrottlingLock().wait(actualWait);
-                    } // wait = 0 mean infinite wait :O :O :O  O my God!
+                    }else {
+                        logThrottleState(132, "zero wait interval");
+                    }// wait = 0 mean infinite wait :O :O :O  O my God!
                     // while it should actually be no wait as per our purpose.
                 }
             }

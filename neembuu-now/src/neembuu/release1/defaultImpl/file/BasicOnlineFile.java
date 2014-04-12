@@ -21,6 +21,7 @@ import neembuu.release1.api.file.OnlineFile;
 import neembuu.release1.api.file.PropertyProvider;
 import neembuu.release1.defaultImpl.linkhandler.BasicLinkHandler;
 import neembuu.vfs.connection.NewConnectionProvider;
+import neembuu.vfs.connection.jdimpl.JD_DownloadManager;
 import neembuu.vfs.connection.sampleImpl.DownloadManager;
 
 /**
@@ -90,7 +91,10 @@ public final class BasicOnlineFile implements OnlineFile {
         }
         
         public Builder setUrl(String url) {
-            return setNewConnectionProvider(new DownloadManager(url));
+            return setNewConnectionProvider(
+                    new JD_DownloadManager(url)
+                    //new DownloadManager(url)
+            );
         }
 
         public Builder setName(String name) {

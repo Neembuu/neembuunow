@@ -43,6 +43,11 @@ public class Application {
     public enum Runtime {
         Jar, Development
     }
+    
+    public static long releaseTime() {
+        return 1397223376463L; 
+        //returning as a System.currentTime() long value
+    }
 
     private static MainComponent mainComponent;
 

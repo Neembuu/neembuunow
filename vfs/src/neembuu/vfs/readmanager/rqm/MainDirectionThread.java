@@ -61,7 +61,7 @@ public class MainDirectionThread implements Runnable {
     }
     
     void open() {
-        rQMAccess.rqmLogger().log(Level.INFO, "opening MainDirectionThread " + s_(), new Throwable());
+        rQMAccess.logger().log(Level.INFO, "opening MainDirectionThread " + s_(), new Throwable());
         synchronized (sleepLock) {
             sleepLock.notifyAll();
         }
@@ -84,7 +84,7 @@ public class MainDirectionThread implements Runnable {
     }
 
     void close() {
-        rQMAccess.rqmLogger().log(Level.INFO, "closing MainDirectionThread " + s_(), new Throwable());
+        rQMAccess.logger().log(Level.INFO, "closing MainDirectionThread " + s_(), new Throwable());
         synchronized (sleepLock) {
             sleepLock.notifyAll();
         }
@@ -118,7 +118,7 @@ public class MainDirectionThread implements Runnable {
 
     @Override
     public void run() {
-        rQMAccess.rqmLogger().info("MainDirectionThread just started " + s_());
+        rQMAccess.logger().info("MainDirectionThread just started " + s_());
         if (!thread_state.compareAndSet(STARTING, WORKING)) {
             throw new IllegalStateException("Thread was not set to starting");
         }
@@ -134,13 +134,13 @@ public class MainDirectionThread implements Runnable {
                     } else {
                         checkExternal();
                         if (externalMainCnt == 0) {
-                            rQMAccess.rqmLogger().info("Completed but No external main");
+                            rQMAccess.logger().info("Completed but No external main");
                         }
                         if (filesPriorToMeCompleted) {
-                            rQMAccess.rqmLogger().info("Completed and prior files completed");
+                            rQMAccess.logger().info("Completed and prior files completed");
                             break IF;
                         } else {
-                            rQMAccess.rqmLogger().info("Completed but a prior file has not completed yet");
+                            rQMAccess.logger().info("Completed but a prior file has not completed yet");
                         }
                     }
                 } else {
@@ -148,11 +148,11 @@ public class MainDirectionThread implements Runnable {
                     if (!complete) {
                         checkExternal();
                         if (filesPriorToMeCompleted && externalMainCnt == 0) {
-                            rQMAccess.rqmLogger().info("Prior files completed and not even 1 external main, finding main here");
+                            rQMAccess.logger().info("Prior files completed and not even 1 external main, finding main here");
                             iterateAndFindInternalMain(true);
                             break IF;
                         } else {
-                            rQMAccess.rqmLogger().info("A prior file has not completed yet");
+                            rQMAccess.logger().info("A prior file has not completed yet");
                         }
                     }
                 }
@@ -165,14 +165,15 @@ public class MainDirectionThread implements Runnable {
                 synchronized (sleepLock) {
                     sleepLock.wait(sle);
                 }
+                kickStuckConnections();
                 findRequestsPendingSinceALongTime();
                 checkAndSetComplete_2();
             } catch (Exception a) {
-                rQMAccess.rqmLogger().log(Level.SEVERE, "", a);
+                rQMAccess.logger().log(Level.SEVERE, "", a);
             }
         }
         changeMainDirc(939, null);
-        rQMAccess.rqmLogger().info("MainDirectionThread dead " + s_());
+        rQMAccess.logger().info("MainDirectionThread dead " + s_());
     }
 
     private void checkExternal() {
@@ -204,12 +205,29 @@ public class MainDirectionThread implements Runnable {
                 if (!dch.isComplete()) {
                     //if(!dch.hasAMainConnection()){
                     filesPriorToMeCompleted = false;
-                    rQMAccess.rqmLogger().info("File not completed " + dch);
+                    rQMAccess.logger().info("File not completed " + dch);
                     break FOR;
                     //}
                 }
             }
             ind++;
+        }
+    }
+    
+    private void kickStuckConnections(){
+        if(true)return;
+        UnsyncRangeArrayCopy<RegionHandler> uh
+                = rQMAccess.handlers_tryToGetUnsynchronizedCopy();
+        long atlestMillisec = Math.min(
+                TroubleHandler.DEFAULT_PENDING_ATLEAST_FOR_MILLISECONDS,
+                rQMAccess.provider_getTroubleHandler().pendingAtleastFor());
+        LinkedList<ReadRequest> pendingRrs = new LinkedList<ReadRequest>();
+        // concept of main should be in favour of those connection that are starving
+        for (int i = 0; i < uh.size(); i++) {
+            RegionHandler rh = uh.get(i).getProperty();
+            if (rh!=null &&  rh.hasPendingRequests()) {// when state is resumed, older strips have null RegionHandler (maybe)
+                rh.fillInOperationsPendingSince(pendingRrs, atlestMillisec);
+            }
         }
     }
 
@@ -316,9 +334,9 @@ public class MainDirectionThread implements Runnable {
                 // read request must be atleast along 1 of them files
             // handleConstrainedRQMs does this for us
             // one the file will sense this flag and do the appropriate
-            rQMAccess.rqmLogger().log(Level.INFO, "We require a connection from offset 0");
+            rQMAccess.logger().log(Level.INFO, "We require a connection from offset 0");
             if (!rQMAccess.message_requiredConnectionAtZero()) {
-                rQMAccess.rqmLogger().log(Level.INFO, "Request for connection was already send");
+                rQMAccess.logger().log(Level.INFO, "Request for connection was already send");
             }
             return null; // we shall wait for zero region to be created.
             // then we can set it as main :) using the code below
@@ -335,9 +353,9 @@ public class MainDirectionThread implements Runnable {
                 } else {
                     // setting first gap as main, we are filling gaps now
                     found = uh.get(j).getProperty();
-                    rQMAccess.rqmLogger().log(Level.INFO, "MainDirectionThread filling gap " + found);
+                    rQMAccess.logger().log(Level.INFO, "MainDirectionThread filling gap " + found);
                     if (found.ending() + 1 >= found.fileSize()) {
-                        rQMAccess.rqmLogger().log(Level.INFO, "Looks like entire file downloaded cannot set main");
+                        rQMAccess.logger().log(Level.INFO, "Looks like entire file downloaded cannot set main");
                         found = null;
                         complete();
                     }
@@ -363,7 +381,7 @@ public class MainDirectionThread implements Runnable {
                 // collided
             } else if (j == uh.size() - 1 && uh.get(j).ending() >= uh.get(j).getProperty().fileSize() - 1) {
                 //collided
-                rQMAccess.rqmLogger().log(Level.INFO, "Looks like entire file downloaded cannot set main");
+                rQMAccess.logger().log(Level.INFO, "Looks like entire file downloaded cannot set main");
                 complete();
             } else {
                 break OUTER_LOOP;
@@ -374,7 +392,7 @@ public class MainDirectionThread implements Runnable {
 
     private void complete() {
         if (!complete) {
-            rQMAccess.rqmLogger().log(Level.INFO, "File Completed");
+            rQMAccess.logger().log(Level.INFO, "File Completed");
             complete = true;
             rQMAccess.notifyDownloadComplete();
         }
@@ -383,7 +401,7 @@ public class MainDirectionThread implements Runnable {
 
     private void changeMainDirc(int l, RegionHandler rh) {
         if (rh != mdrh) {
-            rQMAccess.rqmLogger().info("changing main to " + rh + " l=" + l);
+            rQMAccess.logger().info("changing main to " + rh + " l=" + l);
         }
 
         if (mdrh != null) {

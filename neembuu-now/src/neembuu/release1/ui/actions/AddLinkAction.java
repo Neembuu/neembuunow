@@ -165,7 +165,7 @@ public class AddLinkAction implements Runnable, LinkGroupUICreator {
             OpenableEUI openableEUI = Link_UI_Factory.make(
                 luic1, mainComponent, realFileProvider, 
                 minimalistFileSystem,linkGroup,new DownloadSpeedProvider(){
-                    @Override public double getDownloadSpeed_KiBps(){return 256;}},
+                    @Override public double getDownloadSpeed_KiBps(){return 56;}},
                 this);
             
             if(openableEUI==null){return;}

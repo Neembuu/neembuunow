@@ -73,7 +73,7 @@ public final class BasicLinkHandler implements LinkHandler {
             }if (linkHandler.groupName == null) {
                 throw new IllegalArgumentException("File groupName unknown");
             }if (linkHandler.groupName.length() == 0) {
-                throw new IllegalArgumentException("linkHandler.groupName.length() == 0");
+                throw new IllegalArgumentException("File name unknown : groupName.length() == 0");
             }
             return linkHandler;
         }
