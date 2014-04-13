@@ -45,7 +45,7 @@ public class Application {
     }
     
     public static long releaseTime() {
-        return 1397223376463L; 
+        return 1397383036664L; 
         //returning as a System.currentTime() long value
     }
 
