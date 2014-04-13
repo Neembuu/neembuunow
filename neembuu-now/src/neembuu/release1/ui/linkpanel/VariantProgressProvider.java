@@ -84,6 +84,12 @@ public class VariantProgressProvider implements ReAddAction.CallBack, ProgressPr
             this.display = display; this.file = file;
             variantProgress = new ProgressImpl(p, graph,ProgressImpl.Mode.VariantProgressUI);
         }
+
+        @Override public NeembuuFile getFile() {
+            return file;
+        }
+        
+        
         @Override public void select() {    
             variantProgress.init(file.fileBeingDownloaded()); 
             lastSelected = variantProgress;

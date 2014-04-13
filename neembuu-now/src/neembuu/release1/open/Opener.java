@@ -48,6 +48,12 @@ public final class Opener {
     
     public static final Opener I = new Opener();
     
+    public void closeAll(){
+        for(Open o : openHandles.values()){
+            o.close();
+        }
+    }
+    
     public Open open(File f){
         String fileToOpen = f.getAbsolutePath();
         Open x = openHandles.get(fileToOpen);

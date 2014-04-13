@@ -210,7 +210,7 @@ public class TestGenericLinkPanel {
         MultiVariantFileCreator fileCreator = createMultiVariantTypeForTest();
         
         MultiVariantOpenAction openAction = new MultiVariantOpenAction(realFileProviderMultiVariant, mainComponent, 
-            new DownloadSpeedProvider(){@Override public double getDownloadSpeed_KiBps(){return 256;}});
+            new DownloadSpeedProvider(){@Override public double getDownloadSpeed_KiBps(){return 256;}},null);
 
         linkActionsImpl = new LinkActionsImpl(null,
                 lp.closeActionUIA, removeFromUI, mainComponent, fileCreator,openAction);

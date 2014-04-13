@@ -17,14 +17,9 @@
 
 package neembuu.release1.ui.linkpanel;
 
-import java.nio.ByteBuffer;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.file.StandardOpenOption;
-import neembuu.diskmanager.Session;
 import neembuu.release1.defaultImpl.file.split.SplitMergeNeembuuFileCreator;
 import neembuu.release1.defaultImpl.file.SimpleNeembuuFileCreator;
 import neembuu.release1.api.RealFileProvider;
-import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.linkgroup.LinkGroup;
 import neembuu.release1.api.ui.ExpandableUIContainer;
 import neembuu.release1.api.ui.LinkGroupUICreator;
@@ -61,7 +56,7 @@ public final class Link_UI_Factory {
     private final RealFileProvider realFileProvider;
     private final MinimalistFileSystem root;
     private final LinkGroup linkGroup;
-    private final DownloadSpeedProvider downloadSpeedProvider;
+    private final DownloadSpeedProvider speedProvider;
     private final LinkGroupUICreator linkUIMaker;
 
     public Link_UI_Factory(ExpandableUIContainer luic1, MainComponent mainComponent, RealFileProvider realFileProvider, MinimalistFileSystem root, LinkGroup linkGroup, DownloadSpeedProvider downloadSpeedProvider,LinkGroupUICreator linkGroupUICreator) {
@@ -70,7 +65,7 @@ public final class Link_UI_Factory {
         this.realFileProvider = realFileProvider;
         this.root = root;
         this.linkGroup = linkGroup;
-        this.downloadSpeedProvider = downloadSpeedProvider;
+        this.speedProvider = downloadSpeedProvider;
         this.linkUIMaker = linkGroupUICreator;
     }
     
@@ -157,7 +152,7 @@ public final class Link_UI_Factory {
         
         MultiVariantFileCreator fileCreator = new MultiVariantFileCreator(linkGroup,root);
         
-        MultiVariantOpenAction open = new MultiVariantOpenAction(realFileProvider, mainComp, downloadSpeedProvider);
+        MultiVariantOpenAction open = new MultiVariantOpenAction(realFileProvider, mainComp, speedProvider,lp.progressUIA);
         LinkActionsImpl actions = new LinkActionsImpl(linkGroup.getSession(),
                 lp.closeActionUIA, remover,mainComp, fileCreator,open);
         

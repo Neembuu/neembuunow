@@ -35,12 +35,12 @@ public class VariantSelectorImpl implements VariantSelector{
     private final JButton component;
     private final List<Selectable> l = new ArrayList<Selectable>(){
         @Override public boolean add(Selectable e) {
-            if(isEmpty()){ selecteElement(e); }
+            if(isEmpty()){ actionPerformed(e); }
             return super.add(e);
         }
 
         @Override public void add(int index, Selectable element) {
-            if(isEmpty()){ selecteElement(element); }
+            if(isEmpty()){ actionPerformed(element); }
             super.add(index,element);
         }
     };
@@ -62,7 +62,7 @@ public class VariantSelectorImpl implements VariantSelector{
             final JMenuItem jmi = new JMenuItem(element.getText());
             jmi.addActionListener(new ActionListener() {
                 @Override public void actionPerformed(ActionEvent e) {
-                    selecteElement(element);
+                    VariantSelectorImpl.this.actionPerformed(element);
                 }
             });
             menu.add(jmi);
@@ -70,7 +70,7 @@ public class VariantSelectorImpl implements VariantSelector{
         menu.show(component,0,component.getHeight());
     }
     
-    private void selecteElement(Selectable element){
+    @Override public void actionPerformed(Selectable element) {
         if(selectedItem!=null )selectedItem.unSelect();
         selectedItem = element;
         component.setText(element.getSmallText());

@@ -25,8 +25,10 @@ import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.file.PropertyProvider;
 import neembuu.release1.api.open.Open;
 import neembuu.release1.api.ui.MainComponent;
+import neembuu.release1.api.ui.access.ProgressUIA;
 import neembuu.release1.api.ui.actions.OpenAction;
 import neembuu.release1.api.ui.actions.ReAddAction.CallBack;
+import neembuu.release1.api.ui.linkpanel.VariantSelector;
 import neembuu.release1.ui.ChooseVariantTimeOut;
 import neembuu.vfs.progresscontrol.DownloadSpeedProvider;
 
@@ -40,9 +42,11 @@ public class MultiVariantOpenAction implements OpenAction, CallBack{
     private final MainComponent mainComponent;
     
     private final DownloadSpeedProvider downloadSpeedProvider;
+    
+    private final ProgressUIA progressUIA;
 
-    public MultiVariantOpenAction(RealFileProvider realFileProvider, MainComponent mainComponent, DownloadSpeedProvider downloadSpeedProvider) {
-        this.realFileProvider = realFileProvider;
+    public MultiVariantOpenAction(RealFileProvider realFileProvider, MainComponent mainComponent, DownloadSpeedProvider downloadSpeedProvider,ProgressUIA progressUIA) {
+        this.realFileProvider = realFileProvider; this.progressUIA = progressUIA;
         this.mainComponent = mainComponent; this.downloadSpeedProvider = downloadSpeedProvider;
     }
     
@@ -105,6 +109,53 @@ public class MultiVariantOpenAction implements OpenAction, CallBack{
         ChooseVariantTimeOut.Entry choice = ChooseVariantTimeOut.showMessage(mainComponent, 50, defaultOption, entries);
 
         if(choice==null){return;}
+        
+        NeembuuFile fileToOpen = findFileAndOpen(files, choice);
+        if(fileToOpen==null){
+            mainComponent.newMessage().error()
+                .setMessage("Could not find type."+choice.type())
+                .setTitle("Cannot open file")
+                .show();
+            return;
+        }
+        
+        findAndAutoSelectChoice(fileToOpen, choice);        
+    }
+    
+    private void findAndAutoSelectChoice(NeembuuFile fileToOpen, ChooseVariantTimeOut.Entry choice){
+        try{
+            List<VariantSelector.Selectable> selectables = progressUIA.variantSelector().getItems();
+            for (VariantSelector.Selectable selectable : selectables) {
+                try{
+                    if(compare(fileToOpen, selectable.getFile())){
+                        progressUIA.variantSelector().actionPerformed(selectable);
+                        return;
+                    }
+                }catch(Exception ignore){
+                    ignore.printStackTrace();
+                }
+            }
+        }catch(Exception ignore){
+            ignore.printStackTrace();
+        }
+    }
+    
+    private boolean compare(NeembuuFile f1,NeembuuFile f2){
+        if(f1==null & f2==null)return true;
+        if(f1==null || f2==null)return false;
+        if(f1==f2)return true;
+        
+        if(f1.getMinimumFileInfo()==null || f2.getMinimumFileInfo()==null)return false;
+        if(f1.getMinimumFileInfo().getName()==null || f2.getMinimumFileInfo().getName()==null)return false;
+        
+        if(f1.getMinimumFileInfo().getFileSize() == f2.getMinimumFileInfo().getFileSize()
+                && 
+                f1.getMinimumFileInfo().getName().equals(f2.getMinimumFileInfo().getName())
+                )return true;
+        return false;
+    }
+    
+    private NeembuuFile findFileAndOpen(List<NeembuuFile> files, ChooseVariantTimeOut.Entry choice){
         for (NeembuuFile file : files) {
             String s = file.getPropertyProvider().getStringPropertyValue(PropertyProvider.StringProperty.VARIANT_DESCRIPTION);
             if(s==null || s.length()==0){ s=file.getMinimumFileInfo().getName(); }
@@ -113,18 +164,12 @@ public class MultiVariantOpenAction implements OpenAction, CallBack{
                 impl.doneCreation(file);
                 try{
                     open = impl.openVirtualFile();
-                    return;
+                    return file;
                 }catch(Exception a){
                     
                 }
             }
-        }
-        
-        mainComponent.newMessage().error()
-            .setMessage("Could not find type."+choice.type())
-            .setTitle("Cannot open file")
-            .show();
-        
+        }return null;
     }
     
     private Open open = null;

@@ -100,7 +100,7 @@ public final class win implements InstallService{
         }
         
         int totalWaitTime = 0;
-        while(!Files.exists(pfm_temp.resolve("done.txt"))){
+        while(!Files.exists(pfm_logs.resolve("done.txt"))){
             try{
                 Thread.sleep(100);
                 totalWaitTime += 100;

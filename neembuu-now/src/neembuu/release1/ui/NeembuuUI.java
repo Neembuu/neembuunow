@@ -39,6 +39,7 @@ import neembuu.release1.api.ui.access.MainUIA;
 import neembuu.release1.api.ui.actions.AddLinksAction;
 import neembuu.release1.ui.actions.AddLinkAction;
 import neembuu.release1.api.ui.LinkGroupUICreator;
+import neembuu.release1.open.Opener;
 
 /**
  *
@@ -174,7 +175,16 @@ public final class NeembuuUI {
             }
             catch(Exception a){
                 Main.getLOGGER().log(Level.INFO," ",a);
-            }System.exit(0);
+            }
+            try{
+                Main.getLOGGER().log(Level.INFO," Closing all open files");
+                Opener.I.closeAll();
+            }
+            catch(Exception a){
+                Main.getLOGGER().log(Level.INFO," ",a);
+            }
+            
+            System.exit(0);
         }
 
     }

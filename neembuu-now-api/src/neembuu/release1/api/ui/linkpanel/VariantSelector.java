@@ -18,6 +18,7 @@
 package neembuu.release1.api.ui.linkpanel;
 
 import java.util.List;
+import neembuu.release1.api.file.NeembuuFile;
 
 /**
  *
@@ -32,11 +33,13 @@ public interface VariantSelector {
     Selectable getSelectedItem();
     
     void actionPerformed();
+    void actionPerformed(Selectable element) ;
 
     public static interface Selectable {
         void select();
         void unSelect();
         String getText();
         String getSmallText();
+        NeembuuFile getFile();
     }
 }
