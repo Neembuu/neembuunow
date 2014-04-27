@@ -19,6 +19,7 @@ package neembuu.release1.ui;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.Icon;
@@ -55,6 +56,9 @@ public class MainComponentImpl implements MainComponent{
     private class MessageImpl implements Message {
         private String message,title;
         private int type = JOptionPane.INFORMATION_MESSAGE; 
+        
+        private PreferredLocation pl;
+        
         private Emotion e; private int timeout = 0;
         private JTextArea jta = null; private volatile JDialog dialog = null;
         
@@ -105,6 +109,7 @@ public class MainComponentImpl implements MainComponent{
             }
             jp.add(pf);
             int okCxl = JOptionPane.showConfirmDialog(jf, jp, title, JOptionPane.OK_CANCEL_OPTION, type,i);
+            
             if (okCxl == JOptionPane.OK_OPTION) {
               String password = new String(pf.getPassword());
               return password;
@@ -115,6 +120,11 @@ public class MainComponentImpl implements MainComponent{
             this.timeout = timeout; return this;
         }
 
+        
+        @Override public Message setPreferredLocation(PreferredLocation pl){
+            this.pl = pl;
+            return this;
+        }
         
         @Override public void close() {
             dialog.setVisible(false);
@@ -141,6 +151,7 @@ public class MainComponentImpl implements MainComponent{
             
             final JOptionPane pane = new JOptionPane(m,type,JOptionPane.DEFAULT_OPTION,i);
             dialog = pane.createDialog(jf, title);
+            setDialogLocation(dialog, pl);
             
             if(notBlock){
                 SwingUtilities.invokeLater(new Runnable() {
@@ -176,6 +187,21 @@ public class MainComponentImpl implements MainComponent{
             return null;
         }
         
+    }
+    
+    private void setDialogLocation(JDialog dialog, Message.PreferredLocation pl){
+        if(pl!=null){
+            if(pl==Message.PreferredLocation.Aside){
+                int x = jf.getLocation().x;
+                int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
+                if(x > screenWidth){
+                    x -= dialog.getWidth();
+                }else {
+                    x += jf.getWidth();
+                }
+                dialog.setLocation(x,jf.getLocation().y);
+            }
+        }
     }
     
 }

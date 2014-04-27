@@ -103,10 +103,10 @@ public class MinimalistFileSystem_Root implements MinimalistFileSystem {
     }
     
     public String getSuitableFileName(String filename, DirectoryStream parent){
-        if(filename.length()>50){
-            filename = filename.substring(0,50)
-                    + /*extension*/ filename.substring(filename.length()-4);
-        }
+//        if(filename.length()>50){
+//            filename = filename.substring(0,50)
+//                    + /*extension*/ filename.substring(filename.length()-4);
+//        }
         filename = UniversallyValidFileName.makeUniversallyValidFileName(filename);
         filename = checkConflict(filename,parent);
         return filename;

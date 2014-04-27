@@ -31,6 +31,7 @@ public interface Message {
     Message setTimeout(int timeout);
     
     Message setEmotion(Emotion e);
+    Message setPreferredLocation(PreferredLocation pl);
     Message editable();
     
     void show();
@@ -45,6 +46,15 @@ public interface Message {
     
     enum Emotion {
         I_AM_DEAD,
+    }
+    
+    enum PreferredLocation {
+        /**
+         * basically indicating that the dialog must somehow 
+         * be located in a location that it does not hide the 
+         * Neembuu UI .
+         */
+        Aside
     }
 
 }

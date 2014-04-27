@@ -126,4 +126,20 @@ public class StringUtils{
         return uid;
     }
     
+    public static String getSimpleXMLData(String src, String tag){
+        String value = null;
+        try {
+            String start = "<"+tag+ ">";
+            String end = "</"+ tag+ ">";
+
+            src = src.substring(src.indexOf(start) + start.length());
+
+            src = src.substring(0, src.indexOf(end));
+            value = src;
+        } catch (Exception any) {
+            Main.getLOGGER().severe(any.toString());
+        }
+        return value;
+    }
+    
 }
