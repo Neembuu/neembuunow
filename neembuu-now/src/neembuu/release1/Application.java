@@ -45,8 +45,9 @@ public class Application {
     }
     
     public static long releaseTime() {
-        return 1397383036664L; 
-        //returning as a System.currentTime() long value
+        return 1398604095683L;
+        //return 1397383036664L; 
+        //run neembuu.release1.MakeFileVersion from the Test Packages
     }
 
     private static MainComponent mainComponent;
