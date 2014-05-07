@@ -27,6 +27,8 @@ import neembuu.diskmanager.DiskManagers;
 import neembuu.release1.api.clipboardmonitor.ClipboardMonitor;
 import neembuu.release1.api.linkgroup.LinkGroupMakers;
 import neembuu.release1.api.linkhandler.LinkHandlerProviders;
+import neembuu.release1.api.open.Opener;
+import neembuu.release1.api.open.Openers;
 import neembuu.release1.clipboard.AddLinksFromClipboardImpl;
 import neembuu.release1.clipboard.ClipboardMonitorImpl;
 import neembuu.release1.defaultImpl.linkgroup.DefaultLinkGroupMaker;
@@ -34,7 +36,7 @@ import neembuu.release1.defaultImpl.linkgroup.SplitsLinkGroupMaker;
 import neembuu.release1.defaultImpl.linkhandler.YoutubeLinkHandlerProvider;
 import neembuu.release1.defaultImpl.linkhandler.DirectLinkHandlerProvider;
 import neembuu.release1.defaultImpl.restore_previous.RestorePreviousSessionImpl;
-import neembuu.release1.open.Opener;
+import neembuu.release1.open.OpenerImpl;
 import neembuu.release1.ui.InitLookAndFeel;
 import neembuu.release1.ui.NeembuuUI;
 import neembuu.release1.versioning.CheckUpdate;
@@ -97,18 +99,18 @@ public final class Main {
         LinkGroupMakers.registerDefaultMaker(new DefaultLinkGroupMaker());
         LinkGroupMakers.registerMaker(new SplitsLinkGroupMaker());
         
-        Opener.I.initMainComponent(nui.getMainComponent());
+        OpenerImpl defaultOpener = new OpenerImpl(nui.getMainComponent());
+        Openers.setOpener(defaultOpener);
+        nui.initOpenerA(defaultOpener.getOpenerAccess());
         
         nui.getIndefiniteTaskUI();
         RestorePreviousSessionImpl rpsi = new RestorePreviousSessionImpl(diskManager, nui.getLinkGroupUICreator(),nui);
         rpsi.checkAndRestoreFromPrevious();
         
         AddLinksFromClipboardImpl.createAndStart(nui.getAddLinkUI(), clipboardMonitor);
-        
-        CheckUpdate.checkLater(nui.getMainComponent());
 
+        CheckUpdate.checkLater(nui.getMainComponent());
         FirstTimeUser.handleUser(nui.getAddLinkUI(),nui.getMainComponent());
-        
     }
 
     public TroubleHandler getTroubleHandler() {

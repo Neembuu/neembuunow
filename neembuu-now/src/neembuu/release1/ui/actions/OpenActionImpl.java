@@ -20,6 +20,7 @@ package neembuu.release1.ui.actions;
 import neembuu.release1.api.RealFileProvider;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.open.Open;
+import neembuu.release1.api.open.Openers;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.actions.OpenAction;
 import neembuu.release1.api.ui.actions.ReAddAction;
@@ -65,7 +66,7 @@ public class OpenActionImpl implements OpenAction, ReAddAction.CallBack{
                 .show();
             return null;
         }
-        return neembuu.release1.open.Opener.I.open(f);
+        return Openers.I().open(f.getAbsolutePath());
     }
     
     private Open open = null;
