@@ -19,10 +19,6 @@ package neembuu.release1.clipboard;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import neembuu.release1.httpclient.NHttpClient;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 /**
  *
@@ -52,21 +48,5 @@ public class Util {
             links.add(urlStr);
         }
         return links;
-    }
-    
-    public static void main(String[] args) throws Exception{
-        String text = "http://rapidshare.com/files/183020068/S5E93_-_J2_Revised.part2.rar asassa\n" +
-                "\nsadsada " +
-                "https://rapidshare.com/files/979681925/test120k.rmvb\n asdasdsa" +
-                "\n asdasdsa " +
-                "upd0.appwork.org/jcgi/JDownloader/alpha\n sadsadas" +
-                "asdasd upd0.appwork.org/jcgi/JDownloader asdasd";
-        System.out.println(text);
-        
-        System.out.println(text);
-        ArrayList<String> a = pullLinks(text);
-        for (String url : a) {
-            System.out.println("lnk->"+url);
-        }
     }
 }

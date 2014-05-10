@@ -15,18 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neembuu.release1.api.open;
+package neembuu.release1.open;
+
+import neembuu.release1.api.open.Open;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface Open {
-    boolean isOpen();
-    void close();
-    
-    /**
-     * Close all instances is possible
-     */
-    void closeAll();
+public class DummyOpen implements Open { 
+    public static DummyOpen I() {
+        return new DummyOpen();
+    }
+
+    @Override
+    public boolean isOpen() {
+        return false;/*throw new UnsupportedOperationException("Not supported yet.");*/
+
+    }
+
+    @Override
+    public void close() {
+    }
+
+    @Override
+    public void closeAll() {
+    }
 }

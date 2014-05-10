@@ -15,18 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neembuu.release1.api.open;
+package neembuu.release1;
 
 /**
- *
+ * Used to make 2 entry point in excelsior.
+ * this allows making a separate executable
+ * which silently starts without showing a popup.
  * @author Shashank Tulsyan
  */
-public interface Open {
-    boolean isOpen();
-    void close();
-    
-    /**
-     * Close all instances is possible
-     */
-    void closeAll();
+public class MainSilent {
+    public static void main(String[] args) {
+        Main.main(args);
+    }
 }

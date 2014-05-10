@@ -28,6 +28,8 @@ public interface AddLinkUI {
     String getLinksText();
     void setLinksText(String a);
     
+    void clickAddLinksButton(boolean show);
+    
     Lock getLock();
     
     public static interface Lock { 

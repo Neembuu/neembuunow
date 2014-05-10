@@ -21,7 +21,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.logging.Level;
-import javax.swing.JOptionPane;
 import jpfm.FormatterEvent;
 import jpfm.JPfm;
 import jpfm.MountListener;
@@ -36,6 +35,7 @@ import neembuu.diskmanager.DiskManager;
 import neembuu.release1.Application;
 import neembuu.release1.Main;
 import neembuu.release1.api.RealFileProvider;
+import neembuu.release1.api.open.Openers;
 import neembuu.release1.api.ui.IndefiniteTaskUI;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.Message;
@@ -62,7 +62,7 @@ public class MountManager {
     private final DiskManager diskManager;
     
     private final MinimalistFileSystem minimalistFileSystem;
-
+    
     public MountManager(MainComponent mainComponent, IndefiniteTaskUI indefiniteTaskUI, MainUIA mainUIA, TroubleHandler troubleHandler, DiskManager diskManager) {
         this.mainComponent = mainComponent;
         this.indefiniteTaskUI = indefiniteTaskUI;
@@ -115,7 +115,7 @@ public class MountManager {
                         .set(MountParams.ParamType.FILE_SYSTEM, fs)
                         .set(MountParams.ParamType.LISTENER, new MountListener() {
                             @Override public void eventOccurred(FormatterEvent event) {
-                                successfullyMounted();
+                                mountEventReceived(event);
                             }
                         }).build());
             } catch (NullPointerException ne) {
@@ -142,19 +142,33 @@ public class MountManager {
         throw new RuntimeException("Neither can use pismo file mount nor can install it. Retried " + attempt + " time(s)");
     }
     
-    private void successfullyMounted(){
-        mainUIA.neembuuVirtualFolderButton().setEnabled(true);
+    int c = 0;
+    private void mountEventReceived(FormatterEvent event){
+        if(c>0)return;
+        c++;
         
+        /*if(event.getEventType()!=FormatterEvent.EVENT.SUCCESSFULLY_MOUNTED){
+            return;
+        }*/
+        mainUIA.neembuuVirtualFolderButton().setEnabled(true);
         mainUIA.neembuuVirtualFolderButton().addActionListener(new ActionListener() {
             
             @Override
             public void actionPerformed(ActionEvent e) {
+                System.out.println("executing="+e);
+                String fileToOpen = "";
                 try{
                     File f = getMount().getMountLocation().getAsFile();
-                    java.awt.Desktop.getDesktop().open(f);
+                    fileToOpen = f.getAbsolutePath();
+                    Openers.I().openFolder(fileToOpen);
                 }catch(Exception a){
-                    JOptionPane.showMessageDialog(null,a.getMessage(),"Could not open NeembuuFolder",JOptionPane.ERROR_MESSAGE);
                     Main.getLOGGER().log(Level.SEVERE,"Could not open NeembuuFolder",a);
+                    mainComponent.newMessage().error()
+                        .setMessage(fileToOpen
+                                + "\n.Reason : "
+                                + "\n"+a.getMessage())
+                        .setTitle("Could not open virtual folder ")
+                        .show();
                 }
             }
         });

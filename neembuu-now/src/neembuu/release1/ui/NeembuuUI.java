@@ -31,6 +31,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import neembuu.release1.Main;
 import neembuu.release1.api.IndefiniteTask;
+import neembuu.release1.api.open.OpenerAccess;
 import neembuu.release1.api.ui.AddLinkUI;
 import neembuu.release1.api.ui.HeightProperty;
 import neembuu.release1.api.ui.IndefiniteTaskUI;
@@ -39,7 +40,7 @@ import neembuu.release1.api.ui.access.MainUIA;
 import neembuu.release1.api.ui.actions.AddLinksAction;
 import neembuu.release1.ui.actions.AddLinkAction;
 import neembuu.release1.api.ui.LinkGroupUICreator;
-import neembuu.release1.open.Opener;
+import neembuu.release1.open.OpenerImpl;
 
 /**
  *
@@ -52,6 +53,8 @@ public final class NeembuuUI {
     private final AddLinkAction ala;
     
     private Main main;
+    private OpenerAccess openerA;
+    
     private final LinkedList<IndefiniteTask> indefiniteTasks = new LinkedList<IndefiniteTask>();
     
     private final MainComponent mainComponent;
@@ -87,6 +90,10 @@ public final class NeembuuUI {
         ala.setMain(main);
         initJFrame();
         jf.setVisible(true);
+    }
+    
+    public void initOpenerA(OpenerAccess openerA){
+        this.openerA = openerA;
     }
 
     public LinksContainer getLinksContainer() {
@@ -178,7 +185,7 @@ public final class NeembuuUI {
             }
             try{
                 Main.getLOGGER().log(Level.INFO," Closing all open files");
-                Opener.I.closeAll();
+                openerA.closeAll();
             }
             catch(Exception a){
                 Main.getLOGGER().log(Level.INFO," ",a);

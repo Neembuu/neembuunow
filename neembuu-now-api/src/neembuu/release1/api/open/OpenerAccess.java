@@ -21,12 +21,22 @@ package neembuu.release1.api.open;
  *
  * @author Shashank Tulsyan
  */
-public interface Open {
-    boolean isOpen();
-    void close();
-    
+public interface OpenerAccess {
     /**
-     * Close all instances is possible
+     * We do not want to expose this to other modules/classes.
+     * This is called when the NeembuuNow instance exists.
+     * It's job is to close all instances of any type of file
+     * or folder left open, because these zombie open instances 
+     * vomit many error messages and user gets a bad impression 
+     * about the NeembuuNow program.
      */
     void closeAll();
+    
+    /**
+     * Removes an instance of Open associated with this file path
+     * from the list (or map) of open handles.
+     * @param filePath
+     * @return the removed open handle associated with the given filePath
+     */
+    Open openHandles_remove(String filePath);
 }

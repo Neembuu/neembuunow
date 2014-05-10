@@ -15,18 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neembuu.release1.api.open;
+package neembuu.release1;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface Open {
-    boolean isOpen();
-    void close();
-    
-    /**
-     * Close all instances is possible
-     */
-    void closeAll();
+public class MakeFileVersion {
+    public static void main(String[] args) {
+        System.out.println(System.currentTimeMillis());
+    }
 }

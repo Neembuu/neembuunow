@@ -354,8 +354,7 @@ public class MainPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void showAddLinkUIButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showAddLinkUIButtonActionPerformed
-        addLinksPanel.setVisible(!addLinksPanel.isVisible());
-        listener.changed(null, -1, -1);//nui.updateHeight();
+        addLinksPanelShow(!addLinksPanel.isVisible());
     }//GEN-LAST:event_showAddLinkUIButtonActionPerformed
 
     private void neembuuVirtualFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_neembuuVirtualFolderButtonActionPerformed
@@ -427,8 +426,10 @@ public class MainPanel extends javax.swing.JPanel {
     private void addLinkProgressSet(String a){
         linkAddStatusLabel.setText(a);
     }
+    
     private void addLinksPanelShow(boolean show){
         addLinksPanel.setVisible(show);
+        listener.changed(null, -1, -1);//nui.updateHeight();
     }
     private void addLinksPanelEnable(boolean enable){
         addLinksButton.setEnabled(enable);
@@ -470,6 +471,11 @@ public class MainPanel extends javax.swing.JPanel {
         @Override public String getLinksText() { return MainPanel.this.getLinksText(); }  
         @Override public void setLinksText(String a) { MainPanel.this.setLinksText(a); }
         @Override public AddLinkUI.Lock getLock() { return lockAddUI; }
+        @Override public void clickAddLinksButton(boolean show) {
+            if(show)MainPanel.this.addLinksButtonActionPerformed(null);
+            else MainPanel.this.addOnlyFilesButtonActionPerformed(null);
+        }
+        
         private final Lock lockAddUI = new Lock() { 
             @Override public void lock(boolean f) {
                 getAddLinkUI().addLinksPanelEnable(!f);

@@ -31,17 +31,28 @@ import neembuu.release1.api.ui.AddLinkUI;
 public class AddLinksFromClipboardImpl {
     private final AddLinkUI addLinkUI;
     private final ClipboardMonitor cmi;
-
     
-    public AddLinksFromClipboardImpl(AddLinkUI addLinkUI, ClipboardMonitor cmi) {
+    private AddLinksFromClipboardImpl(AddLinkUI addLinkUI, ClipboardMonitor cmi) {
         this.addLinkUI = addLinkUI;
         this.cmi = cmi;
-        
+    }
+    
+    public void startService(){
         cmi.addListener(new ClipboardListener() {
             @Override public void receive(List<String> urls) {
                 receiveImpl(urls);
             }
         });
+    }
+    
+    public void stopService(){
+        throw new UnsupportedOperationException();
+    }
+    
+    public  static AddLinksFromClipboardImpl createAndStart(AddLinkUI addLinkUI, ClipboardMonitor cmi){
+        AddLinksFromClipboardImpl impl = new AddLinksFromClipboardImpl(addLinkUI, cmi);
+        impl.startService();
+        return impl;
     }
 
     private void receiveImpl(List<String> urls) {

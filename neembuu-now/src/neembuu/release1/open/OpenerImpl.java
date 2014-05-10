@@ -17,79 +17,140 @@
 
 package neembuu.release1.open;
 
+import neembuu.release1.api.open.Opener;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.SwingUtilities;
 import jpfm.SystemUtils;
 import neembuu.release1.Application;
 import neembuu.release1.api.open.Open;
+import neembuu.release1.api.open.OpenerAccess;
 import neembuu.release1.api.ui.MainComponent;
-import neembuu.release1.pismo.PismoInstaller;
 import neembuu.release1.pismo.lin;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public final class Opener {
+public final class OpenerImpl implements Opener {
     
     private final Map<String,Open> openHandles = new HashMap<>();
     
-    private MainComponent mainComponent;
+    private final MainComponent mainComponent;
 
-    public void initMainComponent(MainComponent mainComponent) {
-        if(this.mainComponent!=null){throw new IllegalStateException("Already initialized"); }
+    public OpenerImpl(MainComponent mainComponent) {
         this.mainComponent = mainComponent;
     }
-    
-    public static final Opener I = new Opener();
-    
-    public void closeAll(){
-        for(Open o : openHandles.values()){
-            o.close();
+
+    private final OpenerAccess openerA = new OpenerAccess() {
+
+        @Override public void closeAll() {
+            OpenerImpl.this.closeAllImpl();
         }
+
+        @Override public Open openHandles_remove(String filePath) {
+            return OpenerImpl.this.openHandles.remove(filePath);
+        }
+    };
+
+    private void closeAllImpl(){
+        // this complexity is to avoid concurrent modification exception
+        // closing all instances, includes ones which on close
+        // remove themselves from the list of open handles
+        Open[]openHandlerArr = openHandles.values().toArray(new Open[0]);
+        for(Open o : openHandlerArr){
+            o.closeAll();
+        }
+        
+        // closing zombie open handles which for some odd reason didn't remove
+        // their copies
+        for(Open o : openHandles.values()){
+            System.out.println("Closing zombie open handle -> "+o);
+            try{
+                o.closeAll();
+            }catch(Exception a){
+                a.printStackTrace();
+            }
+        }
+        
+        openHandles.clear();
+        
+    }
+
+    public final OpenerAccess getOpenerAccess() {
+        return openerA;
     }
     
-    public Open open(File f){
-        String fileToOpen = f.getAbsolutePath();
+    @Override
+    public Open open(String fileToOpen){
         Open x = openHandles.get(fileToOpen);
         if(x!=null){ x.close(); }
         
         if(SystemUtils.IS_OS_WINDOWS){
-            return openWin(f);
+            return openWin(fileToOpen);
         }else if(SystemUtils.IS_OS_MAC){
-            return fallBackOpen(f);
+            return fallBackOpen(fileToOpen);
         }else {
-            return openLin(f);
+            return openLin(fileToOpen);
         }
     }
     
-    private Open openWin(File f) {
+    @Override
+    public Open openFolder(String f)throws Exception{
+        if(!new File(f).isDirectory())throw new IllegalArgumentException(f+" is not a directory");
+        
+        if(SystemUtils.IS_OS_WINDOWS){
+            return openFolderWin(f);
+        }else if(SystemUtils.IS_OS_MAC){
+            return fallbackOpenFolder(f);
+        }else {
+            return fallbackOpenFolder(f);
+        }
+    }
+    
+    private Open openFolderWin(String fileToOpen)throws Exception{        
+        ProcessBuilder pb = new ProcessBuilder("explorer.exe",fileToOpen);
+        Process p = null;
+        try{
+            p = pb.start();
+        }catch(Exception a){
+            throw a;
+        }
+        OpenImplWindowFolder oi = new OpenImplWindowFolder(p, fileToOpen, openerA);
+        openHandles.put(fileToOpen, oi);
+        return oi;
+    }
+    
+    private Open fallbackOpenFolder(String f)throws Exception{
+        java.awt.Desktop.getDesktop().open(new File(f));
+        return DummyOpen.I();
+    }
+    
+    private Open openWin(String absoluteFilePath) {
         Path vlc = Application.getResource(Application.Resource.Installation,"vlc");
         vlc = vlc.resolve("vlc-1.1.11-win32").resolve("vlc.exe");
-        if(Files.exists(vlc)){ return make(vlc, f);}
+        if(Files.exists(vlc)){ return make(vlc, absoluteFilePath);}
         else { 
             vlc = Paths.get(System.getenv("ProgramFiles"),"VideoLAN","VLC","vlc.exe");
-            if(Files.exists(vlc)){ return make(vlc, f);}
+            if(Files.exists(vlc)){ return make(vlc, absoluteFilePath);}
             else {
                 vlc = Paths.get("C:","Program Files (x86)","VideoLAN","VLC","vlc.exe");
-                if(Files.exists(vlc)){ return make(vlc, f);}
+                if(Files.exists(vlc)){ return make(vlc, absoluteFilePath);}
                 else { 
                     vlc = Paths.get("C:","Program Files","VideoLAN","VLC","vlc.exe");
-                    if(Files.exists(vlc)){ return make(vlc, f);}
+                    if(Files.exists(vlc)){ return make(vlc, absoluteFilePath);}
                     else { 
-                        return fallBackOpen(f);
+                        return fallBackOpen(absoluteFilePath);
                     }
                 }
             }
         }
     }
     
-    private Open openLin(File f) {
+    private Open openLin(String f) {
         Path vlc = Paths.get("/usr/bin/vlc");
         if(Files.exists(vlc)){
             return make(vlc, f);
@@ -123,64 +184,34 @@ public final class Opener {
         String out = lin.executeAsRoot(password, cmd, mainComponent);
     }
     
-    private Open fallBackOpen(File f){
+    private Open fallBackOpen(String absoulteFilePath){
         try{
-            java.awt.Desktop.getDesktop().open(f);
+            java.awt.Desktop.getDesktop().open(new File(absoulteFilePath));
             return DummyOpen.I();
         }catch(Exception ioe){
             try{
-                java.awt.Desktop.getDesktop().open(f.getParentFile());
+                java.awt.Desktop.getDesktop().open(new File(absoulteFilePath).getParentFile());
             }catch(Exception ioe1){
-                // could not open file :(
-                String fn = "";
-                try{ fn=f.getAbsolutePath();}catch(Exception a){/*null pointer*/}
                 mainComponent.newMessage().error().setTitle("Could not open file")
-                        .setMessage(fn).setTimeout(10000).showNonBlocking();
+                        .setMessage(absoulteFilePath).setTimeout(10000).showNonBlocking();
                 ioe.printStackTrace();
                 ioe1.printStackTrace();
             }
         }return DummyOpen.I();
     }
     
-    private static final class DummyOpen implements Open { 
-        public static DummyOpen I(){return new DummyOpen();}
-        @Override public boolean isOpen() { return false;/*throw new UnsupportedOperationException("Not supported yet.");*/}
-        @Override public void close() { }
-    }
-    
-    private Open make(Path vlc, File toOpen){
-        String fileToOpen = toOpen.getAbsolutePath();
-        ProcessBuilder pb = new ProcessBuilder(vlc.toAbsolutePath().toString(),fileToOpen);
+    private Open make(Path vlc, String fileToOpen){
+        vlc = vlc.toAbsolutePath();
+        ProcessBuilder pb = new ProcessBuilder(vlc.toString(),fileToOpen);
         Process p = null;
         try{
             p = pb.start();
         }catch(Exception a){
-            return fallBackOpen(toOpen);
+            return fallBackOpen(fileToOpen);
         }
-        OpenImpl oi = new OpenImpl(p, fileToOpen);
+        OpenImpl oi = new OpenImpl(p, fileToOpen, openerA);
         openHandles.put(fileToOpen, oi);
         return oi;
     }
-    
-    private final class OpenImpl implements Open { 
-        private final Process p;
-        private final String path;
-
-        public OpenImpl(Process p, String path) { this.p = p; this.path = path; }
-        
-        @Override public boolean isOpen() { 
-            try { p.exitValue(); return false; } 
-            catch (Exception e) { return true; } 
-        }
-        
-        @Override public void close() { 
-            try{ p.destroy(); }catch(Exception a){} 
-            Open o = openHandles.remove(path);
-            if(o!=this && o!=null){
-                new Exception("closed file but removed wrong handle, therefore killing it").printStackTrace();
-                o.close();
-            }
-        }
-    }
-
+   
 }

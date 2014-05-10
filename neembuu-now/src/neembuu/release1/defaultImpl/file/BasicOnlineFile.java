@@ -17,12 +17,13 @@
 
 package neembuu.release1.defaultImpl.file;
 
+import java.util.logging.Level;
+import jpfm.util.UniversallyValidFileName;
 import neembuu.release1.api.file.OnlineFile;
 import neembuu.release1.api.file.PropertyProvider;
 import neembuu.release1.defaultImpl.linkhandler.BasicLinkHandler;
 import neembuu.vfs.connection.NewConnectionProvider;
 import neembuu.vfs.connection.jdimpl.JD_DownloadManager;
-import neembuu.vfs.connection.sampleImpl.DownloadManager;
 
 /**
  *
@@ -98,6 +99,12 @@ public final class BasicOnlineFile implements OnlineFile {
         }
 
         public Builder setName(String name) {
+            // we must normalize name
+            if(!UniversallyValidFileName.isUniversallyValidFileName(name)){
+                neembuu.release1.Main.getLOGGER().log(Level.SEVERE, "fileName need to be normalized {0}", name);
+                name = UniversallyValidFileName.makeUniversallyValidFileName(name);
+                neembuu.release1.Main.getLOGGER().log(Level.SEVERE, "fileName after normalization {0}", name);
+            }
             this.name = name; return this;
         }
 

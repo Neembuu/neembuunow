@@ -21,12 +21,21 @@ package neembuu.release1.api.open;
  *
  * @author Shashank Tulsyan
  */
-public interface Open {
-    boolean isOpen();
-    void close();
-    
+public final class Openers {
+    private static Opener opener;
+
+    public static void setOpener(Opener opener) {
+        if(Openers.opener !=null){
+            throw new IllegalStateException("Already initialized");
+        }
+        Openers.opener = opener;
+    }
+
     /**
-     * Close all instances is possible
+     * @return an instance of the default implementation of opener service
      */
-    void closeAll();
+    public static Opener I() {
+        return opener;
+    }
+
 }

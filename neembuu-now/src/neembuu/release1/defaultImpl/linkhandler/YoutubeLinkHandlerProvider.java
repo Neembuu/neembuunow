@@ -207,7 +207,10 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
             System.out.println("urls: " + jSonArray);
             
             //Set the group name as the name of the video
-            linkHandlerBuilder.setGroupName(jSonObject.getString("filename"));
+            String  nameOfVideo = jSonObject.getString("filename");
+            //normalize name of video
+            nameOfVideo = jpfm.util.UniversallyValidFileName.makeUniversallyValidFileName(nameOfVideo);
+            linkHandlerBuilder.setGroupName(nameOfVideo);
             
             
             // Davide you cannot create a this.fileName field
@@ -259,6 +262,8 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
                 }catch(Exception a){
                     a.printStackTrace();
                 }
+                
+                fileName = nameOfVideo + " " +fileName;
                 
                 fileBuilder.setName(fileName)
                     .setUrl(singleUrl)

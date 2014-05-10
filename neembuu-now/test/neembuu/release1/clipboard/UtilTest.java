@@ -14,36 +14,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package neembuu.release1.clipboard;
 
-package neembuu.release1;
-
-import java.io.File;
-import javax.swing.JFrame;
-import neembuu.release1.api.open.Open;
-import neembuu.release1.api.open.Opener;
-import neembuu.release1.api.open.Openers;
-import neembuu.release1.open.OpenerImpl;
-import neembuu.release1.ui.MainComponentImpl;
+import java.util.ArrayList;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public class OpenTest {
+public class UtilTest {
+    //Pull all links from the body for easy retrieval
+    
     public static void main(String[] args) throws Exception{
-        OpenerImpl defaultOpener = new OpenerImpl(new MainComponentImpl(new JFrame()));
-        Openers.setOpener(defaultOpener);
-
-        //Opener.I.open(null);
-        Open o =  Openers.I().openFolder("f:\\neembuu\\backup");
-        System.out.println("o="+o);
+        String text = "http://rapidshare.com/files/183020068/S5E93_-_J2_Revised.part2.rar asassa\n" +
+                "\nsadsada " +
+                "https://rapidshare.com/files/979681925/test120k.rmvb\n asdasdsa" +
+                "\n asdasdsa " +
+                "upd0.appwork.org/jcgi/JDownloader/alpha\n sadsadas" +
+                "asdasd upd0.appwork.org/jcgi/JDownloader asdasd";
+        System.out.println(text);
         
-        o =  Openers.I().openFolder("f:\\neembuu\\backup");
-        System.out.println("o="+o);
-        
-        Thread.sleep(1000*3);
-        //o.close();
-        
-        defaultOpener.getOpenerAccess().closeAll();
+        System.out.println(text);
+        ArrayList<String> a = Util.pullLinks(text);
+        for (String url : a) {
+            System.out.println("lnk->"+url);
+        }
     }
 }

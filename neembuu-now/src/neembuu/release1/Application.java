@@ -45,8 +45,9 @@ public class Application {
     }
     
     public static long releaseTime() {
-        return 1397383036664L; 
-        //returning as a System.currentTime() long value
+        return 1398604095683L;
+        //return 1397383036664L; 
+        //run neembuu.release1.MakeFileVersion from the Test Packages
     }
 
     private static MainComponent mainComponent;
@@ -57,6 +58,12 @@ public class Application {
         }Application.mainComponent = mainComponent;
     }
     
+    /**
+     * find a resource in the home directory
+     * @param relative
+     * @return same as calling 
+     * getResource(neembuu.release1.Application.Resource.Home, relative) 
+     */
     public static Path getResource(final String... relative) {
         return getResource(Resource.Home, relative);
     }
@@ -72,7 +79,8 @@ public class Application {
             case Logs:                          base = getPath(getHome(),"logs");break;
             default:                            throw new AssertionError();
         }
-        return Paths.get(base.toAbsolutePath().toString(), relative).toAbsolutePath();
+        Path p = Paths.get(base.toAbsolutePath().toString(), relative).toAbsolutePath();
+        return p;
     }
     
     private static Path getVF(){
@@ -145,7 +153,7 @@ public class Application {
             }
         }else {
             try{
-                Files.createDirectory(dir);
+                Files.createDirectories(dir);
             }catch(IOException ioe){
                 ioe.printStackTrace();
                 m.setMessage("Could not create directory\n"
