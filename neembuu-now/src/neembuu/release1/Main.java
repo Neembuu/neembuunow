@@ -33,6 +33,7 @@ import neembuu.release1.defaultImpl.linkgroup.DefaultLinkGroupMaker;
 import neembuu.release1.defaultImpl.linkgroup.SplitsLinkGroupMaker;
 import neembuu.release1.defaultImpl.linkhandler.YoutubeLinkHandlerProvider;
 import neembuu.release1.defaultImpl.linkhandler.DirectLinkHandlerProvider;
+import neembuu.release1.defaultImpl.linkhandler.VimeoLinkHandlerProvider;
 import neembuu.release1.defaultImpl.restore_previous.RestorePreviousSessionImpl;
 import neembuu.release1.open.Opener;
 import neembuu.release1.ui.InitLookAndFeel;
@@ -87,6 +88,7 @@ public final class Main {
         mountManager.initialize();
         
         // move out of this jar
+        LinkHandlerProviders.registerProvider(new VimeoLinkHandlerProvider());
         LinkHandlerProviders.registerProvider(new YoutubeLinkHandlerProvider());
         
         //DefaultLinkHandler is the default handler
