@@ -44,7 +44,7 @@ public class NHttpClientUtils {
             HttpResponse response = httpClient.execute(httpGet);
             long length = response.getEntity().getContentLength();
             System.out.println("Length: " + length);
-            EntityUtils.consume(response.getEntity());
+            httpGet.abort();
             return length;
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
