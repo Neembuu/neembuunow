@@ -50,7 +50,7 @@ public final class Colors {
         return new Color(HSLColor.toRGB((float)h/base, (float)s/base, (float)l/base,alpha),true);
     }
     
-    private static Color hsl(int h, int s, int l,HSLSource hSLSource){
+    public static Color hsl(int h, int s, int l,HSLSource hSLSource){
         int base = hSLSource.getBase();
         return new Color(HSLColor.toRGB((float)h/base, (float)s/base, (float)l/base));
     }

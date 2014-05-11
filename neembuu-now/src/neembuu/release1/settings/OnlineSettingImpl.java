@@ -19,7 +19,7 @@ package neembuu.release1.settings;
 
 import java.util.logging.Level;
 import neembuu.release1.Main;
-import neembuu.release1.StringUtils;
+import davidepastore.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;

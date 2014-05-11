@@ -14,10 +14,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package neembuu.release1;
+package davidepastore;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import neembuu.release1.Main;
 
 /**
  * This class provides simple common methods to work with Strings.

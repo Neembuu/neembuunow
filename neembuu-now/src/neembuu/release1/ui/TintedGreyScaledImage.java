@@ -63,7 +63,7 @@ public class TintedGreyScaledImage {
         return new TintedGreyScaledImage(TintedGreyScaledImage.class.getResource(src),monoColor);
     }
     
-    public static ImageIcon getTintedImage(BufferedImage src, Color tintingColor,boolean monoColor) {
+    public static BufferedImage getTintedBufferedImage(BufferedImage src, Color tintingColor,boolean monoColor) {
         BufferedImage bi = getGraphicsConfiguration().createCompatibleImage(src.getWidth(), src.getHeight());
 
         
@@ -88,7 +88,11 @@ public class TintedGreyScaledImage {
             }
         }
 
-        return new ImageIcon(bi);
+        return bi;
+    }
+    
+    public static ImageIcon getTintedImage(BufferedImage src, Color tintingColor,boolean monoColor) {
+        return new ImageIcon(getTintedBufferedImage(src, tintingColor, monoColor));
     }
 
     static int tintColor(int src, Color tinting_color,boolean monoColor,float averageLum) {
