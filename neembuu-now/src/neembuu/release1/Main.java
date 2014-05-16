@@ -33,6 +33,7 @@ import neembuu.release1.clipboard.AddLinksFromClipboardImpl;
 import neembuu.release1.clipboard.ClipboardMonitorImpl;
 import neembuu.release1.defaultImpl.linkgroup.DefaultLinkGroupMaker;
 import neembuu.release1.defaultImpl.linkgroup.SplitsLinkGroupMaker;
+import neembuu.release1.defaultImpl.linkhandler.DailymotionLinkHandlerProvider;
 import neembuu.release1.defaultImpl.linkhandler.YoutubeLinkHandlerProvider;
 import neembuu.release1.defaultImpl.linkhandler.DirectLinkHandlerProvider;
 import neembuu.release1.defaultImpl.linkhandler.VimeoLinkHandlerProvider;
@@ -91,6 +92,7 @@ public final class Main {
         mountManager.initialize();
         
         // move out of this jar
+        LinkHandlerProviders.registerProvider(new DailymotionLinkHandlerProvider());
         LinkHandlerProviders.registerProvider(new VimeoLinkHandlerProvider());
         LinkHandlerProviders.registerProvider(new YoutubeLinkHandlerProvider());
         
