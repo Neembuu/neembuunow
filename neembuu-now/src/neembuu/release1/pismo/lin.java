@@ -18,8 +18,8 @@
 package neembuu.release1.pismo;
 
 import java.nio.file.Path;
-import neembuu.release1.Application;
-import static neembuu.release1.Application.Resource.Installation;
+import neembuu.release1.app.Application;
+import static neembuu.release1.app.Application.Resource.Installation;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.Message;
 

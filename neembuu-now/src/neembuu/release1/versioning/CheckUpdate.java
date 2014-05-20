@@ -6,7 +6,7 @@ package neembuu.release1.versioning;
 
 import java.util.Date;
 import java.util.logging.Level;
-import neembuu.release1.Application;
+import neembuu.release1.app.Application;
 import neembuu.release1.Main;
 import davidepastore.StringUtils;
 import neembuu.release1.api.ui.MainComponent;

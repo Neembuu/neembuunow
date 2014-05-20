@@ -35,7 +35,7 @@ import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.access.RemoveFromUI;
 import neembuu.release1.api.ui.actions.EditLinksAction;
 import neembuu.release1.defaultImpl.linkgroup.LinkGrouperImpl;
-import neembuu.release1.log.LoggerUtil;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.ui.actions.EditLinksActionImpl.Actions;
 import neembuu.release1.ui.linkpanel.EditLinksPanel;
 

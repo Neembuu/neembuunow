@@ -25,7 +25,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import jpfm.SystemUtils;
-import neembuu.release1.Application;
+import neembuu.release1.app.Application;
 import neembuu.release1.api.open.Open;
 import neembuu.release1.api.open.OpenerAccess;
 import neembuu.release1.api.ui.MainComponent;

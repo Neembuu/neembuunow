@@ -28,25 +28,31 @@ import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.file.Saveable;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.access.ProgressUIA;
+import neembuu.release1.api.ui.actions.ReAddAction.CallBack;
 import neembuu.release1.api.ui.actions.SaveAction;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public class SaveAction_forVariants implements SaveAction {
+public class SaveAction_forVariants implements SaveAction,CallBack {
     private final MainComponent mainComponent;
     private final ProgressUIA ui;
     private final List<PopupEntry> doneFiles = new LinkedList<PopupEntry>();
 
     private PopupEntry mainFileMenuItem = null;
+    private String warning = null;
 
     public SaveAction_forVariants(MainComponent mainComponent, ProgressUIA ui) {
         this.mainComponent = mainComponent; this.ui = ui;
     }
     
+    @Override
+    public void sendWarning(String warning){
+        this.warning = warning;
+    }
     
-    
+    @Override
     public void doneCreation(final NeembuuFile neembuuFile) {
         doneFiles.removeAll(doneFiles);       
         mainFileMenuItem = new PopupEntry(neembuuFile, neembuuFile.getMinimumFileInfo().getName());
@@ -72,7 +78,9 @@ public class SaveAction_forVariants implements SaveAction {
         }
 
         @Override public void actionPerformed(ActionEvent e) {
-            SaveActionImpl sai = new SaveActionImpl(file, mainComponent);
+            SaveActionImpl sai = new SaveActionImpl(mainComponent);
+            sai.setFile(file);
+            sai.sendWarning(warning); // delegating the task to show warning
             sai.actionPerformed();}
     }
     

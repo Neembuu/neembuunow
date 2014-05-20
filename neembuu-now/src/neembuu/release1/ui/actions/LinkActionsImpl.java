@@ -54,9 +54,7 @@ public class LinkActionsImpl {
     private final DeleteAction delete = new DeleteAction() {@Override public void actionPerformed() {
             delete();
         }};;
-    private final SaveAction save = new SaveAction() {@Override public void actionPerformed() {
-            saveFileClicked();
-        }};;
+    private final SaveAction save;
     
     private final CloseAction close = new CloseAction() {
         @Override public void actionPerformed() {
@@ -79,7 +77,9 @@ public class LinkActionsImpl {
     public LinkActionsImpl(Session s,CloseActionUIA ui, RemoveFromUI removeFromUI, 
             MainComponent mainComponent, NeembuuFileCreator neembuuFileCreator, OpenAction oa) {
         this.ui = ui;this.removeFromUI = removeFromUI;openAction = oa;this.s=s;
-        this.mainComponent = mainComponent; this.neembuuFileCreator = neembuuFileCreator;}
+        this.mainComponent = mainComponent; this.neembuuFileCreator = neembuuFileCreator;
+        save = new SaveActionImpl(mainComponent);
+    }
     
     public DeleteAction getDelete() {return delete;}
     public CloseAction getClose() {return close;}
@@ -174,12 +174,6 @@ public class LinkActionsImpl {
                 .setTitle("Could not delete file")
                 .show();
         }
-    }
-    
-    
-    void saveFileClicked(){
-        SaveActionImpl sai = new SaveActionImpl(connectionFile, mainComponent);
-        sai.actionPerformed();
     }
         
     private boolean createNewVirtualFile(){        

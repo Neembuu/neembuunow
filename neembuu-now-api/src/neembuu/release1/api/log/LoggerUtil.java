@@ -14,13 +14,33 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package neembuu.release1.api.ui.actions;
+package neembuu.release1.api.log;
+
+import java.util.logging.Logger;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface SaveAction {
-    void actionPerformed();
-    void sendWarning(String warning);
+public final class LoggerUtil {
+    
+    private static LoggerServiceProvider serviceProvider = null;
+
+    public static void setServiceProvider(LoggerServiceProvider serviceProvider) {
+        if(LoggerUtil.serviceProvider!=null){
+            throw new IllegalStateException("Already initialized with "+LoggerUtil.serviceProvider);
+        }
+        LoggerUtil.serviceProvider = serviceProvider;
+    }   
+
+    public static Logger getLogger() {
+        return getLogger(null);
+    }
+
+    public static Logger getLogger(String name) {
+        if(serviceProvider==null){
+            return Logger.getLogger(name);
+        }
+        return serviceProvider.getLogger(name);
+    }
 }

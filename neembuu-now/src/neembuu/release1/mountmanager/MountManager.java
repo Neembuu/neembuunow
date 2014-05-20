@@ -32,7 +32,7 @@ import jpfm.mount.Mounts;
 import jpfm.volume.CommonFileAttributesProvider;
 import jpfm.volume.vector.VectorRootDirectory;
 import neembuu.diskmanager.DiskManager;
-import neembuu.release1.Application;
+import neembuu.release1.app.Application;
 import neembuu.release1.Main;
 import neembuu.release1.api.RealFileProvider;
 import neembuu.release1.api.open.Openers;

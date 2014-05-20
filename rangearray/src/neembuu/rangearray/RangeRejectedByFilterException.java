@@ -24,5 +24,20 @@ package neembuu.rangearray;
  *
  * @author Shashank Tulsyan
  */
-public class RangeArrayElementRejectedByFilterException extends RuntimeException{
+public class RangeRejectedByFilterException extends RuntimeException{
+    public RangeRejectedByFilterException() {
+    }
+    
+    public RangeRejectedByFilterException(String str) {
+        super(str);
+    }
+    
+    public static final class GreaterThanFileSize extends RangeRejectedByFilterException {
+
+        public GreaterThanFileSize(long fileSize, long elementEnding) {
+            super("Range array element being added ends at="+elementEnding+
+                    " and is greater than the set fileSize="+fileSize);
+        }
+
+    }
 }

@@ -27,6 +27,7 @@ import neembuu.rangearray.Range;
 import neembuu.rangearray.RangeArray;
 import neembuu.rangearray.RangeArrayFactory;
 import neembuu.rangearray.RangeArrayParams;
+import neembuu.rangearray.RangeRejectedByFilterException;
 import neembuu.rangearray.RangeUtils;
 import neembuu.rangearray.UIRangeArrayAccess;
 import neembuu.rangearray.UnsyncRangeArrayCopy;
@@ -37,6 +38,7 @@ import neembuu.release1.api.ui.linkpanel.Graph;
 import neembuu.release1.api.ui.linkpanel.Progress;
 import neembuu.release1.api.ui.access.ProgressUI;
 import neembuu.release1.api.ui.access.ProgressUIA;
+import neembuu.release1.api.ui.actions.SaveAction;
 import neembuu.release1.ui.Colors;
 import neembuu.swing.RangeArrayComponent;
 import neembuu.swing.RangeArrayComponentBuilder;
@@ -57,6 +59,7 @@ public class ProgressImpl implements Progress {
     private final Graph graph;
     private final Mode m;
     private final ProgressUI progressUI;
+    private final SaveAction saveAction;
     
     private RangeArrayComponent progress;
     private RangeArray<Boolean> overallProgress;
@@ -73,8 +76,8 @@ public class ProgressImpl implements Progress {
         VariantProgressUI
     }
 
-    public ProgressImpl(ProgressUIA ui, Graph graph, Mode m) {
-        this.ui = ui; this.graph = graph; this.m = m;
+    public ProgressImpl(ProgressUIA ui, Graph graph, Mode m, SaveAction saveAction) {
+        this.ui = ui; this.graph = graph; this.m = m; this.saveAction = saveAction;
         switch (m) {
             case OverallProgressUI:  progressUI = ui.overallProgressUI(); break;
             case VariantProgressUI:  progressUI = ui.variantProgressUI(); break;
@@ -198,7 +201,15 @@ public class ProgressImpl implements Progress {
         for (int i = 0; i < regionHandlersUnsync.size(); i++) {
             Range<ReadRequestState> r = regionHandlersUnsync.get(i);
             totalDownloaded += RangeUtils.getSize(r);
-            overallProgress.addElement(r.starting(), r.getProperty().authorityLimit(),false);
+            try{
+                overallProgress.addElement(r.starting(), r.getProperty().authorityLimit(),false);
+            }catch(RangeRejectedByFilterException.GreaterThanFileSize reason){// ignore
+                Main.getLOGGER().log(Level.SEVERE,"Evil download pattern as server probably"
+                        + " giving data even after reaching end, or probably"
+                        + " the server doesn't respond to http offset headers.",reason);
+            }catch(RangeRejectedByFilterException reason){// ignore
+                Main.getLOGGER().log(Level.SEVERE,"Bug here : cannot add element",reason);
+            }
         }
 
         
@@ -207,7 +218,13 @@ public class ProgressImpl implements Progress {
             Range r = overallProgressUnsync.get(i);
             if(r.starting() < latestRequestEnding &&
                     latestRequestEnding < r.ending()){
-                overallProgress.addElement(latestRequestEnding+1,r.ending(),true);
+                try{
+                    overallProgress.addElement(latestRequestEnding+1,r.ending(),true);
+                }catch(RangeRejectedByFilterException.GreaterThanFileSize reason){// ignore
+                    Main.getLOGGER().log(Level.SEVERE,"Evil read request ",reason);
+                }catch(RangeRejectedByFilterException reason){// ignore
+                    Main.getLOGGER().log(Level.SEVERE,"Bug here : read request was rejected ",reason);
+                }
                 break;
             }
         }
@@ -224,7 +241,12 @@ public class ProgressImpl implements Progress {
         if(left == 0){
             ui.saveButton().setVisible(true);
         }else if(total_Downloaded > file.getFileSize()){
-            throw new RuntimeException("Total download size of file greater than filesize");
+            saveAction.sendWarning("There seems to be some problem with the website which is sending this file.\n"
+                    + "The website is sending data although the download has finished 100% .\n"
+                    + "The file is most probably corrupt and there is no point in saving it.\n"
+                    + "Do you want to still give it a try and save this file ?");
+            ui.saveButton().setVisible(true);
+            //throw new RuntimeException("Total download size of file greater than filesize");
         } 
         
         if(ui.getExpansionState() == ExpansionState.SemiExpanded ||  ui.getExpansionState() == ExpansionState.FullyExpanded){

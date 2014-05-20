@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package neembuu.release1;
+package neembuu.release1.app;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +26,7 @@ import java.security.CodeSource;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jpfm.SystemUtils;
+import neembuu.release1.Main;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.Message;
 import neembuu.release1.ui.MainComponentImpl;
@@ -37,7 +38,30 @@ import neembuu.release1.ui.MainComponentImpl;
 public class Application {
     
     public enum Resource {
-        Home, Installation, Logs, ExternalPlugins, TempStorage, VirtualFolderMountLocation
+        /**
+         * neembuuhome = user.home/.neembuu-now/release1
+         */
+        Home, 
+        /**
+         * c:\Program Files (x86)\Neembuu\ etc
+         */
+        Installation, 
+        /**
+         * neembuuhome/logs
+         */
+        Logs, 
+        /**
+         * neembuuhome/external_plugins
+         */
+        ExternalPlugins, 
+        /**
+         * java.io.tmpdir/neembuu-now/release1
+         */
+        TempStorage, 
+        /**
+         * neembuuhome/NeembuuVirtualFolder
+         */
+        VirtualFolderMountLocation
     }
     
     public enum Runtime {

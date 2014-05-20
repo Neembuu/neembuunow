@@ -22,8 +22,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandler;
-import neembuu.release1.log.LoggerUtil;
 import neembuu.release1.api.linkhandler.LinkHandlerProvider;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.httpclient.NHttpClient;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -121,11 +121,11 @@ public class DirectLinkHandlerProvider implements LinkHandlerProvider {
             }
 
             @Override public String tempDisplayName(){
-                return url;//.substring(url.lastIndexOf('/')+1);
+                return getReferenceLinkString(); //return url;//.substring(url.lastIndexOf('/')+1);
             }
 
             @Override public String getReferenceLinkString() {
-                return url;
+                return Utils.getRidOfHttps(url);
             }
         };
     }

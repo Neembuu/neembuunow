@@ -51,7 +51,6 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
-import org.openide.util.Exceptions;
 
 /**
  * Neembuu HttpClient.

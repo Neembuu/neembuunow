@@ -30,6 +30,7 @@ import neembuu.release1.api.ui.access.MinimalistFileSystem;
 import neembuu.release1.api.ui.access.RemoveFromUI;
 import neembuu.release1.api.ui.actions.ChangeDownloadModeAction;
 import neembuu.release1.api.ui.actions.ReAddAction;
+import neembuu.release1.api.ui.actions.SaveAction;
 import neembuu.release1.api.ui.linkpanel.ProgressProvider;
 import neembuu.release1.defaultImpl.file.multiVariant.MultiVariantFileCreator;
 import neembuu.release1.defaultImpl.linkgroup.Utils;
@@ -58,7 +59,7 @@ public final class Link_UI_Factory {
     private final LinkGroup linkGroup;
     private final DownloadSpeedProvider speedProvider;
     private final LinkGroupUICreator linkUIMaker;
-
+    
     public Link_UI_Factory(ExpandableUIContainer luic1, MainComponent mainComponent, RealFileProvider realFileProvider, MinimalistFileSystem root, LinkGroup linkGroup, DownloadSpeedProvider downloadSpeedProvider,LinkGroupUICreator linkGroupUICreator) {
         this.luic1 = luic1;
         this.mainComp = mainComponent;
@@ -94,7 +95,6 @@ public final class Link_UI_Factory {
     
     public OpenableEUI makeSingleLinkUI() {
         GenericLinkPanel lp = new GenericLinkPanel();        
-        ProgressImpl progress = makeProgress(lp);
         ChangeDownloadModeAction changeDownloadMode = new ChangeDownloadModeActionImpl(lp.changeDownloadModeUIA);
         RemoveFromUI remover = defaultRemoveFromUI(lp.openableEUI, luic1);
         
@@ -103,8 +103,9 @@ public final class Link_UI_Factory {
         OpenActionImpl open = new OpenActionImpl(realFileProvider, mainComp);
         LinkActionsImpl actions = new LinkActionsImpl(linkGroup.getSession(),
                 lp.closeActionUIA, remover, mainComp, fileCreator, open);
+        ProgressImpl progress = makeProgress(lp,actions.getSave());
         
-        addCallbacks(actions, open, lp, progress, changeDownloadMode, null, true);
+        addCallbacks(actions, open, lp, progress, changeDownloadMode, null, true, actions.getSave());
         
         lp.initActions(new ExpandActionImpl(lp.expandActionUIA,ExpandActionImpl.Mode.SingleLinkType), 
                 open, actions.getClose(), actions.getDelete(), 
@@ -119,18 +120,18 @@ public final class Link_UI_Factory {
     
     public OpenableEUI makeSplitLinkUI() {
         GenericLinkPanel lp = new GenericLinkPanel();
-        ProgressImpl progress = makeProgress(lp);
         ChangeDownloadModeAction cdma = new ChangeDownloadModeActionImpl(lp.changeDownloadModeUIA);
         RemoveFromUI remover = defaultRemoveFromUI(lp.openableEUI, luic1);
 
         SplitMergeNeembuuFileCreator fileCreator = new SplitMergeNeembuuFileCreator(linkGroup, root);
         
         SaveAction_forVariants save = new SaveAction_forVariants(mainComp, lp.progressUIA);
+        ProgressImpl progress = makeProgress(lp,save);
         OpenActionImpl open = new OpenActionImpl(realFileProvider, mainComp);
         LinkActionsImpl actions = new LinkActionsImpl(linkGroup.getSession(),
                 lp.closeActionUIA, remover, mainComp, fileCreator, open);
         
-        addCallbacks(actions, open, lp, progress, cdma, null, true);
+        addCallbacks(actions, open, lp, progress, cdma, null, true, save);
         actions.getReAdd().addCallBack(new VariantProgressProvider(lp.progressUIA,save,null,null,true));
                 
         lp.initActions(new ExpandActionImpl(lp.expandActionUIA,ExpandActionImpl.Mode.SplitLinkType),
@@ -156,7 +157,7 @@ public final class Link_UI_Factory {
         LinkActionsImpl actions = new LinkActionsImpl(linkGroup.getSession(),
                 lp.closeActionUIA, remover,mainComp, fileCreator,open);
         
-        addCallbacks(actions, open, lp, null, changeDownloadModeAction, vpp, false);
+        addCallbacks(actions, open, lp, null, changeDownloadModeAction, vpp, false,save);
         actions.getReAdd().addCallBack(vpp);
                 
         lp.initActions(new ExpandActionImpl(lp.expandActionUIA,ExpandActionImpl.Mode.MultiVariantType),
@@ -174,10 +175,10 @@ public final class Link_UI_Factory {
         return elai;
     }
     
-    private static ProgressImpl makeProgress(GenericLinkPanel lp){
+    private static ProgressImpl makeProgress(GenericLinkPanel lp,SaveAction saveAction){
         Graph graph = new GraphImpl(lp.graphUIA);
-        ProgressImpl progress =  new ProgressImpl(
-                lp.progressUIA,graph,ProgressImpl.Mode.OverallProgressUI);
+        ProgressImpl progress =  new ProgressImpl(lp.progressUIA,graph,
+                ProgressImpl.Mode.OverallProgressUI,saveAction);
         lp.init(graph, progress.progressProvider, VariantsImpl.makeDummy());
         return progress;
     }
@@ -194,13 +195,15 @@ public final class Link_UI_Factory {
     private static void addCallbacks(LinkActionsImpl linkActionsImpl,
             ReAddAction.CallBack openActionImpl, GenericLinkPanel lp,
             ProgressImpl progress, ChangeDownloadModeAction changeDownloadModeAction,
-            ProgressProvider vpi, boolean initalizeProgress){
+            ProgressProvider vpi, boolean initalizeProgress, SaveAction saveAction){
         linkActionsImpl.getReAdd().addCallBack(openActionImpl);
         linkActionsImpl.getReAdd().addCallBack(new ReAddActionCallBackImpl(lp.closeActionUIA, 
                 vpi==null?progress.progressProvider:vpi, 
                 changeDownloadModeAction,initalizeProgress));
         linkActionsImpl.getReAdd().addCallBack(Utils.newDisplayNameSaver());
         linkActionsImpl.getReAdd().addCallBack(UserAnalytics.newReportHandler());
+        if(saveAction instanceof ReAddAction.CallBack)
+            linkActionsImpl.getReAdd().addCallBack((ReAddAction.CallBack)saveAction);
     }
     
     private static RemoveFromUI defaultRemoveFromUI(

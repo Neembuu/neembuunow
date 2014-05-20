@@ -28,6 +28,11 @@ public interface Message {
     Message setTitle(String title);
     Message setMessage(String message);
     
+    /**
+     * Will automatically close dialog box after timeout milliseconds
+     * @param timeout in milli seconds
+     * @return 
+     */
     Message setTimeout(int timeout);
     
     Message setEmotion(Emotion e);

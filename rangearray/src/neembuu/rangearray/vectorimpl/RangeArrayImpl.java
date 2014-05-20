@@ -60,7 +60,7 @@
 package neembuu.rangearray.vectorimpl;
 
 import java.util.Arrays;
-import neembuu.rangearray.RangeArrayElementRejectedByFilterException;
+import neembuu.rangearray.RangeRejectedByFilterException;
 import neembuu.rangearray.RangeArray;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -526,7 +526,7 @@ public class RangeArrayImpl<P>
      * @param newEntry The new entry which is to be added to this RangeArray
      * @see #removeElement(neembuu.common.RangeArrayElement)
      * @see RangeArrayElement#isAnAntagonistEntry()
-     * @throws RangeArrayElementRejectedByFilterException If file size was set to some value which is lesser than
+     * @throws RangeRejectedByFilterException If file size was set to some value which is lesser than
      * {@link #MAX_VALUE_SUPPORTED } and the element being added is greater than this value
      */
     @Override
@@ -542,7 +542,8 @@ public class RangeArrayImpl<P>
         // indexes of x1 & x2
         
         
-        if(!canBeAnElementOfThis(newEntry))throw new RangeArrayElementRejectedByFilterException();
+        RangeRejectedByFilterException reason = canBeAnElementOfThis(newEntry);
+        if(reason!=null)throw reason;
         if(isAnAntagonistEntry){
             removeElement_(newEntry.starting(), newEntry.ending());
             return null;
@@ -1388,7 +1389,8 @@ public class RangeArrayImpl<P>
      */
     @Override
     public void setFileSize(long fileSize) throws ArrayIndexOutOfBoundsException{
-        if(store.get(store.size()-2).ending()>fileSize)
+        if(this.fileSize!=RangeArrayImpl.DEFAULT_FILE_SIZE &&
+                store.get(store.size()-2).ending()>fileSize)
             throw new ArrayIndexOutOfBoundsException(
                     "New file size is lesser than already present values. Current file size="
                     +this.fileSize+" attempting to set file size ="+fileSize
@@ -2032,17 +2034,19 @@ public class RangeArrayImpl<P>
 
     @Override
     @SuppressWarnings(value="unchecked")
-    public final boolean canBeAnElementOfThis(Range<P> element) {
+    public final RangeRejectedByFilterException canBeAnElementOfThis(Range<P> element) {
         if (element.ending() > fileSize) {
-            return false;
+            return new RangeRejectedByFilterException.GreaterThanFileSize(fileSize,element.ending());
         }
-        if(rangeArrayElementFilters==null)return true;
+        if(rangeArrayElementFilters==null)return null;
         if(rangeArrayElementFilters.length>0){
             for(RangeArrayElementFilter filter : rangeArrayElementFilters){
-                if(!filter.canBeAnElementOfThis(element))return false;
+                RangeRejectedByFilterException reason 
+                        = filter.canBeAnElementOfThis(element);
+                if(reason!=null)return reason;
             }
             
-        }return true;
+        }return null;
     }
 
     /**

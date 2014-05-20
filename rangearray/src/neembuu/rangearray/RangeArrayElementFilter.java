@@ -41,5 +41,5 @@ package neembuu.rangearray;
  * @author Shashank Tulsyan
  */
 public interface RangeArrayElementFilter<P> {
-    public boolean canBeAnElementOfThis(Range<P> element);
+    public RangeRejectedByFilterException canBeAnElementOfThis(Range<P> element);
 }

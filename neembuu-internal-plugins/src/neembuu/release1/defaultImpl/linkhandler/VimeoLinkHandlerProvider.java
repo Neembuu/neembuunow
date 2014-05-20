@@ -25,16 +25,15 @@ import neembuu.release1.api.file.PropertyProvider;
 import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProvider;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.defaultImpl.file.BasicOnlineFile;
 import neembuu.release1.defaultImpl.file.BasicPropertyProvider;
 import neembuu.release1.httpclient.NHttpClient;
 import neembuu.release1.httpclient.utils.NHttpClientUtils;
-import neembuu.release1.log.LoggerUtil;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.openide.util.Exceptions;
 
 /**
  * I'm using the method explained <a href="http://jetcracker.wordpress.com/2013/10/29/vimeo-direct-download-link-java/">here</a>.
@@ -80,7 +79,7 @@ public class VimeoLinkHandlerProvider implements LinkHandlerProvider {
             System.out.println("Dataconfigurl: " + dataConfigUrl);
             
         } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
+            ex.printStackTrace();
         }
     }
     
@@ -172,7 +171,9 @@ public class VimeoLinkHandlerProvider implements LinkHandlerProvider {
 
         public void setRetryLimit(int retryLimit) { this.retryLimit = retryLimit; }
 
-        VIMEO_TLH(String url) { this.url = url; }
+        VIMEO_TLH(String url) { 
+            this.url = Utils.getRidOfHttps(url); 
+        }
 
         /**
          * 

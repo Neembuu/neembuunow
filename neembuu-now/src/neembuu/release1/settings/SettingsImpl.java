@@ -28,8 +28,8 @@ import java.nio.file.Path;
 import static java.nio.file.StandardOpenOption.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import neembuu.release1.Application;
-import neembuu.release1.log.LoggerUtil;
+import neembuu.release1.app.Application;
+import neembuu.release1.api.log.LoggerUtil;
 
 /**
  *

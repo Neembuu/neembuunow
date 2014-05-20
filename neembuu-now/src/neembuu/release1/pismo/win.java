@@ -34,10 +34,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import jpfm.MachineUtils;
 import neembuu.diskmanager.NioUtils;
-import neembuu.release1.Application;
-import static neembuu.release1.Application.Resource.Home;
-import static neembuu.release1.Application.Resource.Installation;
-import static neembuu.release1.Application.Resource.Logs;
+import neembuu.release1.app.Application;
+import static neembuu.release1.app.Application.Resource.Home;
+import static neembuu.release1.app.Application.Resource.Installation;
+import static neembuu.release1.app.Application.Resource.Logs;
 import neembuu.release1.Main;
 import static neembuu.release1.pismo.PismoInstaller.installLogFileName;
 

@@ -17,6 +17,7 @@
 
 package neembuu.release1;
 
+import neembuu.release1.app.Application;
 import java.io.PrintStream;
 import neembuu.release1.mountmanager.MountManager;
 import java.util.logging.Logger;
@@ -37,7 +38,9 @@ import neembuu.release1.defaultImpl.linkhandler.DailymotionLinkHandlerProvider;
 import neembuu.release1.defaultImpl.linkhandler.YoutubeLinkHandlerProvider;
 import neembuu.release1.defaultImpl.linkhandler.DirectLinkHandlerProvider;
 import neembuu.release1.defaultImpl.linkhandler.VimeoLinkHandlerProvider;
+import neembuu.release1.defaultImpl.log.LoggerServiceProviderImpl;
 import neembuu.release1.defaultImpl.restore_previous.RestorePreviousSessionImpl;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.open.OpenerImpl;
 import neembuu.release1.ui.InitLookAndFeel;
 import neembuu.release1.ui.NeembuuUI;
@@ -62,6 +65,10 @@ public final class Main {
         this.nui = new NeembuuUI();
         Application.setMainComponent(nui.getMainComponent());
         logger = initLogger();
+        
+        //initialize global logger service
+        LoggerUtil.setServiceProvider(new LoggerServiceProviderImpl());
+        
         troubleHandler = new UnprofessionalTroubleHandler(nui.getMainComponent(),nui.getIndefiniteTaskUI());
 
         String basePath = Application.getResource(Application.Resource.TempStorage)

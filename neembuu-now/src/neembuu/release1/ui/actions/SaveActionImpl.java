@@ -19,31 +19,55 @@ package neembuu.release1.ui.actions;
 
 import java.io.File;
 import java.util.logging.Level;
-import javax.swing.JOptionPane;
 import neembuu.release1.Main;
+import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.file.Saveable;
 import neembuu.release1.api.ui.MainComponent;
+import neembuu.release1.api.ui.actions.ReAddAction;
 import neembuu.release1.api.ui.actions.SaveAction;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public class SaveActionImpl implements SaveAction{
-    private final Saveable connectionFile;
+public class SaveActionImpl implements SaveAction,ReAddAction.CallBack{
+    private Saveable connectionFile;
     private final MainComponent mainComponent;
 
-    public SaveActionImpl(Saveable connectionFile, MainComponent mainComponent) {
-        this.connectionFile = connectionFile;
+    private String warning = null;
+    
+    public SaveActionImpl(MainComponent mainComponent) {
         this.mainComponent = mainComponent;
-        if(connectionFile==null){
+        /*if(connectionFile==null){
             throw new IllegalArgumentException("Connection file not initialized");
-        }
+        }*/
     }        
 
+    public void setFile(Saveable saveable){
+        this.connectionFile = saveable;
+    }
+    
+    @Override
+    public void doneCreation(NeembuuFile neembuuFile) {
+        connectionFile = neembuuFile;
+    }
+
+    @Override
+    public void sendWarning(String warning) {
+        this.warning = warning;
+    }
+    
+    private boolean warning(){
+        if(warning==null)return false;
+        return mainComponent.newMessage().error()
+                .setMessage(warning)
+                .setTitle("There might be issues in saving the file")
+                .setTimeout(10)
+                .ask();
+    }
     
     private void saveAction(java.io.File outputFilePath){
-        // It is weird and pointless to close the file when save is clicked. //closeActionProcess(false);
+        if(warning())return;
         try{
             connectionFile.saveACopy(outputFilePath);
         }catch(Exception a){

@@ -20,7 +20,7 @@ package neembuu.release1.user_analytics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import neembuu.release1.Application;
+import neembuu.release1.app.Application;
 import neembuu.release1.Main;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.ui.actions.ReAddAction;

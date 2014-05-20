@@ -57,7 +57,7 @@ public class VariantProgressProvider implements ReAddAction.CallBack, ProgressPr
         VariantSelector variants = p.variantSelector();
         variants.getItems().removeAll(variants.getItems());
         
-        saveAction_forVariants.doneCreation(neembuuFile);
+        //saveAction_forVariants.doneCreation(neembuuFile);
         
         for (NeembuuFile file : neembuuFile.getVariants()) {
             saveAction_forVariants.addFile(file);
@@ -66,7 +66,7 @@ public class VariantProgressProvider implements ReAddAction.CallBack, ProgressPr
                 variantName = Utils.getFileExtension(file.getMinimumFileInfo().getName()).substring(1);
             }
             
-            VI x = new VI(variantName,file);
+            VI x = new VI(variantName,file,saveAction_forVariants);
             variants.getItems().add(x);
         }    
     }
@@ -80,9 +80,9 @@ public class VariantProgressProvider implements ReAddAction.CallBack, ProgressPr
         private final NeembuuFile file;
         private final Progress variantProgress;
 
-        public VI(String display, NeembuuFile file) {
+        public VI(String display, NeembuuFile file,SaveAction_forVariants sav) {
             this.display = display; this.file = file;
-            variantProgress = new ProgressImpl(p, graph,ProgressImpl.Mode.VariantProgressUI);
+            variantProgress = new ProgressImpl(p, graph,ProgressImpl.Mode.VariantProgressUI,sav);
         }
 
         @Override public NeembuuFile getFile() {

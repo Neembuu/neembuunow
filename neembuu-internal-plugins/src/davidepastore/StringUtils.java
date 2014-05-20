@@ -16,9 +16,10 @@
  */
 package davidepastore;
 
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import neembuu.release1.Main;
+//import neembuu.release1.Main;
 
 /**
  * This class provides simple common methods to work with Strings.
@@ -138,7 +139,7 @@ public class StringUtils{
             src = src.substring(0, src.indexOf(end));
             value = src;
         } catch (Exception any) {
-            Main.getLOGGER().severe(any.toString());
+            Logger.getGlobal().severe(any.toString());
         }
         return value;
     }

@@ -29,7 +29,6 @@ import neembuu.release1.captcha.Captcha;
 import neembuu.release1.defaultImpl.file.BasicOnlineFile;
 import neembuu.release1.defaultImpl.file.BasicPropertyProvider;
 import neembuu.release1.httpclient.NHttpClient;
-import neembuu.release1.log.LoggerUtil;
 import neembuu.release1.httpclient.utils.NHttpClientUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -39,10 +38,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import davidepastore.StringUtils;
+import neembuu.release1.api.log.LoggerUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.openide.util.Exceptions;
 
 /**
  *
@@ -151,7 +150,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
                     
             }
         } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
+            ex.printStackTrace();
         }
         
         printUrls(finalUrls);
@@ -337,9 +336,11 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
                 throw new Exception("Captcha generic error");
             }
         } catch (JSONException ex) {
-            Exceptions.printStackTrace(ex);
+            //ex.printStackTrace();
+            LOGGER.log(Level.INFO,"error",ex);
         } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
+            //ex.printStackTrace();
+            LOGGER.log(Level.INFO,"error",ex);
         }
         
         return false;
@@ -354,7 +355,10 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
 
         public void setRetryLimit(int retryLimit) { this.retryLimit = retryLimit; }
 
-        YT_TLH(String url) { this.url = url; }
+        YT_TLH(String url) { 
+            // normalize the url here
+            this.url = Utils.getRidOfHttps(url);
+        }
 
         /**
          * Inspired by: <a href="http://stackoverflow.com/questions/3717115/regular-expression-for-youtube-links">Stack Overflow</a>
@@ -370,6 +374,8 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
         @Override public String getErrorMessage() { return canHandle() ? null : "Cannot handle"; }
         @Override public boolean containsMultipleLinks() { return true; }
         @Override public String tempDisplayName() { return url; }
-        @Override public String getReferenceLinkString() { return url; }
+        @Override public String getReferenceLinkString() { 
+            return url; 
+        }
     };
 }

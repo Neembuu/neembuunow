@@ -23,7 +23,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
-import org.openide.util.Exceptions;
 
 /**
  * Utils class for NHttpClient.
@@ -47,7 +46,7 @@ public class NHttpClientUtils {
             httpGet.abort();
             return length;
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            ex.printStackTrace();
         }
         return -1;
     }
@@ -67,7 +66,7 @@ public class NHttpClientUtils {
             EntityUtils.consume(response.getEntity());
             return contentType;
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            ex.printStackTrace();
         }
         return null;
     }

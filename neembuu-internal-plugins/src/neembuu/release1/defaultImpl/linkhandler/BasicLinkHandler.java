@@ -22,7 +22,7 @@ import neembuu.release1.api.file.OnlineFile;
 import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.defaultImpl.file.BasicOnlineFile;
 import neembuu.vfs.connection.NewConnectionProvider;
-import neembuu.vfs.connection.sampleImpl.DownloadManager;
+import neembuu.vfs.connection.jdimpl.JD_DownloadManager;
 
 /**
  *
@@ -60,7 +60,10 @@ public final class BasicLinkHandler implements LinkHandler {
         }
 
         public Builder addFile(String url, String name, long size) {
-            return addFile(new DownloadManager(url), name, size);
+            return addFile(
+                    new JD_DownloadManager(url)
+                    //new DownloadManager(url)
+                    , name, size);
         }
 
         public Builder setGroupName(String groupName) {

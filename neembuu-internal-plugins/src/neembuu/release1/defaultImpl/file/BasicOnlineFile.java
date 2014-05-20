@@ -18,9 +18,11 @@
 package neembuu.release1.defaultImpl.file;
 
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import jpfm.util.UniversallyValidFileName;
 import neembuu.release1.api.file.OnlineFile;
 import neembuu.release1.api.file.PropertyProvider;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.defaultImpl.linkhandler.BasicLinkHandler;
 import neembuu.vfs.connection.NewConnectionProvider;
 import neembuu.vfs.connection.jdimpl.JD_DownloadManager;
@@ -35,6 +37,8 @@ public final class BasicOnlineFile implements OnlineFile {
     private final long size;
     
     private final BasicPropertyProvider bpp;
+    
+    private static final Logger logger = LoggerUtil.getLogger();
 
     BasicOnlineFile(NewConnectionProvider ncp, String name, long size,BasicPropertyProvider bpp) {
         if(ncp==null){
@@ -101,9 +105,9 @@ public final class BasicOnlineFile implements OnlineFile {
         public Builder setName(String name) {
             // we must normalize name
             if(!UniversallyValidFileName.isUniversallyValidFileName(name)){
-                neembuu.release1.Main.getLOGGER().log(Level.SEVERE, "fileName need to be normalized {0}", name);
+                logger.log(Level.SEVERE, "fileName need to be normalized {0}", name);
                 name = UniversallyValidFileName.makeUniversallyValidFileName(name);
-                neembuu.release1.Main.getLOGGER().log(Level.SEVERE, "fileName after normalization {0}", name);
+                logger.log(Level.SEVERE, "fileName after normalization {0}", name);
             }
             this.name = name; return this;
         }

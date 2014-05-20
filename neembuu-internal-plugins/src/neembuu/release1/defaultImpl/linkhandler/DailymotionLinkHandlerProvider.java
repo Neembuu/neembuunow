@@ -19,17 +19,17 @@ package neembuu.release1.defaultImpl.linkhandler;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jd.parser.Regex;
+//import jd.parser.Regex;
 import neembuu.release1.api.file.OnlineFile;
 import neembuu.release1.api.file.PropertyProvider;
 import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProvider;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.defaultImpl.file.BasicOnlineFile;
 import neembuu.release1.defaultImpl.file.BasicPropertyProvider;
 import neembuu.release1.httpclient.NHttpClient;
 import neembuu.release1.httpclient.utils.NHttpClientUtils;
-import neembuu.release1.log.LoggerUtil;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.impl.client.BasicCookieStore;
@@ -37,9 +37,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
+import org.appwork.utils.Regex;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.openide.util.Exceptions;
 
 /**
  * I'm using the method explained <a href="https://github.com/rg3/youtube-dl/blob/master/youtube_dl/extractor/dailymotion.py">here</a>.
@@ -109,7 +109,7 @@ public class DailymotionLinkHandlerProvider implements LinkHandlerProvider {
             response = "{" + response + "}";
             
         } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
+            ex.printStackTrace();
         }
         return response;
     }
@@ -203,7 +203,9 @@ public class DailymotionLinkHandlerProvider implements LinkHandlerProvider {
 
         public void setRetryLimit(int retryLimit) { this.retryLimit = retryLimit; }
 
-        DM_TLH(String url) { this.url = url; }
+        DM_TLH(String url) { 
+            this.url = Utils.getRidOfHttps(url);
+        }
 
         /**
          * 
