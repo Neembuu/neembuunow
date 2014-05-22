@@ -25,6 +25,7 @@ import neembuu.release1.Main;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.ui.actions.ReAddAction;
 import neembuu.release1.httpclient.NHttpClient;
+import neembuu.util.Throwables;
 import neembuu.vfs.file.MinimumFileInfo;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -50,7 +51,7 @@ public class UserAnalytics {
     }
     
     public static void report(final MinimumFileInfo minimumFileInfo){
-        Thread t = new Thread("Report file "+minimumFileInfo){
+        Throwables.start(new Runnable(){
             @Override public void run(){
                 try{
                     reportImpl(minimumFileInfo);
@@ -58,9 +59,7 @@ public class UserAnalytics {
                     Main.getLOGGER().log(Level.FINE,"Failed Reporting Statistics",a);
                 }
             }
-        };
-        t.setDaemon(true);
-        t.start();
+        },"Report file "+minimumFileInfo,true);
     }
     
     

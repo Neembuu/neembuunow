@@ -23,7 +23,9 @@ import java.nio.file.Path;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import java.util.Collections;
+import neembuu.release1.Main;
 import neembuu.release1.ui.mc.NonUIMainComponent;
+import neembuu.util.Throwables;
 import org.json.JSONObject;
 
 /**
@@ -70,11 +72,11 @@ public class FlashGotMain {
 
         @Override public boolean solelyRunning(long time) {
             esi.stopService();
-            new Thread("StartNewMain"){
+            Throwables.start(new Runnable() {
                 @Override public void run() {
-                    SystemTrayMain.main(new String[]{});
+                    Main.main(new String[]{});
                 }
-            }.start();
+            },"StartNewMain");
             return false;
         }
     }

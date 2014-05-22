@@ -22,6 +22,7 @@ import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.Message;
 import neembuu.release1.settings.OnlineSettingImpl;
 import neembuu.release1.settings.SettingsImpl;
+import neembuu.util.Throwables;
 
 /**
  *
@@ -42,11 +43,11 @@ public class FirstTimeUser {
     
     public static void handleUser(AddLinkUI alui,MainComponent mc){
         final FirstTimeUser hu =  new FirstTimeUser(alui,mc);
-        new Thread(){
+        Throwables.start(new Runnable() {
             @Override public void run() {
                 hu.handle();
             }
-        }.start();
+        });
     }
     
     public void handle(){

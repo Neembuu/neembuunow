@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import neembuu.release1.api.log.LoggerUtil;
+import neembuu.util.Throwables;
 
 /**
  *
@@ -50,13 +51,12 @@ public class DirectoryWatcherServiceImpl implements DirectoryWatcherService {
     }
 
     @Override public void startService() {
-        thread = new Thread(DirectoryWatcherServiceImpl.class.toString()) {
+        Throwables.start(new Runnable(){
             @Override
             public void run() {
                 startServiceImpl();
             }
-        };
-        thread.start();
+        },DirectoryWatcherServiceImpl.class.toString());
     }
     
     @Override public void stopService(){
@@ -119,13 +119,11 @@ public class DirectoryWatcherServiceImpl implements DirectoryWatcherService {
     @Override public void forceRescan(long time) {
         logger.info("An instance of neembuu was started, something must have happened.\n"
                 + "Checking the commands directory.");
-        Thread t = new Thread("forceRescan"){
+        Throwables.start(new Runnable(){
             @Override public void run() {
                 rescanDirectory();
             }
-        }; t.setDaemon(true);
-        t.start();
-        
+        },null,true);
     }
     
     private void handle(Object pathObj,boolean isRelative){

@@ -22,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.ui.AddLinkUI;
+import neembuu.util.Throwables;
 
 /**
  *
@@ -43,10 +44,10 @@ public class FlashGotDownloadCommand implements FileCommands{
         
         try{
             final FlashGotTemplate fgt = new FlashGotTemplate(file);
-            Thread t = new Thread("handleFile"){
+            Throwables.start(new Runnable() {
                 @Override public void run() {
                     handle(fgt);
-                }}; t.start();
+                }},"handleFile");
             return true;
         }catch(Exception jsone){
             jsone.printStackTrace();

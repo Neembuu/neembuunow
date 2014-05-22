@@ -27,6 +27,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import neembuu.util.Throwables;
 
 /**
  *
@@ -40,11 +41,9 @@ public class ClipboardMonitorImpl implements ClipboardMonitor {
     
     @Override
     public void startService(){
-        t = new Thread(ClipboardMonitorImpl.class.getName()){
+        t = Throwables.start(new Runnable(){
             @Override public void run() { runImpl(); }
-        };
-        t.setDaemon(true);
-        t.start();
+        },ClipboardMonitorImpl.class.getName(),true);
     }
     
     @Override

@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import static java.nio.file.StandardOpenOption.*;
+import neembuu.util.Throwables;
 
 /**
  *
@@ -47,9 +48,8 @@ public final class EnsureSingleInstance {
     
     public void startService(){
         if(callback==null)throw new IllegalStateException("callback not intialized");
-        thread = new Thread(this.toString()) {
-            @Override
-            public void run() {
+        thread = Throwables.start(new Runnable() {
+            @Override public void run() {
                 boolean running = tryInstanceLock();
                 if(running){
                     System.out.println("It seems an instance is already running");                    
@@ -57,7 +57,7 @@ public final class EnsureSingleInstance {
                     System.out.println("Finished "+Thread.currentThread().getName());
                 }
             }
-        }; thread.start();
+        },this.toString());
     }
     
     public void stopService(){

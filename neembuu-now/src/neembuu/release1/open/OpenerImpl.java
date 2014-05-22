@@ -30,6 +30,7 @@ import neembuu.release1.api.open.Open;
 import neembuu.release1.api.open.OpenerAccess;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.pismo.lin;
+import neembuu.util.Throwables;
 
 /**
  *
@@ -155,11 +156,11 @@ public final class OpenerImpl implements Opener {
         if(Files.exists(vlc)){
             return make(vlc, f);
         }else {
-            new Thread("Install VLC thread") {
+            Throwables.start(new Runnable(){
                 @Override public void run() {
                     askLinUserToInstallVLC();
                 }
-            }.start();
+            },"Install VLC thread");
         }return fallBackOpen(f);
     }
     

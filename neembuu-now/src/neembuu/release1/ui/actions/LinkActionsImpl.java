@@ -34,6 +34,7 @@ import neembuu.release1.api.ui.actions.ReAddAction;
 import neembuu.release1.api.ui.actions.ReAddAction.CallBack;
 import neembuu.release1.api.ui.actions.SaveAction;
 import neembuu.release1.ui.Colors;
+import neembuu.util.Throwables;
 
 /**
  *
@@ -103,9 +104,9 @@ public class LinkActionsImpl {
         if(!anotherThread)closeAction(false, false);
         else {
             ui.overlay_setVisible(false); // to prevent clicks on re-add 2 twice
-            new Thread("ReAddAction{"+ui.fileNameLabel().getText()+"}"){
-                @Override public void run() { closeAction(false, false);  }
-            }.start();
+            Throwables.start(new Runnable() { @Override public void run() { 
+                    closeAction(false, false);
+                }},"ReAddAction{"+ui.fileNameLabel().getText()+"}");
         }
     }
     

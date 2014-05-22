@@ -966,6 +966,7 @@ final class BasicRegionHandler
                     throw new RuntimeException("Failure in thread model, multiple concurrent consumer thread");
             }
             totalThreadCreatedWait = 0;
+            // consider using Throwables.start to trace caller 
             dispatchThread = new Thread(this,
                     BasicRegionHandler.class.getSimpleName()+"{"+Long.toString(starting())+"}{"
                     +file.getName()+"}");

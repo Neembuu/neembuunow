@@ -41,6 +41,7 @@ import neembuu.release1.api.ui.actions.AddLinksAction;
 import neembuu.release1.ui.actions.AddLinkAction;
 import neembuu.release1.api.ui.LinkGroupUICreator;
 import neembuu.release1.ui.actions.CloseNeembuuActionImpl;
+import neembuu.util.Throwables;
 
 /**
  *
@@ -134,7 +135,7 @@ public final class NeembuuUI {
     void addLinks(boolean open) {
         mp.getAddLinkUI().addLinksPanelEnable(false);// no chance of race condition
         ala.open(open);
-        new Thread(ala,"Add links thread").start();
+        Throwables.start(ala,"Add links thread");
     }
     
     private void initJFrame(){
