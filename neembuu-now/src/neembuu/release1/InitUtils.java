@@ -16,8 +16,6 @@
  */
 package neembuu.release1;
 
-import java.util.logging.Level;
-
 /**
  *
  * @author Shashank Tulsyan
@@ -33,7 +31,7 @@ public class InitUtils {
                 st+=libraries[i]+"\n";
             }
             st+="==================Native Libraries loaded=============\n";
-            Main.getLOGGER().log(Level.INFO, st);
+            System.out.println(st);
         } catch (Exception a) {
             a.printStackTrace();
         }

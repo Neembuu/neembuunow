@@ -17,6 +17,7 @@
 
 package neembuu.release1.ui;
 
+import neembuu.swing.TintedGreyScaledImage;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;

@@ -27,23 +27,27 @@ import static java.nio.file.StandardOpenOption.*;
  *
  * @author Shashank Tulsyan
  */
-final class EnsureSingleInstance {
+public final class EnsureSingleInstance {
     
     public static final long Instantiated = System.currentTimeMillis();
     private long lastCall = Instantiated;
     
     private final Object lock = new Object();
-    
-    private final SingleInstanceCheckCallback callback;
+    private volatile Thread thread = null;
+    private SingleInstanceCheckCallback callback;
     
     private FileLock fileLock = null;
 
-    public EnsureSingleInstance(SingleInstanceCheckCallback callback) {
+    public EnsureSingleInstance(){
+    }
+
+    public void setCallback(SingleInstanceCheckCallback callback) {
         this.callback = callback;
     }
     
     public void startService(){
-        Thread r = new Thread(this.toString()) {
+        if(callback==null)throw new IllegalStateException("callback not intialized");
+        thread = new Thread(this.toString()) {
             @Override
             public void run() {
                 boolean running = tryInstanceLock();
@@ -53,13 +57,23 @@ final class EnsureSingleInstance {
                     System.out.println("Finished "+Thread.currentThread().getName());
                 }
             }
-        }; r.start();
+        }; thread.start();
+    }
+    
+    public void stopService(){
+        thread = null;
+        synchronized (lock){lock.notifyAll();}
     }
     
     private boolean tryInstanceLock(){
         try(FileChannel fc = FileChannel.open(Application.getResource(".instance"), READ, WRITE,CREATE)) {
             acquireFileLock(fc);
             System.out.println("Initiating on "+Instantiated);
+            boolean proceed = callback.solelyRunning(Instantiated);
+            if(!proceed){
+                System.out.println("Callback denied permission to proceed");
+                return false;
+            }
             shutDownHook();
             startMonitoring(fc);
             return false;
@@ -130,7 +144,7 @@ final class EnsureSingleInstance {
     
     private void startMonitoring(FileChannel fc){
         System.out.println("starting looping");
-        while(true){ 
+        while(Thread.currentThread() == thread){ 
             try{
                 loopElement(fc);
             }catch(Exception a){

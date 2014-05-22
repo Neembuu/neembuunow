@@ -54,7 +54,7 @@ public final class UnprofessionalTroubleHandler implements TroubleHandler{
                 .editable()
                 .setMessage(" There is some problem in your internet connection "+ncp.toString())
                 .setTitle("Internet problem : retried "+numberOfRetries+" times");
-            m.show();
+            m.showNonBlocking();
             cannotCreateNewConnectionMessage = null;
             return;
         }else { 

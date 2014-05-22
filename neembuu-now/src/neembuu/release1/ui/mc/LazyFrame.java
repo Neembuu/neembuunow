@@ -15,18 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neembuu.release1.app;
+package neembuu.release1.ui.mc;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface SingleInstanceCheckCallback {
-    void alreadyRunning(long timeSince);
-    /**
-     * @param time
-     * @return return true indicates continue
-     */
-    boolean solelyRunning(long time);
-    void attemptedToRun(long time);
+public interface LazyFrame {
+    javax.swing.JFrame getJFrame();
+    boolean available();
 }

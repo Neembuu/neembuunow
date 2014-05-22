@@ -17,16 +17,14 @@
 
 package neembuu.release1.app;
 
+import neembuu.release1.Main;
+
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface SingleInstanceCheckCallback {
-    void alreadyRunning(long timeSince);
-    /**
-     * @param time
-     * @return return true indicates continue
-     */
-    boolean solelyRunning(long time);
-    void attemptedToRun(long time);
+public class SystemTrayMain {
+    public static void main(String[] args) {
+        Main.main(args,true);
+    }
 }

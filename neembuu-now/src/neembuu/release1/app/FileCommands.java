@@ -17,16 +17,13 @@
 
 package neembuu.release1.app;
 
+import java.nio.file.Path;
+
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface SingleInstanceCheckCallback {
-    void alreadyRunning(long timeSince);
-    /**
-     * @param time
-     * @return return true indicates continue
-     */
-    boolean solelyRunning(long time);
-    void attemptedToRun(long time);
+public interface FileCommands {
+    String defaultExtension();
+    boolean handleFile(Path file,String extension);
 }

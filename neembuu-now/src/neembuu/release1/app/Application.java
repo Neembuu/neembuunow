@@ -29,7 +29,6 @@ import jpfm.SystemUtils;
 import neembuu.release1.Main;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.Message;
-import neembuu.release1.ui.MainComponentImpl;
 
 /**
  *
@@ -77,8 +76,10 @@ public class Application {
     private static MainComponent mainComponent;
 
     public static void setMainComponent(MainComponent mainComponent) {
-        if(Application.mainComponent!=null ){
-            throw new IllegalStateException("Already initialized");
+        if(Application.mainComponent!=null){
+            if(!Application.mainComponent.allowReplacementWith(mainComponent)){ 
+                throw new IllegalStateException("Already initialized, and relacement denied");
+            }
         }Application.mainComponent = mainComponent;
     }
     
@@ -188,11 +189,6 @@ public class Application {
         }
     }
     
-    public static void main(String[] args) {
-        setMainComponent(new MainComponentImpl(new javax.swing.JFrame()));
-        System.out.println(getResource());
-    }
-
     public static Runtime getRuntime() {
         if(runtime==null)getInstallationRoot();
         return runtime;

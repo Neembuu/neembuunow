@@ -41,7 +41,7 @@ import org.jsoup.nodes.Document;
  */
 public class VimeoLinkHandlerProvider implements LinkHandlerProvider {
     
-    private static final Logger LOGGER = LoggerUtil.getLogger();
+    private static final Logger LOGGER = LoggerUtil.getLogger();  // all logs go into an html file
     private final DefaultHttpClient httpClient = NHttpClient.getNewInstance();
     
     private String dataConfigUrl;

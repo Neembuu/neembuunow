@@ -140,7 +140,7 @@ public class MonitoredHttpFile_Builder_Test {
 
         DiskManager dm = 
             DiskManagers.getDefaultManager(new DiskManagerParams.Builder()
-                    .useDefaultNomenclatureAndLoggerCreate()
+                    .useDefaultNomenclatureAndLoggerCreator()
                     .setBaseStoragePath(storagePath).build());
         
         Session s = dm.createTestSession();

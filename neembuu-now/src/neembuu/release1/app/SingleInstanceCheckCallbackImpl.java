@@ -14,53 +14,60 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package neembuu.release1.app;
 
 import neembuu.release1.api.ui.MainComponent;
+import neembuu.release1.ui.mc.MainComponentImpl;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public class SingleInstanceCheckCallbackImpl implements SingleInstanceCheckCallback{
-    private final MainComponent mc;
+public class SingleInstanceCheckCallbackImpl implements SingleInstanceCheckCallback {
     private final DirectoryWatcherService watcherService;
-
-    public SingleInstanceCheckCallbackImpl(MainComponent mc, DirectoryWatcherService watcherService) {
-        this.mc = mc;
+        
+    public SingleInstanceCheckCallbackImpl(DirectoryWatcherService watcherService) {
         this.watcherService = watcherService;
     }
-    
+
     @Override
-        public void alreadyRunning(long timeSince) {
-            if(true)return;
-            boolean x = mc.newMessage().setTitle("An instance is already running")
-                    .setMessage("Opening two instances of neembuu might result\n"
-                            + "in undesirable behavior.\n"
-                            + "This instance of neembuu will close in a few seconds.\n"
-                            + "\n"
-                            + "If you really want to run this instance,\n"
-                            + "press No to keep this instance running.")
-                    .setTimeout(10000)
-                    .ask();
-            if(x){
-                System.exit(0);
-            }else {
-                System.out.println("User chose to run another instance, and so shall it be.");
-                while(true){
-                    System.out.println("working in infinite loop");
-                    try {
-                        Thread.sleep(1000);
-                    } catch (Exception e) {
-                    }
+    public void alreadyRunning(long timeSince) {
+        if (true) {
+            return;
+        }
+        MainComponent mc = new MainComponentImpl(new javax.swing.JFrame());
+        boolean x = mc.newMessage().setTitle("An instance is already running")
+                .setMessage("Opening two instances of neembuu might result\n"
+                        + "in undesirable behavior.\n"
+                        + "This instance of neembuu will close in a few seconds.\n"
+                        + "\n"
+                        + "If you really want to run this instance,\n"
+                        + "press No to keep this instance running.")
+                .setTimeout(10000)
+                .ask();
+        if (x) {
+            System.exit(0);
+        } else {
+            System.out.println("User chose to run another instance, and so shall it be.");
+            while (true) {
+                System.out.println("working in infinite loop");
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception e) {
                 }
             }
         }
+    }
 
-        @Override
-        public void attemptedToRun(long time) {
-            watcherService.forceRescan(time);
-        }
-    
+    @Override
+    public void attemptedToRun(long time) {
+        watcherService.forceRescan(time);
+    }
+
+    @Override
+    public boolean solelyRunning(long time) {
+        System.out.println("solely running @ "+time);
+        return true;
+    }
+
 }

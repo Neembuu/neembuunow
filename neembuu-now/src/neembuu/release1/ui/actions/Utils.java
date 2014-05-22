@@ -31,7 +31,7 @@ import neembuu.rangearray.UIRangeArrayAccess;
 import neembuu.rangearray.UnsyncRangeArrayCopy;
 import neembuu.release1.Main;
 import neembuu.release1.ui.Colors;
-import neembuu.release1.ui.TintedGreyScaledImage;
+import neembuu.swing.TintedGreyScaledImage;
 import neembuu.vfs.file.MinimumFileInfo;
 
 /**

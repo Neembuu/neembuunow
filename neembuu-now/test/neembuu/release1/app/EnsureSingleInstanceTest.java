@@ -19,7 +19,7 @@ package neembuu.release1.app;
 
 import javax.swing.JFrame;
 import neembuu.release1.api.ui.MainComponent;
-import neembuu.release1.ui.MainComponentImpl;
+import neembuu.release1.ui.mc.MainComponentImpl;
 
 /**
  *
@@ -30,14 +30,13 @@ public class EnsureSingleInstanceTest {
     
     public static void main(String[] args) {
         Application.setMainComponent(mc);
-        EnsureSingleInstance esi = new EnsureSingleInstance(new SingleInstanceCheckCallbackTest());
+        EnsureSingleInstance esi = new EnsureSingleInstance();
+        esi.setCallback(new SingleInstanceCheckCallbackTest());
         esi.startService();
     }
     
     private static final class SingleInstanceCheckCallbackTest implements SingleInstanceCheckCallback{
-
-        @Override
-        public void alreadyRunning(long timeSince) {
+        @Override public void alreadyRunning(long timeSince) {
             if(true)return;
             boolean x = mc.newMessage().setTitle("An instance is already running")
                     .setMessage("Opening two instances of neembuu might result\n"
@@ -62,10 +61,12 @@ public class EnsureSingleInstanceTest {
             }
         }
 
-        @Override
-        public void attemptedToRun(long time) {
+        @Override public void attemptedToRun(long time) {
             System.out.println("A new instance attempted to run on "+time);
         }
-        
+
+        @Override public void solelyRunning(long time) {
+            System.out.println("This program is solely running, do something");
+        }
     }  
 }

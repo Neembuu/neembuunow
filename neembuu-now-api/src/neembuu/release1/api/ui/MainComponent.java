@@ -27,4 +27,6 @@ public interface MainComponent {
     JFrame getJFrame();
     
     Message newMessage();
+    
+    boolean allowReplacementWith(MainComponent mc);
 }

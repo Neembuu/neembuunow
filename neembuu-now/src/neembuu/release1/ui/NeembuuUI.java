@@ -17,6 +17,7 @@
 
 package neembuu.release1.ui;
 
+import neembuu.release1.ui.mc.MainComponentImpl;
 import neembuu.release1.ui.linkcontainer.LinksContainer;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -25,7 +26,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Level;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -40,14 +40,14 @@ import neembuu.release1.api.ui.access.MainUIA;
 import neembuu.release1.api.ui.actions.AddLinksAction;
 import neembuu.release1.ui.actions.AddLinkAction;
 import neembuu.release1.api.ui.LinkGroupUICreator;
-import neembuu.release1.open.OpenerImpl;
+import neembuu.release1.ui.actions.CloseNeembuuActionImpl;
 
 /**
  *
  * @author Shashank Tulsyan
  */
 public final class NeembuuUI {
-    private final JFrame jf;
+    private JFrame jf;
     private final MainPanel mp;
     private final LinksContainer lc;
     private final AddLinkAction ala;
@@ -68,7 +68,6 @@ public final class NeembuuUI {
             return mp.neembuuVirtualFolderButton; }};
     
     public NeembuuUI() {
-        this.jf = makeJFrame();
         mainComponent = new MainComponentImpl(jf);
         this.mp = new MainPanel(addLinksAction,mainComponent,listener);
         this.lc = new LinksContainer(mp,mp.linksPanel);
@@ -86,6 +85,7 @@ public final class NeembuuUI {
     }
     
     public void initialize(Main main){
+        this.jf = makeJFrame();
         this.main = main;
         ala.setMain(main);
         initJFrame();
@@ -145,11 +145,14 @@ public final class NeembuuUI {
         jf.setMinimumSize(new Dimension(463+30,160));
         jf.setMaximumSize(new Dimension(463+200,700));
         jf.getContentPane().add(mp);
-        jf.addWindowListener(new CloseHandler());
+        jf.addWindowListener(new WindowAdapter(){
+            @Override public void windowClosing(WindowEvent e) {
+                new CloseNeembuuActionImpl(main, openerA).actionPerformed();
+            }});
     }
     
     private JFrame makeJFrame(){
-        return new JFrame(){
+        return new JFrame(){            
             @Override
             public final void paint(Graphics g) {
                 Dimension d = getSize();
@@ -167,33 +170,6 @@ public final class NeembuuUI {
                 super.paint(g);
             }
         };
-    }
-    
-    /*void updateHeight(){
-        lc.updateLayout();
-    }*/
-    
-    class CloseHandler extends WindowAdapter {
-        @Override
-        public void windowClosing(WindowEvent e) {
-            try{
-                if(main.getMountManager().getMount()!=null)
-                    main.getMountManager().getMount().unMount();
-            }
-            catch(Exception a){
-                Main.getLOGGER().log(Level.INFO," ",a);
-            }
-            try{
-                Main.getLOGGER().log(Level.INFO," Closing all open files");
-                openerA.closeAll();
-            }
-            catch(Exception a){
-                Main.getLOGGER().log(Level.INFO," ",a);
-            }
-            
-            System.exit(0);
-        }
-
     }
     
     private final class IndefTask implements IndefiniteTask{

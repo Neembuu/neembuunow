@@ -68,7 +68,7 @@ public final class DiskManagerParams {
             this.nomenclature = nomenclature; return this;
         }
         
-        public Builder useDefaultNomenclatureAndLoggerCreate(){
+        public Builder useDefaultNomenclatureAndLoggerCreator(){
             setNomenclature(new DefaultNomenclature());
             setLoggerCreateSPI(new HtmlLoggerCreator());
             return this;

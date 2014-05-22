@@ -38,7 +38,12 @@ public class TestLinkPanel {
             public Message newMessage() {
                 throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
-            
+
+            @Override
+            public boolean allowReplacementWith(MainComponent mc) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
         };
     
     public TestLinkPanel() {

@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package neembuu.release1.ui;
+package neembuu.swing;
 
 import java.awt.Color;
 import java.awt.GraphicsConfiguration;
@@ -103,7 +103,7 @@ public class TintedGreyScaledImage {
         float newLumi = 0;
         
         float[] hsl = new float[3];
-        Colors.HSLColor.fromRGB(tinting_color, hsl);
+        HSLColor.fromRGB(tinting_color, hsl);
         newLumi = lumi/255;
         if(monoColor){
             //rescale luminsence according to max value
@@ -113,7 +113,7 @@ public class TintedGreyScaledImage {
             }
         }
         hsl[2] = newLumi;
-        return Colors.HSLColor.toRGB(hsl);
+        return HSLColor.toRGB(hsl);
     }
 
     static GraphicsConfiguration getGraphicsConfiguration() {

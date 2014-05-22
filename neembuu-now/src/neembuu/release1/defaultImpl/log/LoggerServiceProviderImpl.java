@@ -39,6 +39,7 @@ public class LoggerServiceProviderImpl implements LoggerServiceProvider{
     @Override public Logger getLogger(String name) {
         if (name == null) {
             try {
+                Main.getLOGGER().log(Level.SEVERE, "Using fast class name @depcrecated in jdk8");
                 name = sun.reflect.Reflection.getCallerClass(4).getName();
             } catch (Exception a) {
                 Main.getLOGGER().log(Level.SEVERE, "Problem in using fast class name getter", a);

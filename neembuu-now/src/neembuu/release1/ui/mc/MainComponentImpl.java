@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neembuu.release1.ui;
+package neembuu.release1.ui.mc;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -41,16 +41,31 @@ import neembuu.release1.api.ui.Message;
  * @author Shashank Tulsyan
  */
 public class MainComponentImpl implements MainComponent{
-    private final JFrame jf;
+    private final LazyFrame ff;
 
-    public MainComponentImpl(JFrame jf) {
-        this.jf = jf;
+    public MainComponentImpl(final JFrame jf) {
+        this(new LazyFrame() {
+            @Override public JFrame getJFrame() { return jf;}
+            @Override public boolean available() { return true; }
+        });
     }
     
-    @Override public JFrame getJFrame() { return jf; }
+    public MainComponentImpl(LazyFrame ff) {
+        this.ff = ff;
+    }
+    
+    @Override public JFrame getJFrame() { 
+        if(!ff.available()){throw new IllegalStateException("UI not initialized yet");}
+        return ff.getJFrame(); 
+    }
 
     @Override public Message newMessage() {
         return new MessageImpl();
+    }
+
+    @Override
+    public boolean allowReplacementWith(MainComponent mc) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
     
     private class MessageImpl implements Message {
@@ -89,7 +104,7 @@ public class MainComponentImpl implements MainComponent{
         @Override public boolean ask(){
             Icon i = getIconForEmotion(e);
             type = JOptionPane.QUESTION_MESSAGE;
-            int x = JOptionPane.showConfirmDialog(jf,message,title,JOptionPane.YES_NO_OPTION,type,i);
+            int x = JOptionPane.showConfirmDialog(getJFrame(),message,title,JOptionPane.YES_NO_OPTION,type,i);
             
             return x==JOptionPane.YES_OPTION;
         }
@@ -108,7 +123,7 @@ public class MainComponentImpl implements MainComponent{
                 jp.add(messageLB);
             }
             jp.add(pf);
-            int okCxl = JOptionPane.showConfirmDialog(jf, jp, title, JOptionPane.OK_CANCEL_OPTION, type,i);
+            int okCxl = JOptionPane.showConfirmDialog(getJFrame(), jp, title, JOptionPane.OK_CANCEL_OPTION, type,i);
             
             if (okCxl == JOptionPane.OK_OPTION) {
               String password = new String(pf.getPassword());
@@ -150,7 +165,7 @@ public class MainComponentImpl implements MainComponent{
             }
             
             final JOptionPane pane = new JOptionPane(m,type,JOptionPane.DEFAULT_OPTION,i);
-            dialog = pane.createDialog(jf, title);
+            dialog = pane.createDialog(getJFrame(), title);
             setDialogLocation(dialog, pl);
             
             if(notBlock){
@@ -192,14 +207,14 @@ public class MainComponentImpl implements MainComponent{
     private void setDialogLocation(JDialog dialog, Message.PreferredLocation pl){
         if(pl!=null){
             if(pl==Message.PreferredLocation.Aside){
-                int x = jf.getLocation().x;
+                int x = getJFrame().getLocation().x;
                 int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
                 if(x > screenWidth){
                     x -= dialog.getWidth();
                 }else {
-                    x += jf.getWidth();
+                    x += getJFrame().getWidth();
                 }
-                dialog.setLocation(x,jf.getLocation().y);
+                dialog.setLocation(x,getJFrame().getLocation().y);
             }
         }
     }

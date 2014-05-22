@@ -17,6 +17,7 @@
 
 package neembuu.release1.ui.linkpanel;
 
+import neembuu.swing.TintedGreyScaledImage;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;

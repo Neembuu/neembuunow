@@ -28,7 +28,6 @@ import neembuu.diskmanager.DiskManagers;
 import neembuu.release1.api.clipboardmonitor.ClipboardMonitor;
 import neembuu.release1.api.linkgroup.LinkGroupMakers;
 import neembuu.release1.api.linkhandler.LinkHandlerProviders;
-import neembuu.release1.api.open.Opener;
 import neembuu.release1.api.open.Openers;
 import neembuu.release1.clipboard.AddLinksFromClipboardImpl;
 import neembuu.release1.clipboard.ClipboardMonitorImpl;
@@ -41,9 +40,16 @@ import neembuu.release1.defaultImpl.linkhandler.VimeoLinkHandlerProvider;
 import neembuu.release1.defaultImpl.log.LoggerServiceProviderImpl;
 import neembuu.release1.defaultImpl.restore_previous.RestorePreviousSessionImpl;
 import neembuu.release1.api.log.LoggerUtil;
+import neembuu.release1.app.DirectoryWatcherService;
+import neembuu.release1.app.DirectoryWatcherServiceImpl;
+import neembuu.release1.app.EnsureSingleInstance;
+import neembuu.release1.app.FlashGotDownloadCommand;
+import neembuu.release1.app.MainCommandsListener;
+import neembuu.release1.app.SingleInstanceCheckCallbackImpl;
 import neembuu.release1.open.OpenerImpl;
 import neembuu.release1.ui.InitLookAndFeel;
 import neembuu.release1.ui.NeembuuUI;
+import neembuu.release1.ui.mc.NonUIMainComponent;
 import neembuu.release1.versioning.CheckUpdate;
 import neembuu.release1.versioning.first_time_user.FirstTimeUser;
 import neembuu.vfs.file.TroubleHandler;
@@ -61,9 +67,11 @@ public final class Main {
     private final DiskManager diskManager;
     private final ClipboardMonitor clipboardMonitor;
     
+    private static boolean lazyUI = false;
+    
     public Main() {
         this.nui = new NeembuuUI();
-        Application.setMainComponent(nui.getMainComponent());
+        
         logger = initLogger();
         
         //initialize global logger service
@@ -71,12 +79,13 @@ public final class Main {
         
         troubleHandler = new UnprofessionalTroubleHandler(nui.getMainComponent(),nui.getIndefiniteTaskUI());
 
+        Application.setMainComponent(new NonUIMainComponent());
         String basePath = Application.getResource(Application.Resource.TempStorage)
                     .toAbsolutePath().toString();
         
         diskManager = DiskManagers.getDefaultManager(new DiskManagerParams.Builder()
             .setBaseStoragePath(basePath)
-            .useDefaultNomenclatureAndLoggerCreate()
+            .useDefaultNomenclatureAndLoggerCreator()
             .build()
         );
         
@@ -93,11 +102,51 @@ public final class Main {
         clipboardMonitor = new ClipboardMonitorImpl();
     }
     
+    private void initCommandsMonitor(){
+        MainCommandsListener  mcl = new MainCommandsListener();
+        FlashGotDownloadCommand fgdc = new FlashGotDownloadCommand();
+        mcl.register(fgdc.defaultExtension(), fgdc);
+        DirectoryWatcherService dws = new DirectoryWatcherServiceImpl(mcl);
+        dws.startService();
+        dws.forceRescan(System.currentTimeMillis());
+        EnsureSingleInstance esi = new EnsureSingleInstance();
+        esi.setCallback(new SingleInstanceCheckCallbackImpl(dws));
+        esi.startService();
+    }
+    
     private void initialize(){
+        Application.setMainComponent(nui.getMainComponent());
         clipboardMonitor.startService();
         nui.initialize(this);
         mountManager.initialize();
-        
+        initLinkHandlerProviders();
+        initLinkGroupMakers();
+        initOpener();
+        restorePreviousSession();
+        AddLinksFromClipboardImpl.createAndStart(nui.getAddLinkUI(), clipboardMonitor);
+        CheckUpdate.checkLater(nui.getMainComponent());
+        FirstTimeUser.handleUser(nui.getAddLinkUI(),nui.getMainComponent());
+    }
+    
+    private void restorePreviousSession(){
+        nui.getIndefiniteTaskUI();
+        RestorePreviousSessionImpl rpsi = new RestorePreviousSessionImpl(diskManager, nui.getLinkGroupUICreator(),nui);
+        rpsi.checkAndRestoreFromPrevious();
+    }
+    
+    private void initOpener(){
+        OpenerImpl defaultOpener = new OpenerImpl(nui.getMainComponent());
+        Openers.setOpener(defaultOpener);
+        nui.initOpenerA(defaultOpener.getOpenerAccess());
+    }
+    
+    private void initLinkGroupMakers(){
+        //Registering Link Group makers
+        LinkGroupMakers.registerDefaultMaker(new DefaultLinkGroupMaker());
+        LinkGroupMakers.registerMaker(new SplitsLinkGroupMaker());
+    }
+    
+    private void initLinkHandlerProviders(){
         // move out of this jar
         LinkHandlerProviders.registerProvider(new DailymotionLinkHandlerProvider());
         LinkHandlerProviders.registerProvider(new VimeoLinkHandlerProvider());
@@ -105,23 +154,6 @@ public final class Main {
         
         //DefaultLinkHandler is the default handler
         LinkHandlerProviders.registerDefaultProvider(new DirectLinkHandlerProvider());
-        
-        //Registering Link Group makers
-        LinkGroupMakers.registerDefaultMaker(new DefaultLinkGroupMaker());
-        LinkGroupMakers.registerMaker(new SplitsLinkGroupMaker());
-        
-        OpenerImpl defaultOpener = new OpenerImpl(nui.getMainComponent());
-        Openers.setOpener(defaultOpener);
-        nui.initOpenerA(defaultOpener.getOpenerAccess());
-        
-        nui.getIndefiniteTaskUI();
-        RestorePreviousSessionImpl rpsi = new RestorePreviousSessionImpl(diskManager, nui.getLinkGroupUICreator(),nui);
-        rpsi.checkAndRestoreFromPrevious();
-        
-        AddLinksFromClipboardImpl.createAndStart(nui.getAddLinkUI(), clipboardMonitor);
-
-        CheckUpdate.checkLater(nui.getMainComponent());
-        FirstTimeUser.handleUser(nui.getAddLinkUI(),nui.getMainComponent());
     }
 
     public TroubleHandler getTroubleHandler() {
@@ -171,9 +203,16 @@ public final class Main {
         private static Main m = new Main();
     }
     
+    public static void main(String[] args, boolean lazy) {
+        Main.lazyUI = lazy;
+        main(args);
+    }
+    
     public static void main(String[] args) {
         InitLookAndFeel.init();
-        get().initialize();
+        Main m = get();
+        m.initCommandsMonitor();
+        m.initialize();
     }
 
 }

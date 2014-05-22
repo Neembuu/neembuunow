@@ -1,0 +1,22 @@
+In the project file: turn on the MULTIAPP option:
+
+    -MULTIAPP+ 
+
+Splash screen
+If the application compiled as a multi-app executable has a 
+splash screen and you need to suppress it, 
+e.g. when running the executable with a main class 
+other than the default, specify the 
+
+-Xnosplash 
+
+
+option in the Properties-and-options section of 
+the command line.
+
+You may also wish to replace the pre-configured splash 
+screen image with another one. To do that, use the 
+-splash option specifying the pathname of the 
+desired image, for example
+
+MyApp -splash:another-splash.gif com.mycompany.app.Main 

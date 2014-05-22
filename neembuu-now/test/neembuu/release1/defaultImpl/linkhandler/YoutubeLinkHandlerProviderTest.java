@@ -20,7 +20,7 @@ package neembuu.release1.defaultImpl.linkhandler;
 import neembuu.release1.app.Application;
 import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
-import neembuu.release1.ui.MainComponentImpl;
+import neembuu.release1.ui.mc.MainComponentImpl;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

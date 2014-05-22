@@ -30,7 +30,7 @@ public class BlueTingeVLC {
     public static void main(String[] args)  throws Exception {
         BufferedImage ii = ImageIO.read(new File("F:\\neembuu\\modules\\neembuu-now\\src\\neembuu\\release1\\ui\\images\\vlc.png").toURI().toURL());
         //ii.getImage().
-        BufferedImage ri =  neembuu.release1.ui.TintedGreyScaledImage.getTintedBufferedImage(
+        BufferedImage ri =  neembuu.swing.TintedGreyScaledImage.getTintedBufferedImage(
                 ii, 
                 Colors.hsl(140, 50, 100, Colors.HSLSource.MSEXCEL), 
                 //     hsl(140, 85, 212, Colors.HSLSource.MSEXCEL);

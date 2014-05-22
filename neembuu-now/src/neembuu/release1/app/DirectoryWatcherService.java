@@ -26,4 +26,8 @@ public interface DirectoryWatcherService {
      * @param time last event time
      */
     void forceRescan(long time);
+    
+    void startService();
+    
+    void stopService();
 }

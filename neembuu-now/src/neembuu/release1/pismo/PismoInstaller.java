@@ -27,7 +27,7 @@ import jpfm.SystemUtils;
 import neembuu.release1.app.Application;
 import static neembuu.release1.app.Application.Resource.*;
 import neembuu.release1.api.ui.MainComponent;
-import neembuu.release1.ui.MainComponentImpl;
+import neembuu.release1.ui.mc.MainComponentImpl;
 
 /**
  *

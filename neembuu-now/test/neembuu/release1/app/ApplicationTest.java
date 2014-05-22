@@ -15,16 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neembuu.release1;
+package neembuu.release1.app;
+
+import static neembuu.release1.app.Application.getResource;
+import static neembuu.release1.app.Application.setMainComponent;
+import neembuu.release1.ui.mc.MainComponentImpl;
 
 /**
- * Used to make 2 entry point in excelsior.
- * this allows making a separate executable
- * which silently starts without showing a popup.
+ *
  * @author Shashank Tulsyan
  */
-public class MainSilent {
+public class ApplicationTest {
     public static void main(String[] args) {
-        Main.main(args);
+        setMainComponent(new MainComponentImpl(new javax.swing.JFrame()));
+        System.out.println(getResource());
     }
 }

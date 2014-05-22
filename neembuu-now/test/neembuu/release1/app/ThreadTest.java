@@ -14,19 +14,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package neembuu.release1.app;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface SingleInstanceCheckCallback {
-    void alreadyRunning(long timeSince);
-    /**
-     * @param time
-     * @return return true indicates continue
-     */
-    boolean solelyRunning(long time);
-    void attemptedToRun(long time);
-}
+    public class ThreadTest {
+
+        public void executeNonBlocking() {
+            final StackTraceElement[] callerStackTrace = new Throwable().getStackTrace();
+            new Throwable().printStackTrace();
+            Thread t = new Thread("executeNonBlocking") {
+                @Override public void run() {
+                    // What would be a good way to 
+                    // append callerStackTrace to the stack
+                    // trace of this thread
+                    System.out.println("inside");
+                    new Throwable().printStackTrace();
+                }
+            };
+            t.start();
+        }
+
+        public static void main(String[] args) {
+            new ThreadTest().executeNonBlocking();
+        }
+    }

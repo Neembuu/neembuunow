@@ -17,12 +17,12 @@
 
 package neembuu.release1.defaultImpl.file;
 
-import neembuu.release1.Main;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProviders;
 import neembuu.release1.api.file.NeembuuFileCreator;
 import neembuu.release1.api.linkgroup.LinkGroup;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.ui.access.MinimalistFileSystem;
 
 /**
@@ -53,7 +53,7 @@ public class SimpleNeembuuFileCreator implements NeembuuFileCreator{
         }
         
         if(linkHandler.getFiles().size() > 1) {
-            Main.getLOGGER().info("LinkHandler "+linkHandler+" has more than one file when"
+            LoggerUtil.getLogger().info("LinkHandler "+linkHandler+" has more than one file when"
                     + " it was expected to have only one. Using only first file.");
         }
         
