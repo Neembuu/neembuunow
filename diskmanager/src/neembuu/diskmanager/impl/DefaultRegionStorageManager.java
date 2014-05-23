@@ -19,13 +19,18 @@ package neembuu.diskmanager.impl;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileChannel.MapMode;
+import static java.nio.channels.FileChannel.MapMode.*;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.OpenOption;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 import neembuu.diskmanager.DiskManagerParams;
 import neembuu.diskmanager.LoggerCreateSPI;
@@ -49,6 +54,14 @@ final class DefaultRegionStorageManager implements RegionStorageManager{
     private final DiskManagerParams dmp;
     
     private final ChannelList channels = new ChannelList();
+    
+    // we assume only that only 1 read per download thread is happening.
+    private TracedMapBuffer closestRead = null, closestWrite = null; 
+    private static final int mapSize = 1024*1024*1;
+    
+    private static final boolean USE_MEMORY_MAPPED_FILE = true;
+    
+    private final ArrayList<WeakReference<MappedByteBuffer>> buffers = new ArrayList<WeakReference<MappedByteBuffer>>();
 
     public DefaultRegionStorageManager(DiskManagerParams dmp,DefaultFileStorageManager fsm, long startingOffset,long fileSize) throws IOException{
         this(dmp,fsm,startingOffset, 0,fileSize,null);
@@ -79,6 +92,16 @@ final class DefaultRegionStorageManager implements RegionStorageManager{
         if(fileChannel.isOpen()){
             fileChannel.close();
         }
+        WeakReference<MappedByteBuffer>[]m;
+        synchronized (buffers){
+            m = buffers.toArray(new WeakReference[buffers.size()]);
+        }
+        try{
+            unmapAll(m);
+        }catch(Exception any){
+            any.printStackTrace(System.err);
+        }
+        closestRead = null; closestWrite = null;
     }
 
     @Override
@@ -93,18 +116,30 @@ final class DefaultRegionStorageManager implements RegionStorageManager{
         return Utils.createLogger(filePath, dmp, this, LoggerCreateSPI.Type.Region);
     }
 
-    @Override
+    /*@Override
     public final int write(ByteBuffer src) throws IOException {
         int written = fileChannel.write(src, amountWritten);
         //fileChannel.force(false);
         amountWritten += written;
         return written;
-    }
+    }*/
 
     @Override
     public final int write(ByteBuffer src,long absoulteFileOffset)throws IOException {
-        int written = fileChannel.write(src, absoulteFileOffset-startingOffset);
-        //fileChannel.force(false);
+        int written;
+        if(USE_MEMORY_MAPPED_FILE){
+            if(closestWrite==null || !closestWrite.contains(absoulteFileOffset-startingOffset,src)){
+                /*if(closestWrite!=null){
+                    closestWrite.freeWritable();
+                }*/
+                closestWrite = new TracedMapBuffer(absoulteFileOffset, startingOffset, 
+                        fileChannel,src,READ_WRITE);
+            }
+            written = closestWrite.write(src,absoulteFileOffset);
+        }else{
+            written = fileChannel.write(src, absoulteFileOffset-startingOffset);       
+            //fileChannel.force(false);
+        }
         amountWritten += written;
         return written;
     }
@@ -115,9 +150,27 @@ final class DefaultRegionStorageManager implements RegionStorageManager{
         if(requestEnd > ending() ){
             throw new IllegalStateException("Data available till "+ending()+" resuquesting till "+requestEnd);
         }
-        int amtRead =  fileChannel.read(src, absoulteFileOffset-startingOffset);
-        /*System.err.println("DefaultRegionStorageManager:104:offset"+absoulteFileOffset+" "
-                +generatePeekString(src));*/
+        int amtRead;
+        if(USE_MEMORY_MAPPED_FILE){
+            if(closestRead==null || !closestRead.contains(absoulteFileOffset-startingOffset,src)){
+                /*if(closestRead!=null){
+                    closestRead.freeReadonly(closestWrite);
+                }*/
+                if(closestWrite!=null && closestWrite.contains(absoulteFileOffset-startingOffset,src)){
+                    closestRead = closestWrite.duplicate();
+                } else { 
+                    closestRead = new TracedMapBuffer(absoulteFileOffset, startingOffset,
+                        fileChannel,src, READ_ONLY);
+                    final TracedMapBuffer x = closestRead;
+                    new Thread("load{"+x+"}"){public void run(){x.mbb.load();}}.start();
+                }
+            }
+            amtRead = closestRead.read(src,absoulteFileOffset);
+        }else{
+            amtRead =  fileChannel.read(src, absoulteFileOffset-startingOffset);
+            /*System.err.println("DefaultRegionStorageManager:104:offset"+absoulteFileOffset+" "
+                    +generatePeekString(src));*/
+        }
         return amtRead;
     }
 
@@ -172,5 +225,109 @@ final class DefaultRegionStorageManager implements RegionStorageManager{
     @Override
     public String toString() {
         return DefaultRegionStorageManager.class.getName()+"{"+startingOffset+"}"+regionStore;
+    }
+    
+    private final class TracedMapBuffer {
+        private final MappedByteBuffer mbb;
+        private final long mapStartRelToChan;
+        private final TracedMapBuffer dupOf;
+        //private final AtomicBoolean freed = new AtomicBoolean(false);
+
+        public TracedMapBuffer(long absoulteFileOffset, long regionStartingOffset, 
+                FileChannel fileChannel, ByteBuffer request, MapMode  mm) throws IOException{
+            this(absoulteFileOffset, regionStartingOffset, fileChannel, request, mm, null);
+        }
+
+        public TracedMapBuffer(long absoulteFileOffset, long regionStartingOffset, 
+                FileChannel fileChannel, ByteBuffer request, MapMode  mm,TracedMapBuffer dupOf) throws IOException{
+            long mapCapacity = Math.max(mapSize,request.capacity());
+            mapStartRelToChan = (absoulteFileOffset - regionStartingOffset);
+            mbb = fileChannel.map(mm, mapStartRelToChan, mapCapacity);
+            this.dupOf = dupOf;
+            
+            synchronized (DefaultRegionStorageManager.this.buffers){
+                DefaultRegionStorageManager.this.buffers.add(new WeakReference<>(mbb));
+            }
+        }
+
+        public TracedMapBuffer(MappedByteBuffer mbb, long mapStartRelToChan, TracedMapBuffer dupOf) {
+            this.mbb = mbb;
+            this.mapStartRelToChan = mapStartRelToChan;
+            this.dupOf = dupOf;
+        }
+        
+        public TracedMapBuffer duplicate(){
+            return new TracedMapBuffer((MappedByteBuffer)mbb.duplicate(), 
+                    mapStartRelToChan, this);
+        }
+        
+        public boolean contains(long relativeStarting, ByteBuffer bb){
+            return mapStartRelToChan<= relativeStarting 
+                    && relativeStarting+bb.capacity() < mapStartRelToChan+mapSize;
+        }
+        
+        public int write(ByteBuffer src, long absoulteFileOffset){
+            //check();
+            int index = (int)(absoulteFileOffset - startingOffset - mapStartRelToChan);
+            mbb.clear(); 
+            try{
+                mbb.position(index);
+                mbb.put(src);
+            }catch(Exception a){
+                System.out.println("Write exception->");
+                a.printStackTrace();
+                System.out.println("src->"+absoulteFileOffset+"+>"+src.capacity());
+                System.out.println("mbb->"+(startingOffset+mapStartRelToChan)+"+>"+mbb.capacity());
+                System.out.println("mbb rel to chan->"+mapStartRelToChan);
+                System.out.println("chan starting->"+startingOffset);
+                System.out.println("index>"+index);
+                System.out.println("mbb limit>"+mbb.limit());
+                System.out.println("src limit>"+src.limit());
+                throw new RuntimeException(a);
+            }
+            return src.capacity();
+        }
+        
+        public int read(ByteBuffer dst, long absoulteFileOffset){
+            //check();
+            int index = (int)(absoulteFileOffset - startingOffset - mapStartRelToChan);
+            mbb.clear(); 
+            mbb.position(index);
+            mbb.limit(index+dst.capacity());
+            dst.put(mbb);
+            return dst.capacity();
+        }
+
+        /*public void freeReadonly(TracedMapBuffer checkWith){
+            if(dupOf==checkWith)return;
+            freeWritable();
+        }
+        
+        public void freeWritable(){
+            if(!freed.compareAndSet(false, true)){
+                throw new IllegalStateException("The mapped region has been freed");
+            }
+            unmap(mbb);
+        }
+        
+        public void check(){
+            if(freed.get()){
+                throw new IllegalStateException("The mapped region has been freed");
+            }
+        }*/
+    }
+    
+    private static void unmap(MappedByteBuffer buffer) {
+        sun.misc.Cleaner cleaner = ((sun.nio.ch.DirectBuffer) buffer).cleaner();
+        cleaner.clean();
+    }
+    
+    private static void unmapAll(WeakReference<MappedByteBuffer>[]m){
+        for (WeakReference<MappedByteBuffer> m1 : m) {
+            MappedByteBuffer mbb = m1.get();
+            if(mbb!=null){
+                unmap(mbb);
+            }
+        }
     }
 }

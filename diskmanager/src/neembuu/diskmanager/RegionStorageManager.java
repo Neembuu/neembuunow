@@ -34,7 +34,7 @@ import java.nio.channels.WritableByteChannel;
  */
 public interface RegionStorageManager extends LoggerCreator, SeekableByteChannelCreator{
     long startingOffset();
-    int write(ByteBuffer src) throws IOException ;
+    //int write(ByteBuffer src) throws IOException ;
     int write(ByteBuffer src,long absoulteFileOffset)throws IOException;
     int read(ByteBuffer src,long absoulteFileOffset)throws IOException;
     
