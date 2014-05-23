@@ -59,7 +59,7 @@ final class DefaultRegionStorageManager implements RegionStorageManager{
     private TracedMapBuffer closestRead = null, closestWrite = null; 
     private static final int mapSize = 1024*1024*1;
     
-    private static final boolean USE_MEMORY_MAPPED_FILE = true;
+    private static final boolean USE_MEMORY_MAPPED_FILE = false;
     
     private final ArrayList<WeakReference<MappedByteBuffer>> buffers = new ArrayList<WeakReference<MappedByteBuffer>>();
 
@@ -249,8 +249,10 @@ final class DefaultRegionStorageManager implements RegionStorageManager{
             mbb = fileChannel.map(mm, mapStartRelToChan, mapCapacity);
             this.dupOf = dupOf;
             
-            synchronized (DefaultRegionStorageManager.this.buffers){
-                DefaultRegionStorageManager.this.buffers.add(new WeakReference<>(mbb));
+            if(dupOf!=null){
+                synchronized (DefaultRegionStorageManager.this.buffers){
+                    DefaultRegionStorageManager.this.buffers.add(new WeakReference<>(mbb));
+                }
             }
         }
 
@@ -331,6 +333,7 @@ final class DefaultRegionStorageManager implements RegionStorageManager{
     }
     
     private static void unmapAll(WeakReference<MappedByteBuffer>[]m){
+        if(!USE_MEMORY_MAPPED_FILE)return;
         for (WeakReference<MappedByteBuffer> m1 : m) {
             MappedByteBuffer mbb = m1.get();
             if(mbb!=null){

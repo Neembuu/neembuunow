@@ -22,11 +22,20 @@ package neembuu.release1.defaultImpl.linkhandler;
  * @author Shashank Tulsyan
  */
 public class Utils {
+    public static String normalize(String url){
+        return getRidOfHash(getRidOfHttps(url));
+    }
+    
     public static String getRidOfHttps(String url){
         url = url.trim();
         if(url.contains("https://")){
             url = url.replace("https://", "http://");
         }
         return url; 
+    }
+    public static String getRidOfHash(String url){
+        if(url.contains("#")){
+            url = url.substring(0,url.indexOf('#'));
+        }return url;
     }
 }

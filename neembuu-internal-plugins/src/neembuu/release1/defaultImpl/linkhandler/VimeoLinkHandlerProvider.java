@@ -172,7 +172,7 @@ public class VimeoLinkHandlerProvider implements LinkHandlerProvider {
         public void setRetryLimit(int retryLimit) { this.retryLimit = retryLimit; }
 
         VIMEO_TLH(String url) { 
-            this.url = Utils.getRidOfHttps(url); 
+            this.url = Utils.normalize(url); 
         }
 
         /**

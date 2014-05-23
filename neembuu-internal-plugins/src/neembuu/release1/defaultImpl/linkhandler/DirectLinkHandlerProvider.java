@@ -125,7 +125,7 @@ public class DirectLinkHandlerProvider implements LinkHandlerProvider {
             }
 
             @Override public String getReferenceLinkString() {
-                return Utils.getRidOfHttps(url);
+                return Utils.normalize(url);
             }
         };
     }

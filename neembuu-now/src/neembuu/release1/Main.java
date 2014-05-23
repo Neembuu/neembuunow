@@ -70,7 +70,8 @@ public final class Main {
     
     public Main() {
         this.nui = new NeembuuUI();
-        
+        //Application.setMainComponent(new NonUIMainComponent());
+        Application.setMainComponent(nui.getMainComponent());
         logger = initLogger();
         
         //initialize global logger service
@@ -78,8 +79,7 @@ public final class Main {
         
         troubleHandler = new UnprofessionalTroubleHandler(nui.getMainComponent(),nui.getIndefiniteTaskUI());
 
-        //Application.setMainComponent(new NonUIMainComponent());
-        Application.setMainComponent(nui.getMainComponent());
+        
         String basePath = Application.getResource(Application.Resource.TempStorage)
                     .toAbsolutePath().toString();
         
@@ -122,9 +122,9 @@ public final class Main {
         initLinkGroupMakers();
         initOpener();
         
+        restorePreviousSession();
         initCommandsMonitor();
         
-        restorePreviousSession();
         AddLinksFromClipboardImpl.createAndStart(nui.getAddLinkUI(), clipboardMonitor);
         CheckUpdate.checkLater(nui.getMainComponent());
         FirstTimeUser.handleUser(nui.getAddLinkUI(),nui.getMainComponent());

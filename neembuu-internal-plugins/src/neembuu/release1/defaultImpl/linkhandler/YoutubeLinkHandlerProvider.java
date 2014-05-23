@@ -357,7 +357,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
 
         YT_TLH(String url) { 
             // normalize the url here
-            this.url = Utils.getRidOfHttps(url);
+            this.url = Utils.normalize(url);
         }
 
         /**
