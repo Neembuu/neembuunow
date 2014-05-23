@@ -17,6 +17,7 @@
 
 package neembuu.release1.app;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -56,6 +57,7 @@ public class FlashGotDownloadCommand implements FileCommands{
         
         try{
             final FlashGotTemplate fgt = new FlashGotTemplate(file);
+            try{Files.delete(file);}catch(IOException a){/**/} 
             Throwables.start(new Runnable() {
                 @Override public void run() {
                     tryHandle(fgt,file,creationTime);
@@ -77,7 +79,7 @@ public class FlashGotDownloadCommand implements FileCommands{
                 reportFailure(a, creationTime);
             }
             if(!success){
-                Files.delete(file);
+                // :P file has already been deleted
             }
         }catch(Exception a){a.printStackTrace(System.err);}
     }

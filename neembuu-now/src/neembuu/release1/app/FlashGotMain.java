@@ -76,7 +76,7 @@ public class FlashGotMain {
         public FlashSICC(EnsureSingleInstance esi) {  this.esi = esi; }
 
         @Override public void alreadyRunning(long timeSince) {
-            try{System.in.read();}catch(Exception a){}
+            //try{System.in.read();}catch(Exception a){}
         }
 
         @Override public void attemptedToRun(long time) { }
