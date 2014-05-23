@@ -104,8 +104,7 @@ public final class Main {
     
     private void initCommandsMonitor(){
         MainCommandsListener  mcl = new MainCommandsListener();
-        FlashGotDownloadCommand fgdc = new FlashGotDownloadCommand(nui.getIndefiniteTaskUI(),
-                nui.getLinksContainer(),nui.getMainComponent(),nui.getAddLinkUI());
+        FlashGotDownloadCommand fgdc = new FlashGotDownloadCommand(nui.getLinkGroupUICreator(),nui.getMainComponent());
         mcl.register(fgdc.defaultExtension(), fgdc);
         DirectoryWatcherService dws = new DirectoryWatcherServiceImpl(mcl);
         dws.startService();
@@ -122,6 +121,9 @@ public final class Main {
         initLinkHandlerProviders();
         initLinkGroupMakers();
         initOpener();
+        
+        initCommandsMonitor();
+        
         restorePreviousSession();
         AddLinksFromClipboardImpl.createAndStart(nui.getAddLinkUI(), clipboardMonitor);
         CheckUpdate.checkLater(nui.getMainComponent());
@@ -212,7 +214,6 @@ public final class Main {
     public static void main(String[] args) {
         InitLookAndFeel.init();
         Main m = get();
-        m.initCommandsMonitor();
         m.initialize();
     }
 

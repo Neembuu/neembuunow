@@ -127,7 +127,7 @@ public class EditLinksActionImpl implements EditLinksAction{
         try{
             LinkGroup newLinkGroup = LinkGroupMakers.modify(linkGroup.getSession(), tlg);
             removeFromUI.remove();
-            linkGroupUICreator.createUIFor(Collections.singletonList(newLinkGroup));
+            linkGroupUICreator.createUIFor(Collections.singletonList(newLinkGroup),false);
         }catch(Exception a){
             l.log(Level.SEVERE,"Editing links failed",a);
             failed(a.getMessage());

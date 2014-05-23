@@ -35,6 +35,17 @@ import org.json.JSONObject;
 public class FlashGotMain {
 
     public static void main(String[] args) throws IOException {
+        /*java.io.PrintStream ps = new java.io.PrintStream(new java.io.File("f:\\flashgot.txt"));
+        System.setOut(ps);
+        System.setErr(ps);*/
+        try{
+            mainImpl(args);
+        }catch(Exception a){
+            a.printStackTrace(System.err);
+            System.in.read();
+        }
+    }
+    public static void mainImpl(String[] args) throws IOException {
         String[] argsNoNull = new String[12];
         for (int i = 0; i < argsNoNull.length; i++) {
             argsNoNull[i] = "";
@@ -65,7 +76,7 @@ public class FlashGotMain {
         public FlashSICC(EnsureSingleInstance esi) {  this.esi = esi; }
 
         @Override public void alreadyRunning(long timeSince) {
-            System.exit(0);
+            try{System.in.read();}catch(Exception a){}
         }
 
         @Override public void attemptedToRun(long time) { }

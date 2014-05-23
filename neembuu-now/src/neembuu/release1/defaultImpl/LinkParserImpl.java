@@ -35,11 +35,10 @@ import neembuu.release1.api.ui.IndefiniteTaskUI;
  */
 public class LinkParserImpl {
     private final IndefiniteTaskUI indefiniteTaskUI;
-    private final Logger logger;
+    private static final Logger logger = Logger.getLogger(LinkParserImpl.class.getName());
 
-    public LinkParserImpl(IndefiniteTaskUI indefiniteTaskUI, Logger logger) {
+    public LinkParserImpl(IndefiniteTaskUI indefiniteTaskUI) {
         this.indefiniteTaskUI = indefiniteTaskUI;
-        this.logger = logger;
     }
     
     public LinkParserResult process(String para){

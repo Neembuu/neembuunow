@@ -18,4 +18,6 @@ public interface LinkGroup {
     List<TrialLinkHandler> getAbsorbedLinks();
     String displayName();
     Session getSession();
+    
+    public static final String displayName_resourceName = "displayName";
 }

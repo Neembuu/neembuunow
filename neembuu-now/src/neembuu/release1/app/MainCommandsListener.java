@@ -41,11 +41,11 @@ public class MainCommandsListener {
         commandsListeners.put(extension, commandsListener);
     }
     
-    public boolean handleFile(Path file,String extension) {
+    public boolean handleFile(Path file,String extension,long creationTime) {
         if(extension != null && extension.length()!=0){
             FileCommands cl = commandsListeners.get(extension);
             if(cl!=null){
-                boolean res = cl.handleFile(file,extension);
+                boolean res = cl.handleFile(file,extension,creationTime);
                 if(res)return true;
             }
         }
@@ -55,9 +55,9 @@ public class MainCommandsListener {
         return false;
     }
     
-    private boolean tryAll(Path file,String extension){
+    private boolean tryAll(Path file,String extension,long creationTime){
         for(FileCommands cls : commandsListeners.values()){
-            boolean res = cls.handleFile(file,extension);
+            boolean res = cls.handleFile(file,extension,creationTime);
             if(res)return true;
         }
         return false;

@@ -25,5 +25,5 @@ import java.nio.file.Path;
  */
 public interface FileCommands {
     String defaultExtension();
-    boolean handleFile(Path file,String extension);
+    boolean handleFile(Path file,String extension,long creationTime);
 }

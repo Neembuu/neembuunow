@@ -26,6 +26,6 @@ import neembuu.release1.api.linkgroup.LinkGroup;
  */
 public interface LinkGroupUICreator {
 
-    void createUIFor(List<LinkGroup> sessions);
+    void createUIFor(List<LinkGroup> sessions,boolean shouldOpen);
     
 }

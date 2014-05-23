@@ -17,15 +17,20 @@
 
 package neembuu.release1.app;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import neembuu.release1.api.linkgroup.LinkGroup;
+import neembuu.release1.api.linkgroup.LinkGroupMakers;
+import neembuu.release1.api.linkgroup.TrialLinkGroup;
+import neembuu.release1.api.linkhandler.LinkHandlerProviders;
+import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.log.LoggerUtil;
-import neembuu.release1.api.ui.AddLinkUI;
-import neembuu.release1.api.ui.IndefiniteTaskUI;
+import neembuu.release1.api.ui.LinkGroupUICreator;
 import neembuu.release1.api.ui.MainComponent;
-import neembuu.release1.ui.actions.AddLinkAction;
-import neembuu.release1.ui.linkcontainer.LinksContainer;
+import neembuu.release1.defaultImpl.linkgroup.Utils;
 import neembuu.util.Throwables;
 
 /**
@@ -38,39 +43,71 @@ public class FlashGotDownloadCommand implements FileCommands{
     
     private static final String ValidExtension = "flashgotjson";
     
-    private final AddLinkUI addLinkUI;
-    private final IndefiniteTaskUI i;
-    private final LinksContainer lc;
+    private final LinkGroupUICreator lguic;
     private final MainComponent mc;
-    
-    public FlashGotDownloadCommand(
-            IndefiniteTaskUI i,LinksContainer lc,
-                MainComponent mc,AddLinkUI alui) {
-        this.addLinkUI = alui; this.i = i; this.lc = lc; this.mc = mc;
+
+    public FlashGotDownloadCommand(LinkGroupUICreator lguic, MainComponent mc) {
+        this.lguic = lguic;
+        this.mc = mc;
     }
     
-    @Override public boolean handleFile(Path file,String extension) {
+    @Override public boolean handleFile(final Path file,String extension,final long creationTime) {
         if(! ValidExtension.equalsIgnoreCase(extension))return false;
         
         try{
             final FlashGotTemplate fgt = new FlashGotTemplate(file);
             Throwables.start(new Runnable() {
                 @Override public void run() {
-                    handle(fgt);
+                    tryHandle(fgt,file,creationTime);
                 }},"handleFile");
             return true;
         }catch(Exception jsone){
-            jsone.printStackTrace();
-            logger.log(Level.SEVERE,"Could not read",jsone);
+            reportFailure(jsone, creationTime);
             return false;
         }
     }
     
-    private void handle(FlashGotTemplate fgt){
-        AddLinkAction ala = new AddLinkAction(i, lc, mc, addLinkUI);
-        ala.open(true);
-        ala.run();
+    private void tryHandle(FlashGotTemplate fgt,final Path file,long creationTime){
+        boolean success = false;
+        try{
+            try{
+                handle(fgt);
+                success = true;
+            }catch(Exception a){
+                reportFailure(a, creationTime);
+            }
+            if(!success){
+                Files.delete(file);
+            }
+        }catch(Exception a){a.printStackTrace(System.err);}
     }
+    
+    private void reportFailure(Exception reason,long creationTime){
+        long delta = System.currentTimeMillis() - creationTime;
+        delta = Math.abs(delta);
+        if(delta < 5*60*1000){ // 5mins
+            mc.newMessage().setTitle("Could not add link send from flashgot")
+                    .setMessage("Reason : "+reason.getMessage())
+                    .setTimeout(5000)
+                    .showNonBlocking();
+        }
+        logger.log(Level.SEVERE,"Could not handle command",reason);
+    }
+    
+    private void handle(FlashGotTemplate fgt)throws Exception{
+        TrialLinkHandler trialLinkHandler = LinkHandlerProviders.getWhichCanHandleOrDefault(fgt.getURL());
+        
+        TrialLinkGroup res = LinkGroupMakers.tryMaking(trialLinkHandler);
+        LinkGroup lg = LinkGroupMakers.make(res);
+        // Utils.saveDisplayName(lg.getSession(), fgt.getFNAME());
+        /**
+         * TODO : Write other session specific data like cookies and stuff, 
+         * and also use it when running.
+         * Send name parameter somehow
+         */
+        lguic.createUIFor(Collections.singletonList(lg),true);
+    }
+
     
     private String checkVersion(Path file){
         String version = file.getFileName().toString();

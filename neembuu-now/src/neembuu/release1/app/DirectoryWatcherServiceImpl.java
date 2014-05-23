@@ -143,8 +143,10 @@ public class DirectoryWatcherServiceImpl implements DirectoryWatcherService {
         
         if(!Files.isReadable(path))return;
         
-        if(tooOld(path)){
-            try{Files.delete(path);}catch(IOException ioe){/*can't help it*/}
+        long creationTime = getCreationTime(path);
+        
+        if(isTooOld(creationTime)){
+            try{Files.delete(path);}catch(IOException ioe){ioe.printStackTrace();}
             return;
         }
         
@@ -155,7 +157,7 @@ public class DirectoryWatcherServiceImpl implements DirectoryWatcherService {
             extesion = "";
         }
         
-        boolean res = mcl.handleFile(path,extesion);
+        boolean res = mcl.handleFile(path,extesion,creationTime);
         if(!res){
             System.out.println("Could not handle file = "+path);
         }
@@ -164,7 +166,7 @@ public class DirectoryWatcherServiceImpl implements DirectoryWatcherService {
     private void rescanDirectory() {
         try (DirectoryStream<Path> ds = Files.newDirectoryStream(commandsDir)){
             for(Path p : ds){
-                handle(this, false);    
+                handle(p, false);    
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -173,23 +175,23 @@ public class DirectoryWatcherServiceImpl implements DirectoryWatcherService {
 
     }
     
-    private boolean tooOld(Path f){
+    private long getCreationTime(Path f){
         String nm = f.getFileName().toString();
         try{
             long t = Long.parseLong(nm);
-            return isTooOld(t);
+            return t;
         }catch(Exception a){
             
         }
         
         try{
             BasicFileAttributeView view = Files.getFileAttributeView(f, BasicFileAttributeView.class);
-            return isTooOld(view.readAttributes().creationTime().toMillis());
+            return view.readAttributes().creationTime().toMillis();
         }catch(IOException ioe){
             
         }
         
-        return false;
+        return System.currentTimeMillis();
     }
     
     private boolean isTooOld(long t){

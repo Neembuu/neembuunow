@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import neembuu.diskmanager.MakeSession;
 import neembuu.diskmanager.Session;
 import neembuu.release1.api.file.NeembuuFile;
+import neembuu.release1.api.linkgroup.LinkGroup;
 import neembuu.release1.api.ui.actions.ReAddAction;
 
 /**
@@ -48,7 +49,7 @@ public final class Utils {
     
     static String restoreDisplayName(Session s){
         try{
-            SeekableByteChannel dp = s.getOrCreateResource(DisplayName_FileName, StandardOpenOption.READ);
+            SeekableByteChannel dp = s.getOrCreateResource(LinkGroup.displayName_resourceName, StandardOpenOption.READ);
             ByteBuffer bb=ByteBuffer.allocate(Math.min((int)dp.size(),4*1024));
             dp.read(bb);
             String t = new String(bb.array());
@@ -64,24 +65,28 @@ public final class Utils {
         return new DisplayNameSaver();
     }
     
-    private static final String DisplayName_FileName = "displayName";
+    //private static final String DisplayName_FileName = "displayName";
     
     private static final class DisplayNameSaver implements ReAddAction.CallBack {
         @Override
         public void doneCreation(NeembuuFile neembuuFile) {
             try{
                 Session s = neembuuFile.getSession();
-                SeekableByteChannel dp = s.getOrCreateResource(
-                        neembuu.release1.defaultImpl.linkgroup.Utils.DisplayName_FileName, 
-                        StandardOpenOption.WRITE,StandardOpenOption.CREATE,
-                        StandardOpenOption.TRUNCATE_EXISTING);
-                String displayName = neembuuFile.getMinimumFileInfo().getName();
-                ByteBuffer bb=ByteBuffer.wrap(displayName.getBytes());
-                dp.write(bb);
-                try{dp.close();}catch(Exception a){a.printStackTrace();}
+                String displayName = neembuuFile.getMinimumFileInfo().getName();            
+                saveDisplayName(s, displayName);
             }catch(Exception a){
                 a.printStackTrace();
             }
         }
+    }
+    
+    public static void saveDisplayName(Session s, String displayName)throws Exception{
+        SeekableByteChannel dp = s.getOrCreateResource(
+                        LinkGroup.displayName_resourceName, 
+                        StandardOpenOption.WRITE,StandardOpenOption.CREATE,
+                        StandardOpenOption.TRUNCATE_EXISTING);
+        ByteBuffer bb=ByteBuffer.wrap(displayName.getBytes());
+        dp.write(bb);
+        try{dp.close();}catch(Exception a){a.printStackTrace();}
     }
 }

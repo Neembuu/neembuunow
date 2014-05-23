@@ -79,7 +79,7 @@ public class RestorePreviousSessionImpl implements FindPreviousSessionCallback {
                 deleteFailedSessions(session);
             }
         }
-        linkGroupUICreator.createUIFor(lgs);
+        linkGroupUICreator.createUIFor(lgs,false);
         addUILock.lock(false);
     }
     

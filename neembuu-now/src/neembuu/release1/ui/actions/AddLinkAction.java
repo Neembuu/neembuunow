@@ -47,7 +47,6 @@ import neembuu.vfs.progresscontrol.DownloadSpeedProvider;
  */
 public class AddLinkAction implements Runnable, LinkGroupUICreator {
     
-    private Main main;
     private final IndefiniteTaskUI indefiniteTaskUI;
     private final ExpandableUIContainer luic1;
     private final MainComponent mainComponent;
@@ -68,7 +67,6 @@ public class AddLinkAction implements Runnable, LinkGroupUICreator {
     }
     
     public void setMain(Main m){
-        this.main = m;
         realFileProvider = m.getMountManager().getRealFileProvider();
         minimalistFileSystem = m.getMountManager().getMinimalistFileSystem();
     }
@@ -87,7 +85,7 @@ public class AddLinkAction implements Runnable, LinkGroupUICreator {
         // old links must be removed, to prevent the operation being repeated
         // if user pressed (+) twice
         addLinkUI.addLinksPanelEnable(true);
-        LinkParserImpl linkParserImpl = new LinkParserImpl(indefiniteTaskUI, main.getLOGGER());
+        LinkParserImpl linkParserImpl = new LinkParserImpl(indefiniteTaskUI);
         
         LinkParserResult linkParserResult = linkParserImpl.process(linkParagraph);
 
@@ -101,7 +99,7 @@ public class AddLinkAction implements Runnable, LinkGroupUICreator {
             List<LinkGroup> sessions = saveLinks(grouperResults,linkParserResult);
             printState(grouperResults);
             
-            createUIFor(sessions);
+            createUIFor(sessions,this.open);
         }
         
     }
@@ -161,7 +159,7 @@ public class AddLinkAction implements Runnable, LinkGroupUICreator {
     
     @Override
     //@ThreadSafe
-    public void createUIFor(List<LinkGroup> sessions){
+    public void createUIFor(List<LinkGroup> sessions,boolean shouldOpen){
         for(LinkGroup linkGroup :  sessions){
             
             OpenableEUI openableEUI = Link_UI_Factory.make(
@@ -172,7 +170,7 @@ public class AddLinkAction implements Runnable, LinkGroupUICreator {
             
             if(openableEUI==null){return;}
             ((LinksContainer)luic1).addUI(openableEUI, 0);
-            if(open){
+            if(shouldOpen){
                 openableEUI.open();
             }
         }
