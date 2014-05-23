@@ -191,6 +191,8 @@ public class ProgressImpl implements Progress {
     
     @Override public void repaint(){ progress.repaint(); }
     
+    public Exception previouslyLoggedException = null;
+    
     private void handleChange(){        
         downloadedRegionHandlers = file.getRegionHandlers();
 
@@ -203,12 +205,22 @@ public class ProgressImpl implements Progress {
             totalDownloaded += RangeUtils.getSize(r);
             try{
                 overallProgress.addElement(r.starting(), r.getProperty().authorityLimit(),false);
-            }catch(RangeRejectedByFilterException.GreaterThanFileSize reason){// ignore
-                Main.getLOGGER().log(Level.SEVERE,"Evil download pattern as server probably"
+            }catch(Exception reason){// ignore
+                if(previouslyLoggedException!=null && !previouslyLoggedException.getClass().equals(reason.getClass())){
+                    String message;
+                    if(reason instanceof RangeRejectedByFilterException.GreaterThanFileSize){
+                        message = "Evil download pattern as server probably"
                         + " giving data even after reaching end, or probably"
-                        + " the server doesn't respond to http offset headers.",reason);
-            }catch(RangeRejectedByFilterException reason){// ignore
-                Main.getLOGGER().log(Level.SEVERE,"Bug here : cannot add element",reason);
+                        + " the server doesn't respond to http offset headers.";
+                    }else if(reason instanceof RangeRejectedByFilterException){
+                        message = "Bug here : cannot add element";
+                    }else { 
+                        message = "Some weird unknown error ";
+                    }
+
+                    Main.getLOGGER().log(Level.SEVERE, message,reason);
+                    previouslyLoggedException = reason;
+                }
             }
         }
 

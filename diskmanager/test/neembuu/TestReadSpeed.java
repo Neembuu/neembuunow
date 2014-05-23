@@ -33,9 +33,9 @@ public class TestReadSpeed {
     public static void main(String[] args) throws IOException{
         Path baseDir = Paths.get("C:\\Users\\Shashank Tulsyan\\.neembuu-now\\release1\\NeembuuVirtualFolder\\");
         FileChannel fc
-                = FileChannel.open(baseDir.resolve("video-389803-h264_high.mp4"),StandardOpenOption.READ);
+                = FileChannel.open(baseDir.resolve("6769.mp4 cdn_hash=cc0a70937feefa8bb788eeed0311e299&cdn_creation_time=1400843381&cdn_ttl=900&cdn_bw=119296"),StandardOpenOption.READ);
         
-        ByteBuffer bb = ByteBuffer.allocateDirect(10);
+        ByteBuffer bb = ByteBuffer.allocateDirect(1024);
         MeasureCodeExecutionTime.setEnabled(true);
         MeasureCodeExecutionTime.startNew();
         int step = 0;

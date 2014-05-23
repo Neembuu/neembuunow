@@ -38,8 +38,6 @@ import neembuu.release1.api.ui.access.MinimalistFileSystem;
 import neembuu.release1.defaultImpl.linkgroup.LinkGrouperImpl;
 import neembuu.release1.defaultImpl.LinkParserImpl;
 import neembuu.release1.ui.linkcontainer.LinksContainer;
-import neembuu.release1.ui.MainPanel;
-import neembuu.release1.ui.NeembuuUI;
 import neembuu.release1.ui.linkpanel.Link_UI_Factory;
 import neembuu.vfs.progresscontrol.DownloadSpeedProvider;
 
@@ -57,12 +55,15 @@ public class AddLinkAction implements Runnable, LinkGroupUICreator {
     private MinimalistFileSystem minimalistFileSystem;
     private final AddLinkUI addLinkUI;
     
-    public AddLinkAction(NeembuuUI nui,MainPanel mp) {
-        addLinkUI = mp.getAddLinkUI();
+    public AddLinkAction(IndefiniteTaskUI indefiniteTaskUI,
+            ExpandableUIContainer luic1,
+            MainComponent mainComponent,
+            AddLinkUI addLinkUI) {
+        this.addLinkUI = addLinkUI;
         
-        indefiniteTaskUI = nui.getIndefiniteTaskUI();
-        luic1 = nui.getLinksContainer();
-        mainComponent = nui.getMainComponent();
+        this.indefiniteTaskUI = indefiniteTaskUI;
+        this.luic1 = luic1;
+        this.mainComponent = mainComponent;
         
     }
     

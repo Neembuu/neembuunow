@@ -161,8 +161,12 @@ final class DefaultRegionStorageManager implements RegionStorageManager{
                 } else { 
                     closestRead = new TracedMapBuffer(absoulteFileOffset, startingOffset,
                         fileChannel,src, READ_ONLY);
-                    final TracedMapBuffer x = closestRead;
-                    new Thread("load{"+x+"}"){public void run(){x.mbb.load();}}.start();
+                    if(closestRead.insideDownloadedRegion()){
+                        final TracedMapBuffer x = closestRead;
+                        //new Thread("load{"+x+"}"){public void run(){
+                           x.mbb.load();
+                        //}}.start();
+                    }
                 }
             }
             amtRead = closestRead.read(src,absoulteFileOffset);
@@ -264,6 +268,10 @@ final class DefaultRegionStorageManager implements RegionStorageManager{
         public boolean contains(long relativeStarting, ByteBuffer bb){
             return mapStartRelToChan<= relativeStarting 
                     && relativeStarting+bb.capacity() < mapStartRelToChan+mapSize;
+        }
+        
+        public boolean insideDownloadedRegion(){
+            return (mapStartRelToChan + mapSize) < amountWritten;
         }
         
         public int write(ByteBuffer src, long absoulteFileOffset){

@@ -20,7 +20,9 @@ package neembuu.release1.ui.linkcontainer;
 import java.util.ArrayList;
 import java.util.Collection;
 import javax.swing.GroupLayout;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import neembuu.release1.api.ui.linkpanel.ExpandableUI;
 import neembuu.release1.api.ui.HeightProperty;
 import neembuu.release1.api.ui.ExpandableUIContainer;
@@ -32,7 +34,7 @@ import neembuu.release1.ui.MainPanel;
  */
 public final class LinksContainer implements ExpandableUIContainer {
     
-    final ArrayList<ExpandableUI> expandableUIs = new ArrayList<ExpandableUI>(){
+    private final ArrayList<ExpandableUI> expandableUIs = new ArrayList<ExpandableUI>(){
         @Override public boolean add(ExpandableUI e) {
             linkContainerHeightProperty.notifyChange();
             return super.add(e);}
@@ -42,6 +44,7 @@ public final class LinksContainer implements ExpandableUIContainer {
         @Override public boolean remove(Object o) {
             linkContainerHeightProperty.notifyChange();
             return super.remove(o); }
+        
     };
     
     private final MainPanel mp;
@@ -55,21 +58,39 @@ public final class LinksContainer implements ExpandableUIContainer {
     }
     
     public void addUI(ExpandableUI lpI, int index){
-        if(index< 0){
-            expandableUIs.add(lpI);
-        }else {
-            expandableUIs.add(index,lpI);
+        synchronized(expandableUIs){
+            if(index< 0){
+                expandableUIs.add(lpI);
+            }else {
+                expandableUIs.add(index,lpI);
+            }
         }
         lpI.heightProperty().addListener(listener_of_height_of_individual_linkuis);
-        updateLayout();
+        updateLayout(null);
         listener_of_height_of_individual_linkuis.changed(lpI.heightProperty(), 0, lpI.heightProperty().getValue());
     }
     
-    private void updateLayout(){        
+    /**
+     * Delegating remove operation to updateLayout because it runs
+     * in the Swing Event Dispatch Thread, which will be the right way 
+     * to do things.
+     * @param toRemove element to remove
+     */
+    private void updateLayout(final JComponent toRemove){
         //doing horizontal alignment
+        final ExpandableUI euis[]=getExpandableUIsCopy();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override public void run() {
+                updateLayout(euis,toRemove);
+            }
+        });
+    }
+    
+    private void updateLayout(ExpandableUI[]euis,final JComponent toRemove){
+        if(toRemove!=null)linksPanel.remove(toRemove);
         GroupLayout linksPanelLayout = (GroupLayout)linksPanel.getLayout();
         GroupLayout.ParallelGroup parallelGroup = linksPanelLayout.createParallelGroup();
-        for (ExpandableUI eui : expandableUIs) {
+        for (ExpandableUI eui : euis) {
             parallelGroup.addComponent(
                     eui.getJComponent(), javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE);
         }
@@ -77,7 +98,7 @@ public final class LinksContainer implements ExpandableUIContainer {
                 .addGap(left, left, left)
                 .addGroup(parallelGroup)
                 .addGap(right, right, right));
-        adjustHeightOfLinksSection(1);
+        adjustHeightOfLinksSection(1,euis);
     }
     
     
@@ -86,11 +107,11 @@ public final class LinksContainer implements ExpandableUIContainer {
     private final int right = 40;
     final int bottom = 10;
     
-    private void adjustHeightOfLinksSection(double f){
+    private void adjustHeightOfLinksSection(double f,ExpandableUI euis[]){
         GroupLayout linksPanelLayout = (GroupLayout)linksPanel.getLayout();
         GroupLayout.SequentialGroup sequentialGroup = linksPanelLayout.createSequentialGroup();
         
-        for (ExpandableUI eui : expandableUIs) {
+        for (ExpandableUI eui : euis) {
             sequentialGroup
                 .addComponent(eui.getJComponent(), javax.swing.GroupLayout.DEFAULT_SIZE, eui.heightProperty().getValue(), eui.heightProperty().getValue())
                 .addGap(bottom, bottom, bottom);
@@ -101,17 +122,31 @@ public final class LinksContainer implements ExpandableUIContainer {
 
     @Override
     public void removeUI(ExpandableUI uI) {
-        expandableUIs.remove(uI);
+        synchronized (expandableUIs){
+            expandableUIs.remove(uI);
+        }
         uI.heightProperty().removeListener(listener_of_height_of_individual_linkuis);
-        linksPanel.remove(uI.getJComponent());
-        updateLayout();
+        updateLayout(uI.getJComponent());
+    }
+    
+    /**
+     * To avoid race condition, and using sychronization is slightly undesirably
+     * as holding locks is risky deadlocks. I avoid using synchronization,
+     * or holding lock over multiple statements and function calls.
+     * Copy on access feels safer.
+     * @return Array copy of ExpandableUIs
+     */
+    ExpandableUI[]getExpandableUIsCopy(){
+        synchronized (expandableUIs){
+            return expandableUIs.toArray(new ExpandableUI[expandableUIs.size()]);
+        }
     }
 
     @Override public HeightProperty heightProperty() { return linkContainerHeightProperty; }
     
     private final HeightProperty.Listener listener_of_height_of_individual_linkuis = new HeightProperty.Listener() {
             @Override public void changed(HeightProperty h, int oldValue, int newValue) {
-                updateLayout(); // to layout link container
+                updateLayout(null); // to layout link container
                 linkContainerHeightProperty.notifyChange(); // to layout main frame
             }};
 }

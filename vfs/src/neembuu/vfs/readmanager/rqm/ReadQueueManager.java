@@ -165,11 +165,12 @@ public final class ReadQueueManager {
                     rqmLogger.info(range.toString()+" closed");
                     range.getProperty().close();
                 }
-            }catch(ClassCastException cce){
+            }catch(Exception cce){
+                // we cannot let this exception slip to the kernel side
                 cce.printStackTrace(System.err);
             }
         }totalReadStatistics.close();
-        mainDirectionThread.close();
+        mainDirectionThread.tryClose();
     }
     
     public final void closeCompletely()throws Exception {

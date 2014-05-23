@@ -25,8 +25,8 @@ import neembuu.diskmanager.FindPreviousSessionCallback;
 import neembuu.diskmanager.Session;
 import neembuu.release1.api.linkgroup.LinkGroup;
 import neembuu.release1.api.linkgroup.LinkGroupMakers;
+import neembuu.release1.api.ui.AddLinkUI;
 import neembuu.release1.api.ui.LinkGroupUICreator;
-import neembuu.release1.ui.NeembuuUI;
 import neembuu.release1.api.ui.AddLinkUI.Lock;
 
 /**
@@ -35,13 +35,13 @@ import neembuu.release1.api.ui.AddLinkUI.Lock;
  */
 public class RestorePreviousSessionImpl implements FindPreviousSessionCallback {
     private final DiskManager dm;
-    private final NeembuuUI nui;
     private final LinkGroupUICreator linkGroupUICreator;
     private final Lock addUILock;
 
-    public RestorePreviousSessionImpl(DiskManager dm, LinkGroupUICreator linkGroupUICreator,NeembuuUI nui) {
-        this.dm = dm; this.nui = nui;
-        this.linkGroupUICreator = linkGroupUICreator; this.addUILock = nui.getAddLinkUI().getLock();
+    public RestorePreviousSessionImpl(DiskManager dm, LinkGroupUICreator linkGroupUICreator,
+            AddLinkUI addLinkUI) {
+        this.dm = dm; 
+        this.linkGroupUICreator = linkGroupUICreator; this.addUILock = addLinkUI.getLock();
     }
 
     

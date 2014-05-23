@@ -83,6 +83,12 @@ public class MainDirectionThread implements Runnable {
         }
     }
 
+    void tryClose(){
+        try{
+            clone();
+        }catch(Exception ignore){}
+    }
+    
     void close() {
         rQMAccess.logger().log(Level.INFO, "closing MainDirectionThread " + s_(), new Throwable());
         synchronized (sleepLock) {

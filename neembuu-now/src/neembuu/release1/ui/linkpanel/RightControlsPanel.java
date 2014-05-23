@@ -17,6 +17,7 @@
 
 package neembuu.release1.ui.linkpanel;
 
+import neembuu.swing.HiddenBorderButton;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
@@ -37,11 +38,24 @@ final class RightControlsPanel {
     
     private final JPanel panel;
 
-    RightControlsPanel(JButton saveBtn, JButton crossBtn, JButton downBtn, JPanel panel) {
-        this.saveBtn = saveBtn;
-        this.crossBtn = crossBtn;
-        this.downBtn = downBtn;
-        this.panel = panel;
+    RightControlsPanel() {
+        panel = new JPanel();
+        saveBtn = HiddenBorderButton.make(this,"../images/save.png", "../images/save_s.png",false);
+        crossBtn = HiddenBorderButton.make(this,"../images/cross.png", "../images/cross_s.png",false);
+        downBtn = HiddenBorderButton.make(this,"../images/down.png", "../images/down_s.png",false);
+        
+        saveBtn.setBounds(0, 8, 24, 24);
+        crossBtn.setBounds(25, 8, 24, 24);
+        downBtn.setBounds(50, 8, 24, 24);
+        
+        panel.add(saveBtn);
+        panel.add(crossBtn);
+        panel.add(downBtn);
+        
+        saveBtn.setToolTipText("Save a copy");
+        saveBtn.setVisible(false);
+        crossBtn.setToolTipText("Close");
+        downBtn.setToolTipText("Details");
     }
 
     public JButton getSaveBtn() {
@@ -63,29 +77,7 @@ final class RightControlsPanel {
     
     
     static RightControlsPanel makeRightControlPanel(){
-        JPanel panel = new JPanel();
-        JButton saveBtn;
-        JButton crossBtn;
-        JButton downBtn;
-        
-        saveBtn = HiddenBorderButton.make("images/save.png", "images/save_s.png",false);
-        crossBtn = HiddenBorderButton.make("images/cross.png", "images/cross_s.png",false);
-        downBtn = HiddenBorderButton.make("images/down.png", "images/down_s.png",false);
-        
-        saveBtn.setBounds(0, 8, 24, 24);
-        crossBtn.setBounds(25, 8, 24, 24);
-        downBtn.setBounds(50, 8, 24, 24);
-        
-        panel.add(saveBtn);
-        panel.add(crossBtn);
-        panel.add(downBtn);
-        
-        saveBtn.setToolTipText("Save a copy");
-        saveBtn.setVisible(false);
-        crossBtn.setToolTipText("Close");
-        downBtn.setToolTipText("Details");
-        
-        return new RightControlsPanel(saveBtn, crossBtn, downBtn, panel);
+        return new RightControlsPanel();
     }
     
     

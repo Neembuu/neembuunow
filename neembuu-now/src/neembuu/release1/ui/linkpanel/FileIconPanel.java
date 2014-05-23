@@ -17,6 +17,7 @@
 
 package neembuu.release1.ui.linkpanel;
 
+import neembuu.swing.HiddenBorderButton;
 import neembuu.swing.TintedGreyScaledImage;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -39,7 +40,7 @@ import neembuu.release1.api.ui.actions.OpenAction;
 final class FileIconPanel {
     
     FileIconPanel(){
-        final TintedGreyScaledImage image = TintedGreyScaledImage.make("/neembuu/release1/ui/images/vlc.png",false);
+        final TintedGreyScaledImage image = TintedGreyScaledImage.make(this,"../images/vlc.png",false);
         
         Icon bw = image.getTintedImage(Colors.TINTED_IMAGE );
         Icon clr = image.getBaseImage();

@@ -22,6 +22,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.ui.AddLinkUI;
+import neembuu.release1.api.ui.IndefiniteTaskUI;
+import neembuu.release1.api.ui.MainComponent;
+import neembuu.release1.ui.actions.AddLinkAction;
+import neembuu.release1.ui.linkcontainer.LinksContainer;
 import neembuu.util.Throwables;
 
 /**
@@ -33,10 +37,16 @@ public class FlashGotDownloadCommand implements FileCommands{
     private static final Logger logger = LoggerUtil.getLogger(FlashGotDownloadCommand.class.getName());
     
     private static final String ValidExtension = "flashgotjson";
+    
     private final AddLinkUI addLinkUI;
-
-    public FlashGotDownloadCommand(AddLinkUI addLinkUI) {
-        this.addLinkUI = addLinkUI;
+    private final IndefiniteTaskUI i;
+    private final LinksContainer lc;
+    private final MainComponent mc;
+    
+    public FlashGotDownloadCommand(
+            IndefiniteTaskUI i,LinksContainer lc,
+                MainComponent mc,AddLinkUI alui) {
+        this.addLinkUI = alui; this.i = i; this.lc = lc; this.mc = mc;
     }
     
     @Override public boolean handleFile(Path file,String extension) {
@@ -57,7 +67,9 @@ public class FlashGotDownloadCommand implements FileCommands{
     }
     
     private void handle(FlashGotTemplate fgt){
-        
+        AddLinkAction ala = new AddLinkAction(i, lc, mc, addLinkUI);
+        ala.open(true);
+        ala.run();
     }
     
     private String checkVersion(Path file){

@@ -49,7 +49,6 @@ import neembuu.release1.app.SingleInstanceCheckCallbackImpl;
 import neembuu.release1.open.OpenerImpl;
 import neembuu.release1.ui.InitLookAndFeel;
 import neembuu.release1.ui.NeembuuUI;
-import neembuu.release1.ui.mc.NonUIMainComponent;
 import neembuu.release1.versioning.CheckUpdate;
 import neembuu.release1.versioning.first_time_user.FirstTimeUser;
 import neembuu.vfs.file.TroubleHandler;
@@ -79,7 +78,8 @@ public final class Main {
         
         troubleHandler = new UnprofessionalTroubleHandler(nui.getMainComponent(),nui.getIndefiniteTaskUI());
 
-        Application.setMainComponent(new NonUIMainComponent());
+        //Application.setMainComponent(new NonUIMainComponent());
+        Application.setMainComponent(nui.getMainComponent());
         String basePath = Application.getResource(Application.Resource.TempStorage)
                     .toAbsolutePath().toString();
         
@@ -104,7 +104,8 @@ public final class Main {
     
     private void initCommandsMonitor(){
         MainCommandsListener  mcl = new MainCommandsListener();
-        FlashGotDownloadCommand fgdc = new FlashGotDownloadCommand();
+        FlashGotDownloadCommand fgdc = new FlashGotDownloadCommand(nui.getIndefiniteTaskUI(),
+                nui.getLinksContainer(),nui.getMainComponent(),nui.getAddLinkUI());
         mcl.register(fgdc.defaultExtension(), fgdc);
         DirectoryWatcherService dws = new DirectoryWatcherServiceImpl(mcl);
         dws.startService();
@@ -115,7 +116,6 @@ public final class Main {
     }
     
     private void initialize(){
-        Application.setMainComponent(nui.getMainComponent());
         clipboardMonitor.startService();
         nui.initialize(this);
         mountManager.initialize();
@@ -130,7 +130,8 @@ public final class Main {
     
     private void restorePreviousSession(){
         nui.getIndefiniteTaskUI();
-        RestorePreviousSessionImpl rpsi = new RestorePreviousSessionImpl(diskManager, nui.getLinkGroupUICreator(),nui);
+        RestorePreviousSessionImpl rpsi = new RestorePreviousSessionImpl(diskManager, 
+                nui.getLinkGroupUICreator(),nui.getAddLinkUI());
         rpsi.checkAndRestoreFromPrevious();
     }
     

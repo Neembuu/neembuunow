@@ -16,6 +16,7 @@
  */
 package neembuu.release1.ui.linkpanel;
 
+import neembuu.swing.HiddenBorderButton;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
@@ -147,10 +148,10 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         layeredPane = new javax.swing.JLayeredPane();
         indefiniteProgress = new javax.swing.JLabel();
         overlay = new javax.swing.JPanel();
-        editLinksButton = HiddenBorderButton.make("images/edit_link.png", "images/edit_link_s.png", false);
+        editLinksButton = HiddenBorderButton.make(this,"../images/edit_link.png", "../images/edit_link_s.png", false);
         rightOverlayElements = new javax.swing.JPanel();
-        delete = HiddenBorderButton.make("images/delete.png", "images/delete_s.png", false);
-        reEnableButton = HiddenBorderButton.make("images/small+.png", "images/small+_s.png", false);
+        delete = HiddenBorderButton.make(this,"../images/delete.png", "../images/delete_s.png", false);
+        reEnableButton = HiddenBorderButton.make(this,"../images/small+.png", "../images/small+_s.png", false);
         actualContentsPanel = new javax.swing.JPanel();
         vlcPane = getFileIconPanelWithButton();
         fileNamePane = new javax.swing.JPanel();
@@ -250,12 +251,10 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         overlayLayout.setVerticalGroup(
             overlayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(overlayLayout.createSequentialGroup()
-                .addComponent(editLinksButton, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(overlayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(editLinksButton, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(rightOverlayElements, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 135, Short.MAX_VALUE))
-            .addGroup(overlayLayout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addComponent(rightOverlayElements, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         actualContentsPanel.setBackground(new java.awt.Color(255, 255, 255));

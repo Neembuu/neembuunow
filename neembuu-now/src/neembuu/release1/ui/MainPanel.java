@@ -28,6 +28,7 @@ import neembuu.release1.api.ui.HeightProperty;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.actions.AddLinksAction;
 import static neembuu.release1.ui.ContextMenuMouseListener.Actions.*;
+import neembuu.swing.HiddenBorderButton;
 import neembuu.swing.TextBubbleBorder;
 
 /**

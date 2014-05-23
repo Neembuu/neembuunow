@@ -38,7 +38,7 @@ final class LCHeightProperty implements HeightProperty {
     @Override
     public int getValue() {
         int ht_temp = 0;
-        for (ExpandableUI eui : lc.expandableUIs) {
+        for (ExpandableUI eui : lc.getExpandableUIsCopy()) {
             ht_temp += eui.heightProperty().getValue();
             ht_temp += lc.bottom;
             ht_temp += 10; // extra padding

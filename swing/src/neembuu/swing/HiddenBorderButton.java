@@ -15,9 +15,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neembuu.release1.ui;
+package neembuu.swing;
 
-import neembuu.swing.TintedGreyScaledImage;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -29,7 +28,7 @@ import javax.swing.JButton;
  *
  * @author Shashank Tulsyan
  */
-final class HiddenBorderButton extends JButton{
+public final class HiddenBorderButton extends JButton{
 
     private Icon icon_bw;
     private Icon icon_clr;
@@ -70,15 +69,15 @@ final class HiddenBorderButton extends JButton{
     
     
 
-    static JButton makeWithTinting(String imgLoc,Color tintingColor){
+    /*static JButton makeWithTinting(String imgLoc,Color tintingColor){
         final TintedGreyScaledImage icon;
-        icon = TintedGreyScaledImage.make(imgLoc,true);
+        icon = TintedGreyScaledImage.make(HiddenBorderButton.class.getResource(imgLoc),true);
         return HiddenBorderButton.make(icon.getBaseImage(), icon.getTintedImage(tintingColor));
-    }
+    }*/
     
-    static JButton make(final String p1,final String p2,boolean fillOnHover){
-        final ImageIcon i1 = new ImageIcon(TintedGreyScaledImage.class.getResource(p1));
-        final ImageIcon i2 = new ImageIcon(TintedGreyScaledImage.class.getResource(p2));
+    public static JButton make(final Object clz,final String p1,final String p2,boolean fillOnHover){
+        final ImageIcon i1 = new ImageIcon(clz.getClass().getResource(p1));
+        final ImageIcon i2 = new ImageIcon(clz.getClass().getResource(p2));
         
         return make(i1, i2,fillOnHover);
     }
@@ -87,7 +86,7 @@ final class HiddenBorderButton extends JButton{
         return make(icon_bw, icon_clr, true);
     }
     
-    static HiddenBorderButton make(Icon icon_bw,Icon icon_clr,boolean fillOnHover){
+    public static HiddenBorderButton make(Icon icon_bw,Icon icon_clr,boolean fillOnHover){
         final HiddenBorderButton button;
         button = new HiddenBorderButton(icon_bw);
         
@@ -115,7 +114,7 @@ final class HiddenBorderButton extends JButton{
         return button;
     }
     
-    static JButton make(String text){
+    public static JButton make(String text){
         final HiddenBorderButton button = new HiddenBorderButton(text);
         button.setContentAreaFilled(false); //this is the piece of code you needed
         button.addMouseListener(new MouseAdapter() {

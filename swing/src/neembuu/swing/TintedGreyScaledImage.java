@@ -59,8 +59,11 @@ public class TintedGreyScaledImage {
         return getTintedImage(bi,tintingColor,monoColor);
     }
     
-    public static TintedGreyScaledImage make(String src,boolean monoColor){
-        return new TintedGreyScaledImage(TintedGreyScaledImage.class.getResource(src),monoColor);
+    public static TintedGreyScaledImage make(Object clz,String src,boolean monoColor){
+        return TintedGreyScaledImage.make(clz.getClass().getResource(src),monoColor);
+    }
+    public static TintedGreyScaledImage make(URL src,boolean monoColor){
+        return new TintedGreyScaledImage(src,monoColor);
     }
     
     public static BufferedImage getTintedBufferedImage(BufferedImage src, Color tintingColor,boolean monoColor) {

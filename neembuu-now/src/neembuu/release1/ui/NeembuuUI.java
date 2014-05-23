@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import neembuu.release1.Main;
 import neembuu.release1.api.IndefiniteTask;
 import neembuu.release1.api.open.OpenerAccess;
@@ -73,7 +74,8 @@ public final class NeembuuUI {
         this.mp = new MainPanel(addLinksAction,mainComponent,listener);
         this.lc = new LinksContainer(mp,mp.linksPanel);
         lc.heightProperty().addListener(listener);
-        ala = new AddLinkAction(this,mp);
+        ala = new AddLinkAction(getIndefiniteTaskUI(),getLinksContainer(),
+                getMainComponent(),mp.getAddLinkUI());
         mp.neembuuVirtualFolderButton.setEnabled(false);
     }
 
@@ -218,7 +220,9 @@ public final class NeembuuUI {
     
     private final HeightProperty.Listener listener = new HeightProperty.Listener() {
             @Override public void changed(HeightProperty h, int oldValue, int newValue) {
-                adjustHeightOfMainWindow(0);
+                SwingUtilities.invokeLater(new Runnable() { @Override public void run() {
+                        adjustHeightOfMainWindow(0);
+                    }});
             } };
     
     private final AddLinksAction addLinksAction = new AddLinksAction() {
