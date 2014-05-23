@@ -160,6 +160,7 @@ public class AddLinkAction implements Runnable, LinkGroupUICreator {
     }
     
     @Override
+    //@ThreadSafe
     public void createUIFor(List<LinkGroup> sessions){
         for(LinkGroup linkGroup :  sessions){
             

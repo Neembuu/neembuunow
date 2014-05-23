@@ -57,17 +57,18 @@ public final class LinksContainer implements ExpandableUIContainer {
         this.linksPanel = linksPanel;
     }
     
-    public void addUI(ExpandableUI lpI, int index){
+    //@ThreadSafe
+    public void addUI(ExpandableUI uI, int index){
         synchronized(expandableUIs){
             if(index< 0){
-                expandableUIs.add(lpI);
+                expandableUIs.add(uI);
             }else {
-                expandableUIs.add(index,lpI);
+                expandableUIs.add(index,uI);
             }
         }
-        lpI.heightProperty().addListener(listener_of_height_of_individual_linkuis);
+        uI.heightProperty().addListener(listener_of_height_of_individual_linkuis);
         updateLayout(null);
-        listener_of_height_of_individual_linkuis.changed(lpI.heightProperty(), 0, lpI.heightProperty().getValue());
+        listener_of_height_of_individual_linkuis.changed(uI.heightProperty(), 0, uI.heightProperty().getValue());
     }
     
     /**
@@ -127,6 +128,7 @@ public final class LinksContainer implements ExpandableUIContainer {
         }
         uI.heightProperty().removeListener(listener_of_height_of_individual_linkuis);
         updateLayout(uI.getJComponent());
+        listener_of_height_of_individual_linkuis.changed(null, 0, 0);
     }
     
     /**
