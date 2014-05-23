@@ -231,11 +231,17 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
                 fileName = fileName + "." + extension;
                 
                 String singleUrl = jSonObject.getString("url");
-                singleUrl = singleUrl.substring(0, singleUrl.indexOf("#"));
+                //singleUrl = singleUrl.substring(0, singleUrl.indexOf("#"));
+                //did some changes, but this doesn't help :(
+                System.out.println("Before normalization URL: " + singleUrl);
+                long length = tryFindingSize(singleUrl);
+                singleUrl = Utils.normalize(singleUrl);
+                System.out.println("Normalized URL: " + singleUrl);
                 
-                System.out.println("URL: " + singleUrl);
                 
-                long length = NHttpClientUtils.calculateLength(singleUrl,httpClient);
+                if(length==0){
+                    length = NHttpClientUtils.calculateLength(singleUrl,httpClient);
+                }
                 //System.out.println("Length: " + length);
                 
                 if(length <= 0){ continue; /*skip this url*/ }
@@ -287,6 +293,22 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
         }
 
         return linkHandlerBuilder;
+    }
+    
+    private long tryFindingSize(String rawURL){
+        try{
+            String s = "size=";
+            String sz = rawURL.substring(rawURL.indexOf(s)+s.length());
+            if(sz.contains("#")){
+                sz = sz.substring(0,sz.indexOf("#"));
+            }
+            long size = Long.parseLong(sz);
+            return size;
+        }catch(Exception a){
+            /*size not found ignore*/
+            a.printStackTrace();
+        }
+        return 0;
     }
     
     /**
