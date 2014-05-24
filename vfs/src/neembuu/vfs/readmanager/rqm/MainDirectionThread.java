@@ -78,14 +78,14 @@ public class MainDirectionThread implements Runnable {
             } catch (Exception a) {
 
             }
-            open();
             retry++;
+            open();
         }
     }
 
     void tryClose(){
         try{
-            clone();
+            close();
         }catch(Exception ignore){}
     }
     
@@ -109,8 +109,8 @@ public class MainDirectionThread implements Runnable {
             } catch (Exception a) {
 
             }
-            close();
             retry++;
+            close();
         }
     }
 
