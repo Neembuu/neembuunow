@@ -31,6 +31,7 @@ import neembuu.release1.defaultImpl.file.BasicPropertyProvider;
 import neembuu.release1.httpclient.NHttpClient;
 import neembuu.release1.httpclient.utils.NHttpClientUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -110,11 +111,11 @@ public class VimeoLinkHandlerProvider implements LinkHandlerProvider {
             long cDuration = duration;
             jSonObject = jSonObject.getJSONObject("request").getJSONObject("files").getJSONObject("h264");
             
-            JSONObject hdJsonObject = jSonObject.getJSONObject("hd");
-            JSONObject sdJsonObject = jSonObject.getJSONObject("sd");
+            System.out.println(jSonObject);
             
-            createFileBuilder(hdJsonObject.getString("url"), title, "HD", duration, linkHandlerBuilder);
-            createFileBuilder(sdJsonObject.getString("url"), title, "SD", duration, linkHandlerBuilder);
+            tryQuality("hd",duration,jSonObject,linkHandlerBuilder);
+            tryQuality("sd",duration,jSonObject,linkHandlerBuilder);
+            
             final String extension = "mp4";
             
             for(OnlineFile of : linkHandlerBuilder.getFiles()){
@@ -137,6 +138,14 @@ public class VimeoLinkHandlerProvider implements LinkHandlerProvider {
         return linkHandlerBuilder;
     }
     
+    private void tryQuality(String q, long duration,JSONObject jSonObject, BasicLinkHandler.Builder linkHandlerBuilder){
+        try{
+            JSONObject q_JsonObject = jSonObject.getJSONObject(q);
+            createFileBuilder(q_JsonObject.getString("url"), title, q.toUpperCase(), duration, linkHandlerBuilder);
+        }catch(JSONException jsone){
+            jsone.printStackTrace(System.err);
+        }
+    }
     
     private void createFileBuilder(String url, String title, String quality, long duration, BasicLinkHandler.Builder linkHandlerBuilder){
         long length = NHttpClientUtils.calculateLength(url, httpClient);
