@@ -42,6 +42,7 @@ import neembuu.release1.api.ui.actions.AddLinksAction;
 import neembuu.release1.ui.actions.AddLinkAction;
 import neembuu.release1.api.ui.LinkGroupUICreator;
 import neembuu.release1.ui.actions.CloseNeembuuActionImpl;
+import neembuu.release1.ui.frame.JFrameDecorator;
 import neembuu.util.Throwables;
 
 /**
@@ -49,7 +50,7 @@ import neembuu.util.Throwables;
  * @author Shashank Tulsyan
  */
 public final class NeembuuUI {
-    private JFrame jf;
+    private JFrame jf = new JFrame();
     private final MainPanel mp;
     private final LinksContainer lc;
     private final AddLinkAction ala;
@@ -90,8 +91,11 @@ public final class NeembuuUI {
     public void initialize(Main main){
         this.jf = makeJFrame();
         this.main = main;
-        ala.setMain(main);
         initJFrame();
+        ala.setMain(main);
+        JFrameDecorator fd = new JFrameDecorator(jf);
+        fd.getFrameDecoration().getCustomJFrame().contentArea().add(mp);
+        //fd.getContentPane().add(mp);
         jf.setVisible(true);
     }
     
@@ -145,9 +149,9 @@ public final class NeembuuUI {
         jf.setFont(Fonts.FuturaLight);
         jf.setIconImage(new ImageIcon(NeembuuUI.class.getResource("images/7_ls_small_transparent_32x32.png") ).getImage());
         jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        jf.setMinimumSize(new Dimension(463+30,160));
+        jf.setMinimumSize(new Dimension(463+30,172));
         jf.setMaximumSize(new Dimension(463+200,700));
-        jf.getContentPane().add(mp);
+        //jf.getContentPane().add(mp);
         jf.addWindowListener(new WindowAdapter(){
             @Override public void windowClosing(WindowEvent e) {
                 new CloseNeembuuActionImpl(main, openerA).actionPerformed();
