@@ -26,7 +26,6 @@ import static java.nio.file.StandardOpenOption.WRITE;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import neembuu.release1.Main;
 import neembuu.release1.api.log.LoggerServiceProvider;
 import neembuu.release1.app.Application;
 
@@ -36,13 +35,16 @@ import neembuu.release1.app.Application;
  */
 public class LoggerServiceProviderImpl implements LoggerServiceProvider{
 
-    @Override public Logger getLogger(String name) {
+    @Override public Logger getLogger(String name,boolean console,boolean file) {
+        if(!console && !file){
+            throw new IllegalArgumentException("Atleast one should be true, console or file");
+        }
         if (name == null) {
             try {
-                Main.getLOGGER().log(Level.SEVERE, "Using fast class name @depcrecated in jdk8");
+                Logger.getGlobal().log(Level.SEVERE, "Using fast class name @depcrecated in jdk8");
                 name = sun.reflect.Reflection.getCallerClass(4).getName();
             } catch (Exception a) {
-                Main.getLOGGER().log(Level.SEVERE, "Problem in using fast class name getter", a);
+                Logger.getGlobal().log(Level.SEVERE, "Problem in using fast class name getter", a);
                 name = Thread.currentThread().getStackTrace()[4].getClassName();
             }
         }
@@ -50,10 +52,16 @@ public class LoggerServiceProviderImpl implements LoggerServiceProvider{
         try {
             SeekableByteChannel sbc = FileChannel.open(Application.getResource(
                     Application.Resource.Logs,name+".log.html"), WRITE, CREATE, TRUNCATE_EXISTING);
-            logger = neembuu.util.logging.LoggerUtil.getLightWeightHtmlLogger(name, sbc, 1024 * 1024);
-            logger.addHandler(new ConsoleHandler());
+            if(file){
+                logger = neembuu.util.logging.LoggerUtil.getLightWeightHtmlLogger(name, sbc, 1024 * 1024);
+            }else {
+                logger = Logger.getLogger(name);
+            }
+            if(console && file){
+                logger.addHandler(new ConsoleHandler());
+            }
         } catch (IOException ioe) {
-            Main.getLOGGER().log(Level.SEVERE, "Could not create HTML logger",ioe);
+            Logger.getGlobal().log(Level.SEVERE, "Could not create HTML logger",ioe);
             logger = Logger.getLogger(name);
             //logger = neembuu.util.logging.LoggerUtil.getLogger(name);
         }

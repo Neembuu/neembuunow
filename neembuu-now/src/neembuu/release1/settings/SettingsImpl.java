@@ -41,7 +41,7 @@ public class SettingsImpl implements Settings {
         return new SettingsImpl();
     }
     
-    private final static Logger l = LoggerUtil.getLogger();
+    private final static Logger l = LoggerUtil.getLogger(SettingsImpl.class.getName());
 
     private SettingsImpl() {
     }

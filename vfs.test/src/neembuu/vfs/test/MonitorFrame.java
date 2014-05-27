@@ -33,7 +33,6 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import jpfm.DirectoryStream;
 import jpfm.FileAttributesProvider;
-import neembuu.util.logging.LoggerUtil;
 import neembuu.vfs.file.MonitoredHttpFile;
 
 /**
@@ -47,7 +46,7 @@ public class MonitorFrame implements ActionListener{
     
     public static final boolean DEBUG = true;
 
-    private static final Logger LOGGER = LoggerUtil.getLogger();
+    private static final Logger LOGGER = Logger.getLogger(MonitorFrame.class.getName());
     
     private final MountManagerService managerService;
 

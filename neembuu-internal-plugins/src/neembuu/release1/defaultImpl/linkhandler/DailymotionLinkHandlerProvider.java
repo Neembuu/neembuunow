@@ -47,7 +47,7 @@ import org.json.JSONObject;
  */
 public class DailymotionLinkHandlerProvider implements LinkHandlerProvider {
     
-    private static final Logger LOGGER = LoggerUtil.getLogger();
+    private static final Logger LOGGER = LoggerUtil.getLogger(DailymotionLinkHandlerProvider.class.getName());
     private final DefaultHttpClient httpClient = NHttpClient.getNewInstance();
     private HttpContext httpContext;
     

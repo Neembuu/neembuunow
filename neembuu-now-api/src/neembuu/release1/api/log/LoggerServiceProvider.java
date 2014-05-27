@@ -24,5 +24,5 @@ import java.util.logging.Logger;
  * @author Shashank Tulsyan
  */
 public interface LoggerServiceProvider {
-    Logger getLogger(String name);
+    Logger getLogger(String name,boolean console,boolean file);
 }

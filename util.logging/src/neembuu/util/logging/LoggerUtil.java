@@ -20,7 +20,6 @@ package neembuu.util.logging;
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
 import java.util.ResourceBundle;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Filter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -39,18 +38,15 @@ public final class LoggerUtil {
 
     public final static Level level=Level.ALL;
 
-    public static java.util.logging.Logger getLightWeightLogger() {
-        return getLightWeightLogger(null);
-    }
-    
     public static java.util.logging.Logger getLightWeightLogger(String name) {
         if(name==null){
-                try{
+                throw new IllegalArgumentException("name should not be null");
+                /*try{
                     name = sun.reflect.Reflection.getCallerClass(2).getName();//takes around 40microseconds
                 }catch(Exception a){
                     Logger.getGlobal().log(Level.SEVERE,"Problem in using fast class name getter",a);
                     name = Thread.currentThread().getStackTrace()[2].getClassName();// takes around 228.3 microsec
-                }
+                }*/
             }
         return new LightWeightLogger(name);
         //return LoggerImpl.SINGLETON;
@@ -84,19 +80,16 @@ public final class LoggerUtil {
         return logger;
     }
 
-    public static java.util.logging.Logger getLogger() {
-        return getLogger(null);
-    }
-    
-    public static java.util.logging.Logger getLogger(String name) {
+   public static java.util.logging.Logger getLogger(String name) {
         if(true){
             if(name==null){
-                try{
+                throw new IllegalArgumentException("name is null");
+                /*try{
                     name = sun.reflect.Reflection.getCallerClass(2).getName();
                 }catch(Exception a){
                     Logger.getGlobal().log(Level.SEVERE,"Problem in using fast class name getter",a);
                     name = Thread.currentThread().getStackTrace()[2].getClassName();
-                }
+                }*/
             }
             final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(name);
             logger.setLevel(level);

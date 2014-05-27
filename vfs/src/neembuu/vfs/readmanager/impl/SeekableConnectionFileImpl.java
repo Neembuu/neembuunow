@@ -34,7 +34,6 @@ import jpfm.volume.BasicCascadableAbstractFile;
 import jpfm.volume.OpenCloseListener;
 import neembuu.rangearray.Range;
 import neembuu.rangearray.UIRangeArrayAccess;
-import neembuu.util.logging.LoggerUtil;
 import neembuu.util.weaklisteners.WeakListeners;
 import neembuu.vfs.annotations.ReadQueueManagerThread;
 import neembuu.vfs.connection.NewConnectionProvider;
@@ -65,7 +64,7 @@ final class SeekableConnectionFileImpl // package private
     private final NewConnectionProvider newConnectionProvider;
 
     private final SeekableConnectionFileParams scfp;
-    private static final Logger LOGGER = LoggerUtil.getLogger();
+    private static final Logger LOGGER = Logger.getLogger(SeekableConnectionFileImpl.class.getName());;
     
     public SeekableConnectionFileImpl(SeekableConnectionFileParams scfp)throws IOException  {
         //super(name, INVALID_FILE_SIZE);

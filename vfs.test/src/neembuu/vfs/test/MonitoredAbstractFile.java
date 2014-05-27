@@ -31,7 +31,6 @@ import neembuu.rangearray.RangeArray;
 import neembuu.rangearray.RangeArrayFactory;
 import neembuu.rangearray.RangeArrayParams;
 import neembuu.rangearray.UIRangeArrayAccess;
-import neembuu.util.logging.LoggerUtil;
 
 
 /**
@@ -41,7 +40,7 @@ import neembuu.util.logging.LoggerUtil;
 public class MonitoredAbstractFile extends BasicAbstractFileWrap implements MonitorableNonHttpFile {
     private final RangeArray requestedRegion;
     private MonitoredFilePanel filePanel;
-    private static final Logger LOGGER = LoggerUtil.getLogger();
+    private static final Logger LOGGER = Logger.getLogger(MonitoredAbstractFile.class.getName());
 
     public MonitoredAbstractFile(AbstractFile srcfile,DirectoryStream fileContainer) throws IOException{
         super(srcfile,fileContainer);

@@ -53,7 +53,8 @@ public class SimpleNeembuuFileCreator implements NeembuuFileCreator{
         }
         
         if(linkHandler.getFiles().size() > 1) {
-            LoggerUtil.getLogger().info("LinkHandler "+linkHandler+" has more than one file when"
+            LoggerUtil.getLogger(SimpleNeembuuFileCreator.class.getName())
+                    .info("LinkHandler "+linkHandler+" has more than one file when"
                     + " it was expected to have only one. Using only first file.");
         }
         

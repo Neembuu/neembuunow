@@ -29,7 +29,6 @@ import neembuu.diskmanager.DiskManager;
 import neembuu.diskmanager.DiskManagerParams;
 import neembuu.diskmanager.DiskManagers;
 import neembuu.diskmanager.Session;
-import neembuu.util.logging.LoggerUtil;
 import neembuu.vfs.connection.NewConnectionProvider;
 import neembuu.vfs.connection.sampleImpl.DownloadManager;
 import neembuu.vfs.file.AskResume;
@@ -53,7 +52,7 @@ public class MonitoredHttpFile_Builder_Test {
     private NewConnectionProvider newConnectionProvider = null;
     private String url = null;
     private TroubleHandler troubleHandler = null;
-    private static final Logger LOGGER = LoggerUtil.getLogger();
+    private static final Logger LOGGER = Logger.getLogger(MonitoredHttpFile_Builder_Test.class.getName());
 
     public MonitoredHttpFile_Builder_Test() {
     }

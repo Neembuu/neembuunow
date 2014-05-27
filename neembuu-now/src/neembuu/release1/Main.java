@@ -191,7 +191,8 @@ public final class Main {
             a.printStackTrace();
         }
         //return neembuu.release1.log.LoggerUtil.getLogger("Main");
-        return neembuu.util.logging.LoggerUtil.getLogger();
+        return Logger.getLogger(Main.class.getName());
+        //return neembuu.util.logging.LoggerUtil.getLogger();
     }
     
     private static Main get() {

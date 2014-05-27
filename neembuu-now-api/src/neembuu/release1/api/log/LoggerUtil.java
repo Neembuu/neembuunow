@@ -33,14 +33,10 @@ public final class LoggerUtil {
         LoggerUtil.serviceProvider = serviceProvider;
     }   
 
-    public static Logger getLogger() {
-        return getLogger(null);
-    }
-
     public static Logger getLogger(String name) {
         if(serviceProvider==null){
             return Logger.getLogger(name);
         }
-        return serviceProvider.getLogger(name);
+        return serviceProvider.getLogger(name,true,true);
     }
 }

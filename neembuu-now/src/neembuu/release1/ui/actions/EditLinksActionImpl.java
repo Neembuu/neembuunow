@@ -50,7 +50,7 @@ public class EditLinksActionImpl implements EditLinksAction{
     private final MainComponent mainComponent;
     private final RemoveFromUI removeFromUI;
     
-    private final static Logger l = LoggerUtil.getLogger();
+    private final static Logger l = LoggerUtil.getLogger(EditLinksActionImpl.class.getName());
 
     public EditLinksActionImpl(LinkGroupUICreator linkGroupUICreator, LinkGroup linkGroup, MainComponent mainComponent, RemoveFromUI removeFromUI) {
         this.linkGroupUICreator = linkGroupUICreator;

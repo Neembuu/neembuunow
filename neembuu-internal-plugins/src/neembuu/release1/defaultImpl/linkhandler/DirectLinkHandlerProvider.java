@@ -34,7 +34,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
  * @author Shashank Tulsyan
  */
 public class DirectLinkHandlerProvider implements LinkHandlerProvider {    
-    private static final Logger LOGGER = LoggerUtil.getLogger();
+    private static final Logger LOGGER = LoggerUtil.getLogger(DirectLinkHandlerProvider.class.getName());
     
     private LinkHandler getDirectLinkHandler(String url)throws Exception{
         

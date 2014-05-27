@@ -40,7 +40,6 @@ import jpfm.volume.VeryBigFile;
 import jpfm.volume.vector.VectorDirectory;
 import jpfm.volume.vector.VectorNode;
 import jpfm.volume.vector.VectorRootDirectory;
-import neembuu.util.logging.LoggerUtil;
 import neembuu.vfs.NeembuuVirtualFileSystem;
 import neembuu.vfs.file.ConstrainUtility;
 import neembuu.vfs.file.MonitoredHttpFile;
@@ -65,7 +64,7 @@ public class MountManager {
     
     final FrameProvider fp;
 
-    private static final Logger LOGGER = LoggerUtil.getLogger();
+    private static final Logger LOGGER = Logger.getLogger(MountManager.class.getName());;
     
     private final TroubleHandler troubleHandler;
     

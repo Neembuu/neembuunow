@@ -19,8 +19,8 @@ package neembuu.release1.defaultImpl.file.multiVariant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import jpfm.volume.vector.VectorDirectory;
-import neembuu.release1.Main;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.file.OnlineFile;
 import neembuu.release1.api.linkgroup.LinkGroup;
@@ -28,6 +28,7 @@ import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProviders;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.file.NeembuuFileCreator;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.ui.access.MinimalistFileSystem;
 import neembuu.release1.defaultImpl.file.NeembuuFileWrapSCF;
 import neembuu.vfs.file.ConstrainUtility;
@@ -43,6 +44,8 @@ public class MultiVariantFileCreator implements NeembuuFileCreator {
     private final MinimalistFileSystem root;
 
     MultiVariantSession session = null;
+    
+    private static final Logger L = LoggerUtil.getLogger(MultiVariantFileCreator.class.getName());
     
     public MultiVariantFileCreator(LinkGroup linkGroup, MinimalistFileSystem root) {
         this.linkGroup = linkGroup;
@@ -66,7 +69,7 @@ public class MultiVariantFileCreator implements NeembuuFileCreator {
         try {
             session = new MultiVariantSession(variants, vd, root, linkGroup.getSession());
         } catch (Exception a) {
-            Main.getLOGGER().log(Level.INFO, "Could not handle splits", a);
+            L.log(Level.INFO, "Could not handle splits", a);
         }
         
         return session;
@@ -86,7 +89,7 @@ public class MultiVariantFileCreator implements NeembuuFileCreator {
 
         
         if(linkHandler.getFiles().size() == 1) {
-            Main.getLOGGER().info("MultiVariantFileCreator "+linkHandler+" has just one file when"
+            L.info("MultiVariantFileCreator "+linkHandler+" has just one file when"
                     + " it was expected to have many. Using only first file.");
         }
         

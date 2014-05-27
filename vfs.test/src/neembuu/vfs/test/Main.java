@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import jpfm.SystemUtils;
-import neembuu.util.logging.LoggerUtil;
 
 /**
  *
@@ -30,7 +29,7 @@ import neembuu.util.logging.LoggerUtil;
  */
 public final class Main {
     
-    private static final Logger LOGGER = LoggerUtil.getLogger();
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     
     public static MountManagerService mountManagerService;
     

@@ -22,14 +22,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import jpfm.util.UniversallyValidFileName;
 import neembuu.config.GlobalTestSettings;
-import neembuu.util.logging.LoggerUtil;
 import org.apache.http.HttpConnection;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.AuthState;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.auth.params.AuthPNames;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.conn.scheme.PlainSocketFactory;
@@ -53,7 +51,7 @@ import org.apache.http.protocol.HttpContext;
  * @author Shashank Tulsyan
  */
 public class FileNameAndSizeFinderService {    
-    private static final Logger LOGGER = LoggerUtil.getLogger();
+    private static final Logger LOGGER = Logger.getLogger(FileNameAndSizeFinderService.class.getName());
     private final static FileNameAndSizeFinderService SINGLETON = new FileNameAndSizeFinderService();
     
     FileNameAndSizeFinderService() {

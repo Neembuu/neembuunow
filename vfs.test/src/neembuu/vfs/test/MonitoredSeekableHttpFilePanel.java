@@ -41,7 +41,6 @@ import neembuu.swing.RangeArrayComponent;
 import neembuu.swing.RangeArrayElementColorProvider;
 import neembuu.swing.RangeArrayElementToolTipTextProvider;
 import neembuu.swing.RangeSelectedListener;
-import neembuu.util.logging.LoggerUtil;
 import neembuu.vfs.file.MonitoredHttpFile;
 import neembuu.vfs.readmanager.RegionHandler;
 
@@ -58,7 +57,7 @@ public final class MonitoredSeekableHttpFilePanel
     private final MonitoredHttpFile file;
     private SpeedGraphJFluid graphJFluid = null;
     private volatile String virtualPathOfFile = null;
-    private static final Logger LOGGER = LoggerUtil.getLogger();
+    private static final Logger LOGGER = Logger.getLogger(MonitoredSeekableHttpFilePanel.class.getName());
 
     private volatile Range lastRegionSelected = null;
     private volatile RegionHandler lastRegionHandler = null;

@@ -27,11 +27,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.logging.Logger;
 import javax.swing.JProgressBar;
 import javax.swing.ToolTipManager;
 import neembuu.rangearray.Range;
@@ -41,7 +39,6 @@ import neembuu.rangearray.RangeUtils;
 import neembuu.rangearray.UIRangeArrayAccess;
 import neembuu.rangearray.UnsyncRangeArrayCopy;
 import neembuu.rangearray.vectorimpl.RangeArrayImpl;
-import neembuu.util.logging.LoggerUtil;
 
 
 
@@ -72,7 +69,7 @@ public class RangeArrayComponent
             new Color(191,98,4,255);
     private final LinkedList<RangeSelectedListener> listeners
             = new LinkedList<RangeSelectedListener>();
-    private static final Logger LOGGER = LoggerUtil.getLogger();
+    //private static final Logger LOGGER = LoggerUtil.getLogger();
     private final RangeArrayElementToolTipTextProvider toolTipTextProvider;
     private Color unprogressedBaseColor;
     

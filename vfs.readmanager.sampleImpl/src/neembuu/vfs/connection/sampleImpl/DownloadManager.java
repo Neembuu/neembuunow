@@ -19,7 +19,6 @@ package neembuu.vfs.connection.sampleImpl;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import neembuu.util.logging.LoggerUtil;
 import neembuu.vfs.connection.NewConnectionParams;
 import neembuu.vfs.connection.NewConnectionProvider;
 
@@ -37,7 +36,7 @@ public final class DownloadManager implements NewConnectionProvider {
      * simple direct download http links only
      */
     private final String link;
-    private static final Logger LOGGER = LoggerUtil.getLogger();
+    private static final Logger LOGGER = Logger.getLogger(DownloadManager.class.getName());;
     // for debuggin race condition in connection creation which results in
     // multiple connection creation for overlapping or exactly same region.
     private final ConcurrentLinkedQueue<NewConnection> connection_list = new ConcurrentLinkedQueue<NewConnection>();

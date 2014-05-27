@@ -48,7 +48,7 @@ import org.json.JSONObject;
  * @author davidepastore
  */
 public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
-    private static final Logger LOGGER = LoggerUtil.getLogger(); // all logs go into an html file
+    private static final Logger LOGGER = LoggerUtil.getLogger(YoutubeLinkHandlerProvider.class.getName()); // all logs go into an html file
     
     private final String K_CHALLENGE_URL = "https://www.google.com/recaptcha/api/challenge?k=";
     private final String K_CHALLENGE_CODE = "6LcVessSAAAAAH73irTtpZYKknjeBvN3nuUzJ2G3";

@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import neembuu.util.logging.LoggerUtil;
 
 //import neembuu.release1.log.LoggerUtil;
 
@@ -32,7 +31,7 @@ import neembuu.util.logging.LoggerUtil;
  */
 public final class LinkHandlerProviders {
     
-    private static final Logger LOGGER = LoggerUtil.getLogger();
+    private static final Logger LOGGER = Logger.getLogger(LinkHandlerProviders.class.getName());
     
     private static final Set<LinkHandlerProvider> providers =
         (Set<LinkHandlerProvider>)Collections.newSetFromMap(new /*Weak*/HashMap());

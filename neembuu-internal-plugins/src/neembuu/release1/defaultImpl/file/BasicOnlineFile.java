@@ -38,7 +38,7 @@ public final class BasicOnlineFile implements OnlineFile {
     
     private final BasicPropertyProvider bpp;
     
-    private static final Logger logger = LoggerUtil.getLogger();
+    private static final Logger logger = LoggerUtil.getLogger(BasicOnlineFile.class.getName());
 
     BasicOnlineFile(NewConnectionProvider ncp, String name, long size,BasicPropertyProvider bpp) {
         if(ncp==null){
