@@ -39,7 +39,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import davidepastore.StringUtils;
 import neembuu.release1.api.log.LoggerUtil;
-import neembuu.release1.defaultImpl.external.ExternalLinkHandlerProvider;
+import neembuu.release1.defaultImpl.external.ExternalLinkHandlerProviderAnnotation;
 import neembuu.release1.defaultImpl.linkhandler.BasicLinkHandler;
 import neembuu.release1.defaultImpl.linkhandler.Utils;
 import org.json.JSONArray;
@@ -50,7 +50,7 @@ import org.json.JSONObject;
  *
  * @author davidepastore
  */
-@ExternalLinkHandlerProvider(
+@ExternalLinkHandlerProviderAnnotation(
         checkingRegex = "https?://(www.youtube.com/watch\\?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=]*)?",
         dependenciesURL = {"http://neembuu.com/now/update/neembuu-external-linkhandlers/dist/neembuu-external-linkhandlers.jar"},
         minimumReleaseVerReq = 1398604095683L

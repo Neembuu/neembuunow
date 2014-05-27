@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.TYPE)
-public @interface ExternalLinkHandlerProvider {
+public @interface ExternalLinkHandlerProviderAnnotation {
     /**
      * @return If url.matches(checkingRegex())==true implies that
      * this link handler can handle the given url.
@@ -32,6 +32,10 @@ public @interface ExternalLinkHandlerProvider {
      * @return List of required, class files and jar files
      */
     String[]dependenciesURL();
+    /**
+     * @return Location relative to this file, path resolved using class.getResource()
+     */
+    String[]dependenciesLocalPath();
     /**
      * @return The minimum version of NeembuuNow required for this plugin
      * to function properly. Refer {@link neembuu.release1.app.Application#releaseTime(long time) } 
