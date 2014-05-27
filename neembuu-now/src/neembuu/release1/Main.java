@@ -20,7 +20,6 @@ package neembuu.release1;
 import neembuu.release1.app.Application;
 import java.io.PrintStream;
 import neembuu.release1.mountmanager.MountManager;
-import java.util.logging.Logger;
 import jpfm.fs.FSUtils;
 import neembuu.diskmanager.DiskManager;
 import neembuu.diskmanager.DiskManagerParams;
@@ -60,7 +59,6 @@ import neembuu.vfs.file.TroubleHandler;
 public final class Main {
 
     private final NeembuuUI nui;
-    private final Logger logger;
     private final TroubleHandler troubleHandler;
     private final MountManager mountManager;
     private final DiskManager diskManager;
@@ -72,10 +70,8 @@ public final class Main {
         this.nui = new NeembuuUI();
         //Application.setMainComponent(new NonUIMainComponent());
         Application.setMainComponent(nui.getMainComponent());
-        logger = initLogger();
         
-        //initialize global logger service
-        LoggerUtil.setServiceProvider(new LoggerServiceProviderImpl());
+        initLogger();
         
         troubleHandler = new UnprofessionalTroubleHandler(nui.getMainComponent(),nui.getIndefiniteTaskUI());
 
@@ -116,7 +112,7 @@ public final class Main {
     
     private void initialize(){
         clipboardMonitor.startService();
-        nui.initialize(this);
+        nui.initialize(mountManager);
         mountManager.initialize();
         initLinkHandlerProviders();
         initLinkGroupMakers();
@@ -169,18 +165,13 @@ public final class Main {
     
     public NeembuuUI getNui() {
         return nui;
-    }
-
-    /*public static Logger getLOGGER() {
-        return get().logger;
-    }*/
-    
+    }    
 
     public MountManager getMountManager() {
         return mountManager;
     }
     
-    private Logger initLogger(){
+    private void initLogger(){
         try{
             if(Application.getRuntime() != Application.Runtime.Development){
                 java.io.File stdout = Application.getResource(Application.Resource.Logs, "std.out.txt").toFile();
@@ -191,8 +182,11 @@ public final class Main {
             a.printStackTrace();
         }
         //return neembuu.release1.log.LoggerUtil.getLogger("Main");
-        return Logger.getLogger(Main.class.getName());
         //return neembuu.util.logging.LoggerUtil.getLogger();
+        
+        //initialize global logger service
+        LoggerUtil.setServiceProvider(new LoggerServiceProviderImpl());
+        //return Logger.getLogger(Main.class.getName());
     }
     
     private static Main get() {

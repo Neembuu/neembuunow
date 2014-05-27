@@ -208,7 +208,8 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
             //Set the group name as the name of the video
             String  nameOfVideo = jSonObject.getString("filename");
             //normalize name of video
-            nameOfVideo = jpfm.util.UniversallyValidFileName.makeUniversallyValidFileName(nameOfVideo);
+            
+            //nameOfVideo = jpfm.util.UniversallyValidFileName.makeUniversallyValidFileName(nameOfVideo);
             linkHandlerBuilder.setGroupName(nameOfVideo);
             
             

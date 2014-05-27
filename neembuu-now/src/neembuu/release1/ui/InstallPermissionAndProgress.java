@@ -20,7 +20,6 @@ package neembuu.release1.ui;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import neembuu.release1.Main;
 import neembuu.release1.api.ui.MainComponent;
 
 /**

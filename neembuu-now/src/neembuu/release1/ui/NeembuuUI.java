@@ -30,7 +30,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import neembuu.release1.Main;
 import neembuu.release1.api.IndefiniteTask;
 import neembuu.release1.api.open.OpenerAccess;
 import neembuu.release1.api.ui.AddLinkUI;
@@ -41,6 +40,7 @@ import neembuu.release1.api.ui.access.MainUIA;
 import neembuu.release1.api.ui.actions.AddLinksAction;
 import neembuu.release1.ui.actions.AddLinkAction;
 import neembuu.release1.api.ui.LinkGroupUICreator;
+import neembuu.release1.mountmanager.MountManager;
 import neembuu.release1.ui.actions.CloseNeembuuActionImpl;
 import neembuu.release1.ui.frame.JFrameDecorator;
 import neembuu.util.Throwables;
@@ -55,7 +55,7 @@ public final class NeembuuUI {
     private final LinksContainer lc;
     private final AddLinkAction ala;
     
-    private Main main;
+    private MountManager mm;
     private OpenerAccess openerA;
     
     private final LinkedList<IndefiniteTask> indefiniteTasks = new LinkedList<IndefiniteTask>();
@@ -88,11 +88,11 @@ public final class NeembuuUI {
         return ala;
     }
     
-    public void initialize(Main main){
+    public void initialize(MountManager mm){
         this.jf = makeJFrame();
-        this.main = main;
+        this.mm = mm;
         initJFrame();
-        ala.setMain(main);
+        ala.initialize(mm.getRealFileProvider(),mm.getMinimalistFileSystem());
         JFrameDecorator fd = new JFrameDecorator(jf);
         fd.getFrameDecoration().getCustomJFrame().contentArea().add(mp);
         //fd.getContentPane().add(mp);
@@ -154,7 +154,7 @@ public final class NeembuuUI {
         //jf.getContentPane().add(mp);
         jf.addWindowListener(new WindowAdapter(){
             @Override public void windowClosing(WindowEvent e) {
-                new CloseNeembuuActionImpl(main, openerA).actionPerformed();
+                new CloseNeembuuActionImpl(mm, openerA).actionPerformed();
             }});
     }
     

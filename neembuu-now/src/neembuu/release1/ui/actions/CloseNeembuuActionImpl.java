@@ -17,9 +17,9 @@
 package neembuu.release1.ui.actions;
 
 import java.util.logging.Level;
-import neembuu.release1.Main;
 import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.open.OpenerAccess;
+import neembuu.release1.mountmanager.MountManager;
 
 /**
  *
@@ -27,11 +27,11 @@ import neembuu.release1.api.open.OpenerAccess;
  */
 public class CloseNeembuuActionImpl {
 
-    private final Main main;
+    private final MountManager mountManager;
     private final OpenerAccess openerA;
 
-    public CloseNeembuuActionImpl(Main main, OpenerAccess openerA) {
-        this.main = main;
+    public CloseNeembuuActionImpl(MountManager mountManager, OpenerAccess openerA) {
+        this.mountManager = mountManager;
         this.openerA = openerA;
     }
 
@@ -50,8 +50,8 @@ public class CloseNeembuuActionImpl {
         killIfHungThread.start();
 
         try {
-            if (main.getMountManager().getMount() != null) {
-                main.getMountManager().getMount().unMount();
+            if (mountManager.getMount() != null) {
+                mountManager.getMount().unMount();
             }
         } catch (Exception a) {
             LoggerUtil.L().log(Level.INFO, " ", a);

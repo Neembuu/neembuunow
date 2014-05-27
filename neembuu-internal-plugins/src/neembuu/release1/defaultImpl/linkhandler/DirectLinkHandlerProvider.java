@@ -71,7 +71,7 @@ public class DirectLinkHandlerProvider implements LinkHandlerProvider {
             }
             
             if(fileName.length() ==0 ){
-                fileName = jpfm.util.UniversallyValidFileName.makeUniversallyValidFileName(url);
+                fileName = Utils.getNameFromURL(url);
             }
             
             long length = response.getEntity().getContentLength();

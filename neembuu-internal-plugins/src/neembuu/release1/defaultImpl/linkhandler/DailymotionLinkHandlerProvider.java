@@ -19,7 +19,7 @@ package neembuu.release1.defaultImpl.linkhandler;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-//import jd.parser.Regex;
+import java.util.regex.Pattern;
 import neembuu.release1.api.file.OnlineFile;
 import neembuu.release1.api.file.PropertyProvider;
 import neembuu.release1.api.linkhandler.LinkHandler;
@@ -37,7 +37,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
-import org.appwork.utils.Regex;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -105,7 +104,12 @@ public class DailymotionLinkHandlerProvider implements LinkHandlerProvider {
             response = NHttpClientUtils.getData("http://www.dailymotion.com/embed/video/" + id, httpClient);
             String regExp = "(?m)var info = \\{(.*?)\\},$";
 
-            response = new Regex(response, regExp).getMatch(0);
+            if(true)throw new UnsupportedOperationException("Please do not use appwork stuff here."
+                    + " Having dependency on libraries which are highly unstable will make us cry in future.");
+            //probably make a regex utility here in neembuu
+            //and we shall share that utility in NU and NN
+            //response = new org.appwork.utils.Regex(response, regExp).getMatch(0);
+
             response = "{" + response + "}";
             
         } catch (Exception ex) {
@@ -183,7 +187,13 @@ public class DailymotionLinkHandlerProvider implements LinkHandlerProvider {
     
     
     private void createFileBuilder(String url, String title, String quality, long duration, BasicLinkHandler.Builder linkHandlerBuilder){
-        long length = NHttpClientUtils.calculateLength(url, httpClient);
+        long length;
+        try {
+            length = NHttpClientUtils.calculateLength(url, httpClient);
+        } catch (Exception e) {
+            return;
+        }
+        
 
         BasicOnlineFile.Builder fileBuilder = linkHandlerBuilder
                 .createFile();

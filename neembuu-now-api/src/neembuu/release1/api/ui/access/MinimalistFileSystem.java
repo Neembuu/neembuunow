@@ -38,4 +38,6 @@ public interface MinimalistFileSystem {
     RealFileProvider getRealFileProvider();
     
     BasicCascadeMount cascadeMount(BasicCascadableProvider basicCascadable)throws UnsupportedOperationException;
+    
+    String getSuitableFileName(String filename);
 }

@@ -20,7 +20,6 @@ import neembuu.release1.api.ui.LinkGroupUICreator;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import neembuu.release1.Main;
 import neembuu.release1.api.IndefiniteTask;
 import neembuu.release1.api.RealFileProvider;
 import neembuu.release1.api.linkgroup.LinkGroup;
@@ -66,9 +65,9 @@ public class AddLinkAction implements Runnable, LinkGroupUICreator {
         
     }
     
-    public void setMain(Main m){
-        realFileProvider = m.getMountManager().getRealFileProvider();
-        minimalistFileSystem = m.getMountManager().getMinimalistFileSystem();
+    public void initialize(RealFileProvider realFileProvider, MinimalistFileSystem minimalistFileSystem){
+        this.realFileProvider = realFileProvider;
+        this.minimalistFileSystem = minimalistFileSystem;
     }
     
     boolean open = false; 

@@ -85,7 +85,9 @@ public class MultiVariantFileCreator implements NeembuuFileCreator {
                     + "supported anymore by Neembuu now.");
         }
         
-        VectorDirectory vd = new VectorDirectory(linkHandler.getGroupName(), null);
+        String directoryName = linkHandler.getGroupName();
+        directoryName = root.getSuitableFileName(directoryName);
+        VectorDirectory vd = new VectorDirectory(directoryName, null);
 
         
         if(linkHandler.getFiles().size() == 1) {

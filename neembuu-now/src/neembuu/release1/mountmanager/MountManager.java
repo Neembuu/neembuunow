@@ -19,6 +19,7 @@ package neembuu.release1.mountmanager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,7 +35,6 @@ import jpfm.volume.CommonFileAttributesProvider;
 import jpfm.volume.vector.VectorRootDirectory;
 import neembuu.diskmanager.DiskManager;
 import neembuu.release1.app.Application;
-import neembuu.release1.Main;
 import neembuu.release1.api.RealFileProvider;
 import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.open.Openers;
@@ -50,7 +50,7 @@ import neembuu.vfs.file.TroubleHandler;
  *
  * @author Shashank Tulsyan
  */
-public class MountManager {
+public final class MountManager {
     private Mount mount;
     private JPfm.Manager manager = null;
     
@@ -151,31 +151,46 @@ public class MountManager {
         if(c>0)return;
         c++;
         
-        /*if(event.getEventType()!=FormatterEvent.EVENT.SUCCESSFULLY_MOUNTED){
-            return;
-        }*/
+        addHelpFile();
+        
         mainUIA.neembuuVirtualFolderButton().setEnabled(true);
         mainUIA.neembuuVirtualFolderButton().addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
+            @Override public void actionPerformed(ActionEvent e) {
                 System.out.println("executing="+e);
-                String fileToOpen = "";
-                try{
-                    File f = getMount().getMountLocation().getAsFile();
-                    fileToOpen = f.getAbsolutePath();
-                    Openers.I().openFolder(fileToOpen);
-                }catch(Exception a){
-                    L.log(Level.SEVERE,"Could not open NeembuuFolder",a);
-                    mainComponent.newMessage().error()
-                        .setMessage(fileToOpen
-                                + "\n.Reason : "
-                                + "\n"+a.getMessage())
-                        .setTitle("Could not open virtual folder ")
-                        .show();
-                }
+                openVirtualFolder();
             }
         });
+    }
+    
+    private void openVirtualFolder(){
+        String fileToOpen = "";
+        try{
+            File f = getMount().getMountLocation().getAsFile();
+            fileToOpen = f.getAbsolutePath();
+            Openers.I().openFolder(fileToOpen);
+        }catch(Exception a){
+            L.log(Level.SEVERE,"Could not open NeembuuFolder",a);
+            mainComponent.newMessage().error()
+                .setMessage(fileToOpen
+                        + "\n.Reason : "
+                        + "\n"+a.getMessage())
+                .setTitle("Could not open virtual folder ")
+                .show();
+        }
+    }
+    
+    private void addHelpFile(){
+        // The file name and file contents should respect local language
+        Path helpFile = Application.getResource(Application.Resource.Installation, "help","Getting started.pdf");
+        try {
+            if(!Files.exists(helpFile))return;
+            if(!Files.isRegularFile(helpFile))return;
+            jpfm.volume.RealFile rf = 
+                jpfm.volume.RealFileProvider.getNonBlockingRealFile(helpFile.toAbsolutePath().toString(), volume);
+            volume.add(rf);
+        } catch (Exception e) {
+            L.log(Level.SEVERE,"Could not put help file in virtual folder",e);
+        }
     }
     
     private final RealFileProvider realFileProvider =  new RealFileProvider() {

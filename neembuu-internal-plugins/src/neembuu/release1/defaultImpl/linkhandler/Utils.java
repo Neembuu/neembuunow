@@ -38,4 +38,17 @@ public class Utils {
             url = url.substring(0,url.indexOf('#'));
         }return url;
     }
+    public static String getNameFromURL(String url){
+        String fileName = url;
+        try{
+            if(fileName.contains("/")){
+                fileName = url.substring( url.lastIndexOf('/')+1, url.length() );
+            }if(fileName.contains("?")){
+                fileName = url.substring(0, url.lastIndexOf('?'));
+            }
+        }catch(Exception a){
+        }
+        //fileName = jpfm.util.UniversallyValidFileName.makeUniversallyValidFileName(url);
+        return fileName;
+    }
 }

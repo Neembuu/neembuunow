@@ -61,7 +61,7 @@ public class MinimalistFileSystem_Root implements MinimalistFileSystem {
     
     @Override
     public SeekableConnectionFile create(final OnlineFile f,Session s)throws Exception {
-        String fileName = getSuitableFileName(f.getName(), volume);
+        String fileName = getSuitableFileName(f.getName());
         
         SeekableConnectionFile connectionFile
                 = SeekableConnectionFileImplBuilder.build(new SeekableConnectionFileParams.Builder()
@@ -102,7 +102,11 @@ public class MinimalistFileSystem_Root implements MinimalistFileSystem {
         }
     }
     
-    public String getSuitableFileName(String filename, DirectoryStream parent){
+    @Override public String getSuitableFileName(String filename){
+        return getSuitableFileName(filename, volume);
+    }
+    
+    private String getSuitableFileName(String filename, DirectoryStream parent){
 //        if(filename.length()>50){
 //            filename = filename.substring(0,50)
 //                    + /*extension*/ filename.substring(filename.length()-4);
