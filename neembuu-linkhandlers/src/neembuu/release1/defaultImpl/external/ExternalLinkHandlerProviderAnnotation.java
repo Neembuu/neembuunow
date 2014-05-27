@@ -6,17 +6,15 @@
 
 package neembuu.release1.defaultImpl.external;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-@Retention(RetentionPolicy.CLASS)
-@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+//@Target(ElementType.TYPE)
 public @interface ExternalLinkHandlerProviderAnnotation {
     /**
      * @return If url.matches(checkingRegex())==true implies that

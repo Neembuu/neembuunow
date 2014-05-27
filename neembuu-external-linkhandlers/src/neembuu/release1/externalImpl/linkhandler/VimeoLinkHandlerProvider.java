@@ -51,6 +51,7 @@ import org.jsoup.nodes.Document;
         // as this jar becomes bigger and bigger, we must instead 
         // start providing path of each class file.
         dependenciesURL = {"http://neembuu.com/now/update/neembuu-external-linkhandlers/dist/neembuu-external-linkhandlers.jar"},
+        dependenciesLocalPath = {"../../../../../dist/neembuu-external-linkhandlers.jar"},
         minimumReleaseVerReq = 1398604095683L
 )
 public class VimeoLinkHandlerProvider implements LinkHandlerProvider {

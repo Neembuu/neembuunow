@@ -53,6 +53,7 @@ import org.json.JSONObject;
 @ExternalLinkHandlerProviderAnnotation(
         checkingRegex = "https?://(www.youtube.com/watch\\?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=]*)?",
         dependenciesURL = {"http://neembuu.com/now/update/neembuu-external-linkhandlers/dist/neembuu-external-linkhandlers.jar"},
+        dependenciesLocalPath = {"../../../../../../dist/neembuu-external-linkhandlers.jar"},
         minimumReleaseVerReq = 1398604095683L
 )
 public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
@@ -72,6 +73,8 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
         BasicLinkHandler.Builder linkHandlerBuilder = clipConverterExtraction(tlh);
         return linkHandlerBuilder.build();
     }
+    
+    private void xzz(){}
     
     /**
      * Grab the title.

@@ -13,6 +13,7 @@ package neembuu.release1.defaultImpl.external;
 public interface ExternalLinkHandlerEntry {
     String checkingRegex();
     String checkingJavaCode();
-    long classHash();
+    String className();
+    long[]resourcesHash();
     String[]dependenciesURL();
 }

@@ -49,6 +49,7 @@ import org.json.JSONObject;
 @ExternalLinkHandlerProviderAnnotation(
         checkingRegex = DailymotionLinkHandlerProvider.REG_EXP,
         dependenciesURL = {"http://neembuu.com/now/update/neembuu-external-linkhandlers/dist/neembuu-external-linkhandlers.jar"},
+        dependenciesLocalPath = {"../../../../../../dist/neembuu-external-linkhandlers.jar"},
         minimumReleaseVerReq = 1398604095683L
 )
 public class DailymotionLinkHandlerProvider implements LinkHandlerProvider {
@@ -80,6 +81,7 @@ public class DailymotionLinkHandlerProvider implements LinkHandlerProvider {
         return linkHandlerBuilder.build();
     }
     
+    private void x(){}
     
     /**
      * Set the cookies to allow to watch more videos and to force to use english.
