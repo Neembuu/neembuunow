@@ -80,7 +80,7 @@
                 <id>jar</id>
             </reference>
             <reference>
-                <foreign-project>neembuu-internal-plugins</foreign-project>
+                <foreign-project>neembuu-linkhandlers</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
                 <target>jar</target>

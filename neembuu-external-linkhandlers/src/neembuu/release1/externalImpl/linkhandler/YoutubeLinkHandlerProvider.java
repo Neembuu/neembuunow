@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package neembuu.release1.defaultImpl.linkhandler;
+package neembuu.release1.externalImpl.linkhandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +39,8 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import davidepastore.StringUtils;
 import neembuu.release1.api.log.LoggerUtil;
+import neembuu.release1.defaultImpl.linkhandler.BasicLinkHandler;
+import neembuu.release1.defaultImpl.linkhandler.Utils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -3,7 +3,7 @@
     <type>org.netbeans.modules.java.j2seproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/j2se-project/3">
-            <name>neembuu-internal-plugins</name>
+            <name>neembuu-external-linkhandlers</name>
             <source-roots>
                 <root id="src.dir"/>
             </source-roots>
@@ -12,7 +12,7 @@
             </test-roots>
         </data>
         <libraries xmlns="http://www.netbeans.org/ns/ant-project-libraries/1">
-            <definitions>..\nblibraries.properties</definitions>
+            <definitions>../nblibraries.properties</definitions>
         </libraries>
         <references xmlns="http://www.netbeans.org/ns/ant-project-references/1">
             <reference>
@@ -33,6 +33,14 @@
             </reference>
             <reference>
                 <foreign-project>Virtual_FileSystem_for_Watch_as_you_Download</foreign-project>
+                <artifact-type>jar</artifact-type>
+                <script>build.xml</script>
+                <target>jar</target>
+                <clean-target>clean</clean-target>
+                <id>jar</id>
+            </reference>
+            <reference>
+                <foreign-project>neembuu-linkhandlers</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
                 <target>jar</target>

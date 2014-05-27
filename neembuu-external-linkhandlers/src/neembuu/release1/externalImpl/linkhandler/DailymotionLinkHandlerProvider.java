@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neembuu.release1.defaultImpl.linkhandler;
+package neembuu.release1.externalImpl.linkhandler;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,6 +28,8 @@ import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.defaultImpl.file.BasicOnlineFile;
 import neembuu.release1.defaultImpl.file.BasicPropertyProvider;
+import neembuu.release1.defaultImpl.linkhandler.BasicLinkHandler;
+import neembuu.release1.defaultImpl.linkhandler.Utils;
 import neembuu.release1.httpclient.NHttpClient;
 import neembuu.release1.httpclient.utils.NHttpClientUtils;
 import org.apache.http.client.CookieStore;

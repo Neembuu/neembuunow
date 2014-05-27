@@ -17,6 +17,7 @@
 
 package neembuu.release1.defaultImpl.linkhandler;
 
+import neembuu.release1.externalImpl.linkhandler.YoutubeLinkHandlerProvider;
 import neembuu.release1.app.Application;
 import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;

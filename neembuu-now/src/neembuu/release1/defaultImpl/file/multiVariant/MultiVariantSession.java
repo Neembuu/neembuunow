@@ -30,7 +30,6 @@ import neembuu.release1.defaultImpl.file.BasicPropertyProvider;
 import neembuu.vfs.file.AutoCompleteControls;
 import neembuu.vfs.file.FileBeingDownloaded;
 import neembuu.vfs.file.MinimumFileInfo;
-import neembuu.vfs.file.RequestPatternListener;
 
 /**
  *
@@ -44,9 +43,6 @@ public class MultiVariantSession implements NeembuuFile {
     private final AtomicBoolean completelyClosed = new AtomicBoolean(false);
     
     private final MinimalistFileSystem root;
-    
-    public static final class Holder  { RequestPatternListener requestPatternListener; }
-    private final Holder h = new Holder();
     
     private final Session s;
     
