@@ -31,7 +31,14 @@ public final class LoggerUtil {
             throw new IllegalStateException("Already initialized with "+LoggerUtil.serviceProvider);
         }
         LoggerUtil.serviceProvider = serviceProvider;
-    }   
+        L = getLogger("Global");
+    }
+    
+    private static Logger L = Logger.getGlobal();
+    
+    public static Logger L(){
+        return L;
+    }
 
     public static Logger getLogger(String name) {
         if(serviceProvider==null){

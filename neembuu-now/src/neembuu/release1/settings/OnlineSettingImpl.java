@@ -18,8 +18,8 @@
 package neembuu.release1.settings;
 
 import java.util.logging.Level;
-import neembuu.release1.Main;
 import davidepastore.StringUtils;
+import neembuu.release1.api.log.LoggerUtil;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -45,13 +45,13 @@ public class OnlineSettingImpl {
             pth = pth+"/"+p_ele;
         }
         HttpGet httpget = new HttpGet("http://neembuu.sourceforge.net"+pth);
-        Main.getLOGGER().log(Level.INFO, "Getting online setting ...{0}", p);
+        LoggerUtil.L().log(Level.INFO, "Getting online setting ...{0}", p);
         try {
             HttpResponse response = httpclient.execute(httpget);
             String respxml = EntityUtils.toString(response.getEntity());
             return respxml;
         } catch (Exception ex) {
-            Main.getLOGGER().log(Level.INFO, "Exception while getting resource "+p, ex);
+            LoggerUtil.L().log(Level.INFO, "Exception while getting resource "+p, ex);
         }
 
         return null;

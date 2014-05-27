@@ -29,7 +29,7 @@ import javax.swing.ImageIcon;
 import neembuu.rangearray.Range;
 import neembuu.rangearray.UIRangeArrayAccess;
 import neembuu.rangearray.UnsyncRangeArrayCopy;
-import neembuu.release1.Main;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.ui.Colors;
 import neembuu.swing.TintedGreyScaledImage;
 import neembuu.vfs.file.MinimumFileInfo;
@@ -123,7 +123,7 @@ public class Utils {
             bw = TintedGreyScaledImage.getTintedImage(Utils.iconToBufferedImage(clr), Colors.TINTED_IMAGE, false);
             return new TintedIcons(bw, clr);
         } catch (Exception a) {
-            Main.getLOGGER().log(Level.INFO, "Could not find icon, using default", a);
+            LoggerUtil.L().log(Level.INFO, "Could not find icon, using default", a);
         } return null;
     }
     

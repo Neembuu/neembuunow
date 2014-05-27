@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import neembuu.release1.Main;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.ui.MainComponent;
 
 /** This class is used to display Update Notification window.
@@ -20,7 +20,7 @@ public class NotifyUpdate extends javax.swing.JFrame {
         try{
             setIconImage(mc.getJFrame().getIconImage());
         }catch(Exception ignore){}
-        Main.getLOGGER().info("Displaying Update Notification");
+        LoggerUtil.L().info("Displaying Update Notification");
         //First initialize the components
         initComponents();
         //setIconImage(mc.getJFrame().);
@@ -33,7 +33,7 @@ public class NotifyUpdate extends javax.swing.JFrame {
         currentversionLabel.setText("<html>"+ "The NeembuuNow that you are using was released on " + ": <b>" + CheckUpdate.currentDate() +"</b></html>");
         clickLabel.setText("<html>"+ "Download the latest version from here " + ": <a href=http://neembuu.sourceforge.net/download>http://neembuu.com/</a></html>");
         
-        Main.getLOGGER().log(Level.INFO, "{0}Setting Editor Pane", NotifyUpdate.class.getName());
+        LoggerUtil.L().log(Level.INFO, "{0}Setting Editor Pane", NotifyUpdate.class.getName());
         //Set the editor pane to display the newfeatures.html page.
         try {
             htmlPane.setPage("http://neembuu.sourceforge.net/newfeatures.html");
@@ -135,10 +135,10 @@ public class NotifyUpdate extends javax.swing.JFrame {
         if(!Desktop.isDesktopSupported())
             return;
         try {
-            Main.getLOGGER().log(Level.INFO, "{0}: Link clicked.. Opening the homepage..", getClass().getName());
+            LoggerUtil.L().log(Level.INFO, "{0}: Link clicked.. Opening the homepage..", getClass().getName());
             Desktop.getDesktop().browse(new URI("http://neembuu.sourceforge.net/download"));
         } catch (Exception ex) {
-            Main.getLOGGER().severe(ex.toString());
+            LoggerUtil.L().severe(ex.toString());
         }
     }//GEN-LAST:event_clickLabelMouseClicked
 

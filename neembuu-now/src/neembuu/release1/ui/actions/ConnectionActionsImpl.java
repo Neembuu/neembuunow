@@ -20,7 +20,7 @@ import java.awt.event.ActionEvent;
 import java.util.logging.Level;
 import neembuu.rangearray.Range;
 import neembuu.rangearray.UIRangeArrayAccess;
-import neembuu.release1.Main;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.ui.linkpanel.ProgressProvider;
 import neembuu.release1.api.ui.actions.ConnectionActions;
 
@@ -72,7 +72,7 @@ public class ConnectionActionsImpl implements ConnectionActions {
             ((neembuu.vfs.readmanager.ReadRequestState) selection.getProperty()).
                     getConnectionControls().abort();
         } catch (Exception any) {
-            Main.getLOGGER().log(Level.SEVERE, "Connection killing exception", any);
+            LoggerUtil.L().log(Level.SEVERE, "Connection killing exception", any);
         }
     }
 

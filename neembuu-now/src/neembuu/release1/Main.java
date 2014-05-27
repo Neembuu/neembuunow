@@ -171,9 +171,9 @@ public final class Main {
         return nui;
     }
 
-    public static Logger getLOGGER() {
+    /*public static Logger getLOGGER() {
         return get().logger;
-    }
+    }*/
     
 
     public MountManager getMountManager() {

@@ -18,6 +18,7 @@ package neembuu.release1.ui.actions;
 
 import java.util.logging.Level;
 import neembuu.release1.Main;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.open.OpenerAccess;
 
 /**
@@ -53,14 +54,14 @@ public class CloseNeembuuActionImpl {
                 main.getMountManager().getMount().unMount();
             }
         } catch (Exception a) {
-            Main.getLOGGER().log(Level.INFO, " ", a);
+            LoggerUtil.L().log(Level.INFO, " ", a);
         }
 
         try {
-            Main.getLOGGER().log(Level.INFO, " Closing all open files");
+            LoggerUtil.L().log(Level.INFO, " Closing all open files");
             openerA.closeAll();
         } catch (Exception a) {
-            Main.getLOGGER().log(Level.INFO, " ", a);
+            LoggerUtil.L().log(Level.INFO, " ", a);
         }
 
         System.exit(0);

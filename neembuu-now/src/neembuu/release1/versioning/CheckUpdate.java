@@ -7,17 +7,10 @@ package neembuu.release1.versioning;
 import java.util.Date;
 import java.util.logging.Level;
 import neembuu.release1.app.Application;
-import neembuu.release1.Main;
 import davidepastore.StringUtils;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.settings.OnlineSettingImpl;
-import neembuu.release1.settings.SettingsImpl;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.util.EntityUtils;
 
 /** This thread checks for new updates at every launch.
  *
@@ -53,23 +46,23 @@ public class CheckUpdate extends Thread {
      */
     public boolean isCurrentVersion() {
         //Get the version.xml and read the version value.
-        Main.getLOGGER().info("Checking for new version...");
+        LoggerUtil.L().info("Checking for new version...");
         try {
             String respxml = OnlineSettingImpl.getRaw("version.xml");
             if(respxml==null)return true;
             
             availablever = getReleaseDateFromXML(respxml);            
-            Main.getLOGGER().log(Level.INFO, "Available version: {0}", d(availablever));
+            LoggerUtil.L().log(Level.INFO, "Available version: {0}", d(availablever));
             currentver = Application.releaseTime();
 
-            Main.getLOGGER().log(Level.INFO, "Current version: {0}", d(currentver));
+            LoggerUtil.L().log(Level.INFO, "Current version: {0}", d(currentver));
 
             //Compare both
             if (availablever > currentver) {
                 return false;
             }
         } catch (Exception ex) {
-            Main.getLOGGER().log(Level.INFO, "Exception while checking update\n{0}", ex);
+            LoggerUtil.L().log(Level.INFO, "Exception while checking update\n{0}", ex);
         }
 
         return true;
@@ -86,7 +79,7 @@ public class CheckUpdate extends Thread {
         try {
             ver = Long.parseLong(valStr);
         } catch (Exception any) {
-            Main.getLOGGER().severe(any.toString());
+            LoggerUtil.L().severe(any.toString());
         }
         return ver;
     }
@@ -94,7 +87,7 @@ public class CheckUpdate extends Thread {
     @Override
     public void run() {
         if (!(isCurrentVersion())) {
-            Main.getLOGGER().info("New version found..");
+            LoggerUtil.L().info("New version found..");
             new NotifyUpdate(mc).setVisible(true);
         }
     }

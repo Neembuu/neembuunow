@@ -31,7 +31,7 @@ import neembuu.rangearray.RangeRejectedByFilterException;
 import neembuu.rangearray.RangeUtils;
 import neembuu.rangearray.UIRangeArrayAccess;
 import neembuu.rangearray.UnsyncRangeArrayCopy;
-import neembuu.release1.Main;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.ui.ExpansionState;
 import neembuu.release1.api.ui.linkpanel.ProgressProvider;
 import neembuu.release1.api.ui.linkpanel.Graph;
@@ -172,7 +172,7 @@ public class ProgressImpl implements Progress {
             } try{
                 handleChange();
             }catch(Exception a){
-                Main.getLOGGER().log(Level.SEVERE, "Error in refreshing graphs",a);
+                LoggerUtil.L().log(Level.SEVERE, "Error in refreshing graphs",a);
             }
         }
     });
@@ -218,7 +218,7 @@ public class ProgressImpl implements Progress {
                         message = "Some weird unknown error ";
                     }
 
-                    Main.getLOGGER().log(Level.SEVERE, message,reason);
+                    LoggerUtil.L().log(Level.SEVERE, message,reason);
                     previouslyLoggedException = reason;
                 }
             }
@@ -233,9 +233,9 @@ public class ProgressImpl implements Progress {
                 try{
                     overallProgress.addElement(latestRequestEnding+1,r.ending(),true);
                 }catch(RangeRejectedByFilterException.GreaterThanFileSize reason){// ignore
-                    Main.getLOGGER().log(Level.SEVERE,"Evil read request ",reason);
+                    LoggerUtil.L().log(Level.SEVERE,"Evil read request ",reason);
                 }catch(RangeRejectedByFilterException reason){// ignore
-                    Main.getLOGGER().log(Level.SEVERE,"Bug here : read request was rejected ",reason);
+                    LoggerUtil.L().log(Level.SEVERE,"Bug here : read request was rejected ",reason);
                 }
                 break;
             }

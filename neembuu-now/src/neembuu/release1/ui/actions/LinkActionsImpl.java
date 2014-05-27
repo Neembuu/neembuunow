@@ -21,10 +21,10 @@ import java.awt.Color;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import neembuu.diskmanager.Session;
-import neembuu.release1.Main;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.file.NeembuuFileCreator;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.ui.access.CloseActionUIA;
 import neembuu.release1.api.ui.access.RemoveFromUI;
 import neembuu.release1.api.ui.actions.CloseAction;
@@ -149,7 +149,7 @@ public class LinkActionsImpl {
             connectionFile.removeFromFileSystem();
         }catch(Exception a){
             if(!ignoreError)
-                Main.getLOGGER().log(Level.SEVERE, "Error in removing from filesystem, "
+                LoggerUtil.L().log(Level.SEVERE, "Error in removing from filesystem, "
                     + "file might have not been added in the FS so it cannot be removed",a);
         }
         try{
@@ -157,7 +157,7 @@ public class LinkActionsImpl {
             //vf = null; file cannot be deleted if this is done.
         }catch(Exception a){
             if(!ignoreError && !calledFromDelete)
-                Main.getLOGGER().log(Level.SEVERE, "Error in completely closing file",a);
+                LoggerUtil.L().log(Level.SEVERE, "Error in completely closing file",a);
         }
     }
     
@@ -169,7 +169,7 @@ public class LinkActionsImpl {
         try{
             s.delete();
         }catch(Exception a){
-            Main.getLOGGER().log(Level.SEVERE, "Could not delete file",a);
+            LoggerUtil.L().log(Level.SEVERE, "Could not delete file",a);
             mainComponent.newMessage().error()
                 .setMessage(a.getMessage())
                 .setTitle("Could not delete file")

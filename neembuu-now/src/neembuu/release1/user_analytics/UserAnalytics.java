@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import neembuu.release1.app.Application;
-import neembuu.release1.Main;
 import neembuu.release1.api.file.NeembuuFile;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.ui.actions.ReAddAction;
 import neembuu.release1.httpclient.NHttpClient;
 import neembuu.util.Throwables;
@@ -56,7 +56,7 @@ public class UserAnalytics {
                 try{
                     reportImpl(minimumFileInfo);
                 }catch(Exception a){
-                    Main.getLOGGER().log(Level.FINE,"Failed Reporting Statistics",a);
+                    LoggerUtil.L().log(Level.FINE,"Failed Reporting Statistics",a);
                 }
             }
         },"Report file "+minimumFileInfo,true);
@@ -64,7 +64,7 @@ public class UserAnalytics {
     
     
     private static void reportImpl(final MinimumFileInfo file)throws Exception{
-        Main.getLOGGER().info("Sending statistics..");
+        LoggerUtil.L().info("Sending statistics..");
         List<NameValuePair> formparams = new ArrayList<NameValuePair>();
         formparams.add(new BasicNameValuePair("releasedate", Application.releaseTime()+""));
         formparams.add(new BasicNameValuePair("filename", file.getName()));
@@ -81,7 +81,7 @@ public class UserAnalytics {
         httppost.setParams(params);
         DefaultHttpClient httpclient = NHttpClient.getNewInstance();
         EntityUtils.consume(httpclient.execute(httppost).getEntity());
-        Main.getLOGGER().info("done sending stats");
+        LoggerUtil.L().info("done sending stats");
     }
     
     public static void main(String[] args) throws Exception{

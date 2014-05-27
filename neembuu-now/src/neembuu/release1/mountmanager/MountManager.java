@@ -21,6 +21,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import jpfm.FormatterEvent;
 import jpfm.JPfm;
 import jpfm.MountListener;
@@ -35,6 +36,7 @@ import neembuu.diskmanager.DiskManager;
 import neembuu.release1.app.Application;
 import neembuu.release1.Main;
 import neembuu.release1.api.RealFileProvider;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.open.Openers;
 import neembuu.release1.api.ui.IndefiniteTaskUI;
 import neembuu.release1.api.ui.MainComponent;
@@ -63,6 +65,8 @@ public class MountManager {
     
     private final MinimalistFileSystem minimalistFileSystem;
     
+    private static final Logger L = LoggerUtil.getLogger(MountManager.class.getName());
+    
     public MountManager(MainComponent mainComponent, IndefiniteTaskUI indefiniteTaskUI, MainUIA mainUIA, TroubleHandler troubleHandler, DiskManager diskManager) {
         this.mainComponent = mainComponent;
         this.indefiniteTaskUI = indefiniteTaskUI;
@@ -90,7 +94,7 @@ public class MountManager {
         try{
             mount = mount(0, Application.getResource(Application.Resource.VirtualFolderMountLocation));
         }catch(Exception a){
-            Main.getLOGGER().log(Level.SEVERE,"Could not create NeembuuVirtualFolder",a);
+            L.log(Level.SEVERE,"Could not create NeembuuVirtualFolder",a);
             
             mainComponent.newMessage().error()
                 .setMessage("Could not initialize Java pismo file mount\n"+
@@ -119,10 +123,10 @@ public class MountManager {
                             }
                         }).build());
             } catch (NullPointerException ne) {
-                Main.getLOGGER().log(Level.SEVERE, "NullPointerException while test mounting", ne);
+                L.log(Level.SEVERE, "NullPointerException while test mounting", ne);
                 Throwable e = JPfm.getLastException();
                 if (e != null) {
-                    Main.getLOGGER().log(Level.SEVERE, "", e);
+                    L.log(Level.SEVERE, "", e);
                     if (e.getMessage().equalsIgnoreCase("Pismo file mount incorrectly installed or not installed")) {
                         retry = true;
                     }
@@ -162,7 +166,7 @@ public class MountManager {
                     fileToOpen = f.getAbsolutePath();
                     Openers.I().openFolder(fileToOpen);
                 }catch(Exception a){
-                    Main.getLOGGER().log(Level.SEVERE,"Could not open NeembuuFolder",a);
+                    L.log(Level.SEVERE,"Could not open NeembuuFolder",a);
                     mainComponent.newMessage().error()
                         .setMessage(fileToOpen
                                 + "\n.Reason : "

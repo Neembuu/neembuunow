@@ -33,7 +33,7 @@ import neembuu.rangearray.Range;
 import neembuu.rangearray.RangeUtils;
 import neembuu.rangearray.UIRangeArrayAccess;
 import neembuu.rangearray.UnsyncRangeArrayCopy;
-import neembuu.release1.Main;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.ui.ExpansionState;
 import neembuu.release1.api.ui.linkpanel.Graph;
 import neembuu.release1.api.ui.access.GraphUIA;
@@ -69,7 +69,7 @@ public final class GraphImpl implements Graph{
     
     private void initValues(final Range arrayElement){  
         if(regionHandlers == null){ 
-            Main.getLOGGER().log(Level.SEVERE, "Not initialized");
+            LoggerUtil.L().log(Level.SEVERE, "Not initialized");
             return;
         }
         UnsyncRangeArrayCopy ra = regionHandlers.tryToGetUnsynchronizedCopy();

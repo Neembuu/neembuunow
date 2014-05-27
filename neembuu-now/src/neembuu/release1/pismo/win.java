@@ -16,11 +16,9 @@
  */
 package neembuu.release1.pismo;
 
-import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,14 +29,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import jpfm.MachineUtils;
 import neembuu.diskmanager.NioUtils;
 import neembuu.release1.app.Application;
 import static neembuu.release1.app.Application.Resource.Home;
 import static neembuu.release1.app.Application.Resource.Installation;
 import static neembuu.release1.app.Application.Resource.Logs;
-import neembuu.release1.Main;
+import neembuu.release1.api.log.LoggerUtil;
 import static neembuu.release1.pismo.PismoInstaller.installLogFileName;
 
 /**
@@ -92,10 +89,10 @@ public final class win implements InstallService{
             process = probuilder.start();
             System.out.println(Arrays.toString(command));
         } catch (Throwable e) {
-            Main.getLOGGER().log(Level.INFO,"Error running pismo installer/uninstaller",e);
+            LoggerUtil.L().log(Level.INFO,"Error running pismo installer/uninstaller",e);
         }
         if(process==null){
-            Main.getLOGGER().log(Level.INFO,"Error running pismo installer/uninstaller");
+            LoggerUtil.L().log(Level.INFO,"Error running pismo installer/uninstaller");
             return;
         }
         

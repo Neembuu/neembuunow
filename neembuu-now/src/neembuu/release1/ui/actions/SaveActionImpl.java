@@ -19,9 +19,9 @@ package neembuu.release1.ui.actions;
 
 import java.io.File;
 import java.util.logging.Level;
-import neembuu.release1.Main;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.file.Saveable;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.actions.ReAddAction;
 import neembuu.release1.api.ui.actions.SaveAction;
@@ -75,7 +75,7 @@ public class SaveActionImpl implements SaveAction,ReAddAction.CallBack{
                 .setMessage(a.getMessage())
                 .setTitle("Could not save file")
                 .show();
-            Main.getLOGGER().log(Level.SEVERE, "Could not save file",a);
+            LoggerUtil.L().log(Level.SEVERE, "Could not save file",a);
         }
     }
     
