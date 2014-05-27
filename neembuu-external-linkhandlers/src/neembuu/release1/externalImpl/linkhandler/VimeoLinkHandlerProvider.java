@@ -26,6 +26,7 @@ import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProvider;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.log.LoggerUtil;
+import neembuu.release1.defaultImpl.external.ExternalLinkHandlerProvider;
 import neembuu.release1.defaultImpl.file.BasicOnlineFile;
 import neembuu.release1.defaultImpl.file.BasicPropertyProvider;
 import neembuu.release1.defaultImpl.linkhandler.BasicLinkHandler;
@@ -42,10 +43,22 @@ import org.jsoup.nodes.Document;
  * I'm using the method explained <a href="http://jetcracker.wordpress.com/2013/10/29/vimeo-direct-download-link-java/">here</a>.
  * @author davidepastore
  */
+@ExternalLinkHandlerProvider(
+        checkingRegex = VimeoLinkHandlerProvider.REG_EXP,
+        // It is a bad idea to specify the jar path
+        // because if everytime 1 plugin in updated a BIG jar needs to be downloaded
+        // would result in horrible user experience.
+        // as this jar becomes bigger and bigger, we must instead 
+        // start providing path of each class file.
+        dependenciesURL = {"http://neembuu.com/now/update/neembuu-external-linkhandlers/dist/neembuu-external-linkhandlers.jar"},
+        minimumReleaseVerReq = 1398604095683L
+)
 public class VimeoLinkHandlerProvider implements LinkHandlerProvider {
     
     private static final Logger LOGGER = LoggerUtil.getLogger(VimeoLinkHandlerProvider.class.getName());  // all logs go into an html file
     private final DefaultHttpClient httpClient = NHttpClient.getNewInstance();
+    
+    static final String REG_EXP = "https?://(vimeo.com/)([0-9]+)";
     
     private String dataConfigUrl;
     private String title;
@@ -192,7 +205,7 @@ public class VimeoLinkHandlerProvider implements LinkHandlerProvider {
          * @return 
          */
         @Override public boolean canHandle() {
-            boolean result = url.matches("https?://(vimeo.com/)([0-9]+)");
+            boolean result = url.matches(REG_EXP);
             LOGGER.log(Level.INFO, "Vimeo can handle this? {0}", result);
             return result;
         }

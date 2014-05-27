@@ -19,13 +19,13 @@ package neembuu.release1.externalImpl.linkhandler;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import neembuu.release1.api.file.OnlineFile;
 import neembuu.release1.api.file.PropertyProvider;
 import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProvider;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.log.LoggerUtil;
+import neembuu.release1.defaultImpl.external.ExternalLinkHandlerProvider;
 import neembuu.release1.defaultImpl.file.BasicOnlineFile;
 import neembuu.release1.defaultImpl.file.BasicPropertyProvider;
 import neembuu.release1.defaultImpl.linkhandler.BasicLinkHandler;
@@ -46,13 +46,18 @@ import org.json.JSONObject;
  * I'm using the method explained <a href="https://github.com/rg3/youtube-dl/blob/master/youtube_dl/extractor/dailymotion.py">here</a>.
  * @author davidepastore
  */
+@ExternalLinkHandlerProvider(
+        checkingRegex = DailymotionLinkHandlerProvider.REG_EXP,
+        dependenciesURL = {"http://neembuu.com/now/update/neembuu-external-linkhandlers/dist/neembuu-external-linkhandlers.jar"},
+        minimumReleaseVerReq = 1398604095683L
+)
 public class DailymotionLinkHandlerProvider implements LinkHandlerProvider {
     
     private static final Logger LOGGER = LoggerUtil.getLogger(DailymotionLinkHandlerProvider.class.getName());
     private final DefaultHttpClient httpClient = NHttpClient.getNewInstance();
     private HttpContext httpContext;
     
-    private static final String REG_EXP = "https?://(www\\.)?dailymotion\\.com/(embed/)?video/([a-z0-9\\-_]+)|swf(/video)?/[a-zA-Z0-9]+";
+    static final String REG_EXP = "https?://(www\\.)?dailymotion\\.com/(embed/)?video/([a-z0-9\\-_]+)|swf(/video)?/[a-zA-Z0-9]+";
     
     private String title;
     

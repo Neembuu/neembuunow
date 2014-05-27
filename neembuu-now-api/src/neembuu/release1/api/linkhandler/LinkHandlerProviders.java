@@ -50,6 +50,10 @@ public final class LinkHandlerProviders {
         if(fnasp==null){
             throw new NullPointerException();
         }
+        if(defaultLinkProvider!=null){
+            throw new IllegalArgumentException("Already initialized with "+defaultLinkProvider+" trying to"
+                    + " replace with "+fnasp);
+        }
         defaultLinkProvider = fnasp;
     }
 
