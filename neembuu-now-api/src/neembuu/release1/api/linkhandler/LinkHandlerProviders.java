@@ -63,7 +63,7 @@ public final class LinkHandlerProviders {
         synchronized (providers){
             for(LinkHandlerProvider fnasp : providers){
                 trialLinkHandler = fnasp.tryHandling(url);
-                if(trialLinkHandler.canHandle()){
+                if(trialLinkHandler!=null && trialLinkHandler.canHandle()){
                     System.out.println(fnasp.getClass().getSimpleName() + " is handling " + url);
                     LOGGER.log(Level.INFO, "{0} is handling {1}", new Object[]{fnasp.getClass().getSimpleName(), url});
                     return trialLinkHandler;
@@ -90,12 +90,11 @@ public final class LinkHandlerProviders {
         // both should be tried and whichever works should be used.
         // also if both work, there should be a way to give preferance to one of them.
         // like some kind of priority/ranking flag
+        if(!trialLinkHandler.canHandle())defaultLinkProvider.getLinkHandler(trialLinkHandler);
         synchronized (providers){
             for(LinkHandlerProvider fnasp : providers){
-                if(trialLinkHandler.canHandle()){
-                    LinkHandler lh = fnasp.getLinkHandler(trialLinkHandler);
-                    if(lh!=null){return lh;}
-                }
+                LinkHandler lh = fnasp.getLinkHandler(trialLinkHandler);
+                if(lh!=null){return lh;}
             }
             return defaultLinkProvider.getLinkHandler(trialLinkHandler); // may be null
         }

@@ -17,29 +17,14 @@
 
 package neembuu.release1.defaultImpl.external;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import neembuu.release1.api.linkhandler.LinkHandlerProvider;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-@Retention(RetentionPolicy.RUNTIME)
-//@Target(ElementType.TYPE)
-public @interface ExternalLinkHandlerProviderAnnotation {
-    /**
-     * @return If url.matches(checkingRegex())==true implies that
-     * this link handler can handle the given url.
-     */
-    String checkingRegex();
-    /**
-     * @return if more than simple regex checking is required
-     * to know if the link can be handled or not.
-     */
-    String checkingJavaCode() default "";
-    /**
-     * @return The minimum version of NeembuuNow required for this plugin
-     * to function properly. Refer {@link neembuu.release1.app.Application#releaseTime(long time) } 
-     */
-    long minimumReleaseVerReq() default 1398604095683L;
+public interface LinkHandlersProviderWrapper {
+    LinkHandlerProvider singleton();
+    void remake()throws Exception;
+    boolean canHandle(String url);
 }
