@@ -8,9 +8,13 @@ package neembuu.release1.externalImpl.linkhandler;
 
 import java.io.RandomAccessFile;
 import java.lang.annotation.Annotation;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
+import java.util.ArrayList;
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import neembuu.release1.defaultImpl.external.ExternalLinkHandlerEntry;
 import neembuu.release1.defaultImpl.external.ExternalLinkHandlerProviderAnnotation;
 
@@ -32,48 +36,31 @@ public class GenerateExternalLinkHandlerEntry {
         }
         ExternalLinkHandlerEntryImpl entryImpl = new ExternalLinkHandlerEntryImpl(annot);
         
-        if(annot.dependenciesLocalPath().length!=
-                annot.dependenciesURL().length){
-            throw new IllegalStateException("Local path of each resource must be given");
+        Path[]localPaths = resolveLocalPaths();
+        
+        String[]hashes = new String[localPaths.length];
+        for (int i =0; i < localPaths.length; i++) {
+            hashes[i]=calcFileHash(localPaths[i]);
         }
         
-        Path[]localPaths = resolveLocalPaths(annot.dependenciesLocalPath());
+        entryImpl.setClassName(c.getName());
+        entryImpl.setResourcesHash(hashes);
         
-        
-        for (Path path : localPaths) {
-            calcFileHash(path);
-        }
-        
-        annot.dependenciesLocalPath();
-        
-        return null;
+        return entryImpl;
     }
     
-    private Path[]resolveLocalPaths(String[]relativePaths)throws Exception{
-        Path[]localPaths = new Path[relativePaths.length];
+    private Path[]resolveLocalPaths()throws Exception{
+        ArrayList<Path> localPaths = new ArrayList<Path>();
         Path baseDir = Paths.get(c.getResource(".").toURI());
-        for(int i =0; i < relativePaths.length; i++){
-            String localPath =relativePaths[i];
-            System.out.println(localPath);
-            Path relative = Paths.get(localPath);
-            
-            localPaths[i] = baseDir;
-            
-            // netbeans bug
-            localPaths[i] = Paths.get(localPaths[i].toString().replace("neembuu-linkhandlers", "neembuu-external-linkhandlers"));
-            
-            for(Path ele : relative){
-                System.out.println("");
-                if(ele.getFileName().toString().equals("..")){
-                    localPaths[i] = localPaths[i].getParent();
-                }else { 
-                    localPaths[i] = localPaths[i].resolve(ele);
+        
+        try(DirectoryStream<Path> ds = Files.newDirectoryStream(baseDir)){
+            for(Path p : ds){
+                if(p.getFileName().toString().startsWith(c.getSimpleName())){
+                    localPaths.add(p);
                 }
             }
-            
-            System.out.println("loca="+localPaths[i]);
-            System.out.println("netbeans bug");
-        }return localPaths;
+        }
+        return localPaths.toArray(new Path[localPaths.size()]);
     }
     
     private ExternalLinkHandlerProviderAnnotation getAsAnnotation(){
@@ -94,16 +81,18 @@ public class GenerateExternalLinkHandlerEntry {
         }
     }
     
-    private void calcFileHash(Path filePath) {
+    private String calcFileHash(Path filePath) {
+        return calcFileHash(filePath,"SHA-1");
+    }
+    private String calcFileHash(Path filePath,String algorithm) {
         int buff = 100*1024;
         try {
-            MessageDigest hashSum = MessageDigest.getInstance("SHA-256");
-            long startTime;
-            
+            MessageDigest hashSum = MessageDigest.getInstance(algorithm);
+            int read;
+            byte[] buffer;
             try (RandomAccessFile file = new RandomAccessFile(filePath.toFile(), "r")) {
-                startTime = System.nanoTime();
-                byte[] buffer = new byte[buff];
-                long read = 0;
+                buffer = new byte[buff];
+                read = 0;
                 long offset = file.length();
                 int unitsize;
                 while (read < offset) {
@@ -115,36 +104,10 @@ public class GenerateExternalLinkHandlerEntry {
                     read += unitsize;
                 }
             }
-            //partialHash = new byte[hashSum.getDigestLength()];
-            //partialHash = hashSum.digest();
-            
-            
-            System.out.println("hash="+hashSum.toString());
-
-            long endTime = System.nanoTime();
-
-            System.out.println(endTime - startTime);
-
+            return (new HexBinaryAdapter()).marshal(hashSum.digest());
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
-    
-    private static final class ExternalLinkHandlerEntryImpl implements ExternalLinkHandlerEntry {
-        private final ExternalLinkHandlerProviderAnnotation annotation;
-        private String className;
-        private long[] resourcesHash;
-
-        public ExternalLinkHandlerEntryImpl(ExternalLinkHandlerProviderAnnotation annotation) {
-            this.annotation = annotation;
-        }
         
-        @Override public String checkingRegex() { return annotation.checkingRegex(); }
-        @Override public String checkingJavaCode() { return annotation.checkingJavaCode(); }
-        @Override public long[] resourcesHash() { return resourcesHash; }
-        @Override public String className() { return className; }
-        @Override public String[] dependenciesURL() { return annotation.dependenciesURL(); }
-    }
-    
-    
 }

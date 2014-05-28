@@ -31,7 +31,7 @@ import neembuu.release1.api.open.Openers;
 import neembuu.release1.clipboard.AddLinksFromClipboardImpl;
 import neembuu.release1.clipboard.ClipboardMonitorImpl;
 import neembuu.release1.defaultImpl.linkgroup.DefaultLinkGroupMaker;
-import neembuu.release1.defaultImpl.linkgroup.SplitsLinkGroupMaker;r;
+import neembuu.release1.defaultImpl.linkgroup.SplitsLinkGroupMaker;
 import neembuu.release1.defaultImpl.linkhandler.DirectLinkHandlerProvider;
 import neembuu.release1.defaultImpl.log.LoggerServiceProviderImpl;
 import neembuu.release1.defaultImpl.restore_previous.RestorePreviousSessionImpl;
@@ -144,9 +144,9 @@ public final class Main {
     
     private void initLinkHandlerProviders(){
         // move out of this jar
-        LinkHandlerProviders.registerProvider(new DailymotionLinkHandlerProvider());
+        /*LinkHandlerProviders.registerProvider(new DailymotionLinkHandlerProvider());
         LinkHandlerProviders.registerProvider(new VimeoLinkHandlerProvider());
-        LinkHandlerProviders.registerProvider(new YoutubeLinkHandlerProvider());
+        LinkHandlerProviders.registerProvider(new YoutubeLinkHandlerProvider());*/
         
         //DefaultLinkHandler is the default handler
         LinkHandlerProviders.registerDefaultProvider(new DirectLinkHandlerProvider());

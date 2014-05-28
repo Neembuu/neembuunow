@@ -27,14 +27,6 @@ public @interface ExternalLinkHandlerProviderAnnotation {
      */
     String checkingJavaCode() default "";
     /**
-     * @return List of required, class files and jar files
-     */
-    String[]dependenciesURL();
-    /**
-     * @return Location relative to this file, path resolved using class.getResource()
-     */
-    String[]dependenciesLocalPath();
-    /**
      * @return The minimum version of NeembuuNow required for this plugin
      * to function properly. Refer {@link neembuu.release1.app.Application#releaseTime(long time) } 
      */

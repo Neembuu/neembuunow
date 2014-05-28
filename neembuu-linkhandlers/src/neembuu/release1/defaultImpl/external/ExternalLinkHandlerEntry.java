@@ -11,9 +11,9 @@ package neembuu.release1.defaultImpl.external;
  * @author Shashank Tulsyan
  */
 public interface ExternalLinkHandlerEntry {
-    String checkingRegex();
-    String checkingJavaCode();
-    String className();
-    long[]resourcesHash();
-    String[]dependenciesURL();
+    String getCheckingRegex();
+    String getCheckingJavaCode();
+    String getClassName();
+    String[]getResourcesHash();
+    String[]getDependenciesURL();
 }

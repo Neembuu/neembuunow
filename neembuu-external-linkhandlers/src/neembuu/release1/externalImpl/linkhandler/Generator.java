@@ -6,6 +6,9 @@
 
 package neembuu.release1.externalImpl.linkhandler;
 
+import neembuu.release1.defaultImpl.external.ExternalLinkHandlerEntry;
+import org.json.JSONObject;
+
 /**
  *
  * @author Shashank Tulsyan
@@ -19,7 +22,8 @@ public class Generator {
                 );
         
         
-        
-        entry.getExternalLinkHandlerEntry();
+        ExternalLinkHandlerEntry elhe = entry.getExternalLinkHandlerEntry();
+        JSONObject jsono = new JSONObject(elhe);
+        System.out.println(jsono);
     }
 }

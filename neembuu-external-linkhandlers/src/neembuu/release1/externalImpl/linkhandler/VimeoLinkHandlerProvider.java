@@ -45,13 +45,6 @@ import org.jsoup.nodes.Document;
  */
 @ExternalLinkHandlerProviderAnnotation(
         checkingRegex = VimeoLinkHandlerProvider.REG_EXP,
-        // It is a bad idea to specify the jar path
-        // because if everytime 1 plugin in updated a BIG jar needs to be downloaded
-        // would result in horrible user experience.
-        // as this jar becomes bigger and bigger, we must instead 
-        // start providing path of each class file.
-        dependenciesURL = {"http://neembuu.com/now/update/neembuu-external-linkhandlers/dist/neembuu-external-linkhandlers.jar"},
-        dependenciesLocalPath = {"../../../../../dist/neembuu-external-linkhandlers.jar"},
         minimumReleaseVerReq = 1398604095683L
 )
 public class VimeoLinkHandlerProvider implements LinkHandlerProvider {
