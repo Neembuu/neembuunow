@@ -39,7 +39,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import davidepastore.StringUtils;
 import neembuu.release1.api.log.LoggerUtil;
-import neembuu.release1.defaultImpl.external.ExternalLinkHandlerProviderAnnotation;
+import neembuu.release1.defaultImpl.external.ELHProvider;
 import neembuu.release1.defaultImpl.linkhandler.BasicLinkHandler;
 import neembuu.release1.defaultImpl.linkhandler.Utils;
 import org.json.JSONArray;
@@ -50,7 +50,7 @@ import org.json.JSONObject;
  *
  * @author davidepastore
  */
-@ExternalLinkHandlerProviderAnnotation(
+@ELHProvider(
         checkingRegex = "https?://(www.youtube.com/watch\\?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=]*)?",
         minimumReleaseVerReq = 1398604095683L
 )

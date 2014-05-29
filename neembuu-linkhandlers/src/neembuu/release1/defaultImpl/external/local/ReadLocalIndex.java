@@ -20,8 +20,8 @@ package neembuu.release1.defaultImpl.external.local;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import neembuu.release1.defaultImpl.external.ExternalLinkHandlerEntry;
-import neembuu.release1.defaultImpl.external.ExternalLinkHandlerEntryImpl;
+import neembuu.release1.defaultImpl.external.ELHEntry;
+import neembuu.release1.defaultImpl.external.ELHEntryImpl;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,7 +50,7 @@ public class ReadLocalIndex {
             throw new IllegalStateException(message + append);
         
         JSONArray array = jsono.getJSONArray("handlers");
-        ExternalLinkHandlerEntry[]handlers=new ExternalLinkHandlerEntry[array.length()];
+        ELHEntry[]handlers=new ELHEntry[array.length()];
         for (int i = 0; i < array.length(); i++) {
             handlers[i] = makeELHE(array.getJSONObject(i));
         }lelh.setHandlers(handlers);
@@ -61,15 +61,14 @@ public class ReadLocalIndex {
         return lelh;
     }
     
-    private static ExternalLinkHandlerEntry makeELHE(JSONObject jsono)throws JSONException{
+    private static ELHEntry makeELHE(JSONObject jsono)throws JSONException{
         //String getCheckingRegex();
         //String getCheckingJavaCode();
         //String getClassName();
         //String[]getResourcesHash();
         //String[]getDependenciesURL();
-        ExternalLinkHandlerEntryImpl elhei = new ExternalLinkHandlerEntryImpl();
+        ELHEntryImpl elhei = new ELHEntryImpl();
         elhei.setCheckingRegex(jsono.getString("checkingRegex"));
-        elhei.setCheckingJavaCode(jsono.getString("checkingJavaCode"));
         elhei.setClassName(jsono.getString("className"));
         
         JSONArray resourcesHashJsonArray = jsono.getJSONArray("resourcesHash");

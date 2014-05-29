@@ -26,7 +26,7 @@ import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProvider;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.log.LoggerUtil;
-import neembuu.release1.defaultImpl.external.ExternalLinkHandlerProviderAnnotation;
+import neembuu.release1.defaultImpl.external.ELHProvider;
 import neembuu.release1.defaultImpl.file.BasicOnlineFile;
 import neembuu.release1.defaultImpl.file.BasicPropertyProvider;
 import neembuu.release1.defaultImpl.linkhandler.BasicLinkHandler;
@@ -43,7 +43,7 @@ import org.jsoup.nodes.Document;
  * I'm using the method explained <a href="http://jetcracker.wordpress.com/2013/10/29/vimeo-direct-download-link-java/">here</a>.
  * @author davidepastore
  */
-@ExternalLinkHandlerProviderAnnotation(
+@ELHProvider(
         checkingRegex = VimeoLinkHandlerProvider.REG_EXP,
         minimumReleaseVerReq = 1398604095683L
 )

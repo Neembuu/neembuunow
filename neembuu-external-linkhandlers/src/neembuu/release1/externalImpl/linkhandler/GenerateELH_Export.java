@@ -22,24 +22,28 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import neembuu.release1.api.linkhandler.LinkHandlerProvider;
-import neembuu.release1.defaultImpl.external.ExternalLinkHandlerEntry;
-import neembuu.release1.defaultImpl.external.ExternalLinkHandlers;
+import neembuu.release1.defaultImpl.external.ELHEntry;
+import neembuu.release1.defaultImpl.external.ELHEntryImpl;
+import neembuu.release1.defaultImpl.external.ELH_Export;
 import org.json.JSONObject;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public class GenerateExternalLinkHandlers {
+public class GenerateELH_Export {
     private final Class baseClass;
+    private final Path destDir;
 
-    public GenerateExternalLinkHandlers(Class baseClass) {
+    public GenerateELH_Export(Class baseClass, Path destDir) {
         this.baseClass = baseClass;
+        this.destDir = destDir;
     }
-    
+
     private Path baseDir(){
         try{
             return Paths.get(baseClass.getResource(".").toURI());
@@ -65,7 +69,9 @@ public class GenerateExternalLinkHandlers {
                 }else {
                     System.out.println("not of type linkhandlerprovider "+c);
                 }
-            }catch(ClassNotFoundException cnfe){
+            }catch(NoClassDefFoundError error){
+                error.printStackTrace();
+            }catch(Exception cnfe){
                 cnfe.printStackTrace();
             }
             
@@ -82,6 +88,7 @@ public class GenerateExternalLinkHandlers {
             o = c.newInstance();
             boolean a = o instanceof LinkHandlerProvider;
             if(a)return a;
+            System.out.println("dynamic compilation error");
             try{
                 System.out.println(((LinkHandlerProvider)o).tryHandling(null));
             }catch(Exception xa){
@@ -94,20 +101,20 @@ public class GenerateExternalLinkHandlers {
         return false;
     }
     
-    public ExternalLinkHandlers elh()throws Exception{
-        ArrayList<ExternalLinkHandlerEntry> handlers = new ArrayList<>();
+    public ELH_Export elh()throws Exception{
+        ArrayList<ELHEntry> handlers = new ArrayList<>();
         List<Class> classes = makeList();
         
         for (Class class1 : classes) {
-            GenerateExternalLinkHandlerEntry 
-                entry = new GenerateExternalLinkHandlerEntry(class1);
-            ExternalLinkHandlerEntry elhe = entry.getExternalLinkHandlerEntry();
+            GenerateELHEntry 
+                entry = new GenerateELHEntry(class1,destDir);
+            ELHEntryImpl elhe = entry.generate();
             handlers.add(elhe);
         }
         
-        return new ExternalLinkHandlers(handlers.toArray(new ExternalLinkHandlerEntry[handlers.size()]),
-                GenerateExternalLinkHandlers.class.getName(), 
-                GenerateExternalLinkHandlerEntry.HASHING_ALGORITHM);
+        return new ELH_Export(handlers.toArray(new ELHEntry[handlers.size()]),
+                GenerateELH_Export.class.getName(), 
+                GenerateELHEntry.HASHING_ALGORITHM);
     }
     
     private String baseClassPackageName(){
@@ -117,9 +124,19 @@ public class GenerateExternalLinkHandlers {
     }
     
     public static void main(String[] args) throws Exception{
-        GenerateExternalLinkHandlers gelh = new GenerateExternalLinkHandlers(GenerateExternalLinkHandlers.class);
-        ExternalLinkHandlers elh = gelh.elh();
+        
+        Path destDir = Paths.get(GenerateELHEntry.class.getResource("/").toURI());
+        destDir = destDir.getParent();
+        destDir = destDir.getParent();
+        destDir = destDir.getParent();
+        destDir = destDir.getParent();
+        destDir = destDir.resolve("export_external_plugins");
+        Files.createDirectories(destDir);
+        
+        GenerateELH_Export gelh = new GenerateELH_Export(GenerateELH_Export.class,destDir);
+        ELH_Export elh = gelh.elh();
         JSONObject jsono = new JSONObject(elh);
-        System.out.println(jsono);
+        System.out.println(jsono.toString(1));
+        Files.write(destDir.resolve("localindex.json"), jsono.toString().getBytes(), StandardOpenOption.CREATE,StandardOpenOption.WRITE);
     }
 }

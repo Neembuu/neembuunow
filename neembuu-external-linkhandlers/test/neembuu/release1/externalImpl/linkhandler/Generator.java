@@ -1,3 +1,5 @@
+package neembuu.release1.externalImpl.linkhandler;
+
 /*
  *  Copyright (C) 2014 Shashank Tulsyan
  * 
@@ -15,9 +17,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neembuu.release1.externalImpl.linkhandler;
 
-import neembuu.release1.defaultImpl.external.ExternalLinkHandlerEntry;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import neembuu.release1.defaultImpl.external.ELHEntry;
 import org.json.JSONObject;
 
 /**
@@ -25,15 +30,24 @@ import org.json.JSONObject;
  * @author Shashank Tulsyan
  */
 public class Generator {
-    public static void main(String[] args) throws Exception{        
-        GenerateExternalLinkHandlerEntry 
-                entry = new GenerateExternalLinkHandlerEntry(
-                        DailymotionLinkHandlerProvider.class
+    public static void main(String[] args) throws Exception{ 
+        Path destDir = Paths.get(Generator.class.getResource("/").toURI());
+        destDir = destDir.getParent();
+        destDir = destDir.getParent();
+        destDir = destDir.getParent();
+        destDir = destDir.getParent();
+        destDir = destDir.resolve("export_external_plugins");
+        Files.createDirectories(destDir);
+        
+        GenerateELHEntry 
+                entry = new GenerateELHEntry(
+                        DailymotionLinkHandlerProvider.class,
+                        destDir
                         //YoutubeLinkHandlerProvider.class
                 );
         
         
-        ExternalLinkHandlerEntry elhe = entry.getExternalLinkHandlerEntry();
+        ELHEntry elhe = entry.generate();
         JSONObject jsono = new JSONObject(elhe);
         System.out.println(jsono);
     }

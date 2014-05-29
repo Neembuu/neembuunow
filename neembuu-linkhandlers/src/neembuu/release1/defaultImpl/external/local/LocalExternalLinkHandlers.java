@@ -17,19 +17,19 @@
 
 package neembuu.release1.defaultImpl.external.local;
 
-import neembuu.release1.defaultImpl.external.ExternalLinkHandlerEntry;
+import neembuu.release1.defaultImpl.external.ELHEntry;
 
 /**
  *
  * @author Shashank Tulsyan
  */
 public class LocalExternalLinkHandlers {
-    private ExternalLinkHandlerEntry[] handlers;
+    private ELHEntry[] handlers;
     private long creationTime;
     private String createdBy;
     private String hashingAlgorithm;
 
-    public void setHandlers(ExternalLinkHandlerEntry[] handlers) {
+    public void setHandlers(ELHEntry[] handlers) {
         this.handlers = handlers;
     }
 
@@ -49,7 +49,7 @@ public class LocalExternalLinkHandlers {
         this.createdBy = createdBy;
     }
 
-    public ExternalLinkHandlerEntry[] getHandlers() {
+    public ELHEntry[] getHandlers() {
         return handlers;
     }
 

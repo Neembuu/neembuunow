@@ -17,14 +17,36 @@
 
 package neembuu.release1.defaultImpl.external;
 
-import neembuu.release1.api.linkhandler.LinkHandlerProvider;
-
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface LinkHandlersProviderWrapper {
-    LinkHandlerProvider singleton();
-    void remake()throws Exception;
-    boolean canHandle(String url);
+public class ELH_Export {
+    private final ELHEntry[] handlers;
+    private final long creationTime = System.currentTimeMillis();
+    private final String createdBy;
+    private final String hashingAlgorithm;
+
+    public ELH_Export(ELHEntry[] handlers, String createdBy, String hashingAlgorithm) {
+        this.handlers = handlers;
+        this.createdBy = createdBy;
+        this.hashingAlgorithm = hashingAlgorithm;
+    }
+
+    public ELHEntry[] getHandlers() {
+        return handlers;
+    }
+
+    public long getCreationTime() {
+        return creationTime;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public String getHashingAlgorithm() {
+        return hashingAlgorithm;
+    }
+    
 }

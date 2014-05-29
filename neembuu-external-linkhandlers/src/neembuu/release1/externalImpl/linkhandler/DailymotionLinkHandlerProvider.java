@@ -25,7 +25,7 @@ import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProvider;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.log.LoggerUtil;
-import neembuu.release1.defaultImpl.external.ExternalLinkHandlerProviderAnnotation;
+import neembuu.release1.defaultImpl.external.ELHProvider;
 import neembuu.release1.defaultImpl.file.BasicOnlineFile;
 import neembuu.release1.defaultImpl.file.BasicPropertyProvider;
 import neembuu.release1.defaultImpl.linkhandler.BasicLinkHandler;
@@ -46,9 +46,10 @@ import org.json.JSONObject;
  * I'm using the method explained <a href="https://github.com/rg3/youtube-dl/blob/master/youtube_dl/extractor/dailymotion.py">here</a>.
  * @author davidepastore
  */
-@ExternalLinkHandlerProviderAnnotation(
+@ELHProvider(
         checkingRegex = DailymotionLinkHandlerProvider.REG_EXP,
-        minimumReleaseVerReq = 1398604095683L
+        minimumReleaseVerReq = 1398604095683L,
+        isBroken = true
 )
 public class DailymotionLinkHandlerProvider implements LinkHandlerProvider {
     
