@@ -26,6 +26,11 @@ public class Utils {
         return getRidOfHash(getRidOfHttps(url));
     }
     
+    /**
+     * Get rid of "https"
+     * @param url The url.
+     * @return Returns the url with "http" instead of "https".
+     */
     public static String getRidOfHttps(String url){
         url = url.trim();
         if(url.contains("https://")){
@@ -33,11 +38,23 @@ public class Utils {
         }
         return url; 
     }
+    
+    /**
+     * Get rid of hash ("#")
+     * @param url The url.
+     * @return Returns the url without hash ("#").
+     */
     public static String getRidOfHash(String url){
         if(url.contains("#")){
             url = url.substring(0,url.indexOf('#'));
         }return url;
     }
+    
+    /**
+     * Get the name from an url.
+     * @param url The url.
+     * @return Returns the name from an url.
+     */
     public static String getNameFromURL(String url){
         String fileName = url;
         try{
