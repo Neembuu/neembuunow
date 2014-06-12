@@ -38,13 +38,19 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import davidepastore.StringUtils;
+import java.net.URLEncoder;
 import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.defaultImpl.external.ExternalLinkHandlerProviderAnnotation;
 import neembuu.release1.defaultImpl.linkhandler.BasicLinkHandler;
 import neembuu.release1.defaultImpl.linkhandler.Utils;
+import org.apache.http.client.methods.HttpGet;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /**
  *
@@ -68,7 +74,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
     @Override
     public LinkHandler getLinkHandler(TrialLinkHandler tlh) throws Exception {
         if( !(tlh instanceof YT_TLH) || !tlh.canHandle()){return null;}
-        BasicLinkHandler.Builder linkHandlerBuilder = clipConverterExtraction(tlh);
+        BasicLinkHandler.Builder linkHandlerBuilder = linkYoutubeExtraction(tlh); //clipConverterExtraction(tlh);
         return linkHandlerBuilder.build();
     }
     
@@ -171,9 +177,121 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
     }
     
     /**
+     * Use http://www.linkyoutube.com service to get the urls.
+     * @param url the youtube url.
+     * @return A BasicLinkHandler.Builder with all the urls found for this video.
+     */
+    private BasicLinkHandler.Builder linkYoutubeExtraction(TrialLinkHandler tlh)throws Exception{
+        return linkYoutubeExtraction(tlh, 0);
+    }
+    
+    
+    private BasicLinkHandler.Builder linkYoutubeExtraction(TrialLinkHandler tlh, int retryCount)throws Exception{
+        String url = tlh.getReferenceLinkString();
+        BasicLinkHandler.Builder linkHandlerBuilder = BasicLinkHandler.Builder.create();
+        
+        try {
+            DefaultHttpClient httpClient = NHttpClient.getNewInstance();
+            String requestUrl = "http://www.linkyoutube.com/watch/index.php?video=" + URLEncoder.encode(url, "UTF-8");
+            
+            final String responseString = NHttpClientUtils.getData(requestUrl, httpClient);
+            
+            //Set the group name as the name of the video
+            String nameOfVideo = getVideoName(url);
+            
+            String fileName = "text";
+            
+            linkHandlerBuilder.setGroupName(nameOfVideo);
+            
+            long c_duration = -1;
+            
+            Document doc = Jsoup.parse(responseString);
+            
+            Elements elements = doc.select("#download_links a");
+            
+            for (Element element : elements) {
+                String singleUrl = element.attr("href");
+                fileName = element.text();
+                if(!singleUrl.equals("#")){
+                    
+                    long length = NHttpClientUtils.calculateLength(singleUrl, httpClient);
+                    singleUrl = Utils.normalize(singleUrl);
+                    System.out.println("Normalized URL: " + singleUrl);
+
+
+                    if(length==0){
+                        length = NHttpClientUtils.calculateLength(singleUrl,httpClient);
+                    }
+                    
+                    //System.out.println("Length: " + length);
+                
+                    if(length <= 0){ continue; /*skip this url*/ }
+
+                    BasicOnlineFile.Builder fileBuilder = linkHandlerBuilder
+                            .createFile();
+
+                    try{ // finding video/audio length
+                        String dur = StringUtils.stringBetweenTwoStrings(singleUrl, "dur=", "&");
+                        long duration = (int)(Double.parseDouble(dur)*1000);
+                        if(c_duration < 0 ){ c_duration = duration; }
+                        fileBuilder.putLongPropertyValue(PropertyProvider.LongProperty.MEDIA_DURATION_IN_MILLISECONDS, duration);
+                        System.out.println("dur="+dur);
+                    }catch(NumberFormatException a){
+                        // ignore
+                    }
+
+                    try{ // finding the quality short name
+                        String type = fileName.substring(fileName.indexOf("(")+1);
+                        type = type.substring(0, type.indexOf(")"));
+                        fileBuilder.putStringPropertyValue(PropertyProvider.StringProperty.VARIANT_DESCRIPTION, type);
+                        System.out.println("type="+type);
+                    }catch(Exception a){
+                        a.printStackTrace();
+                    }
+
+                    fileName = nameOfVideo + " " +fileName;
+
+                    fileBuilder.setName(fileName)
+                        .setUrl(singleUrl)
+                        .setSize(length).next();
+                    }
+            }
+            
+            for(OnlineFile of : linkHandlerBuilder.getFiles()){
+                long dur = of.getPropertyProvider().getLongPropertyValue(PropertyProvider.LongProperty.MEDIA_DURATION_IN_MILLISECONDS);
+                if(dur < 0 && c_duration > 0 && 
+                        of.getPropertyProvider() instanceof BasicPropertyProvider){
+                    ((BasicPropertyProvider)of.getPropertyProvider())
+                            .putLongPropertyValue(PropertyProvider.LongProperty.MEDIA_DURATION_IN_MILLISECONDS,c_duration);
+                }
+            }
+            
+        } catch (Exception ex) {
+            int retryLimit = ((YT_TLH)tlh).retryLimit;
+            ex.printStackTrace();
+            System.out.println("retry no. = " + retryCount);
+            if(retryCount > retryLimit) throw ex;
+            return linkYoutubeExtraction(tlh, retryCount + 1);
+        }
+
+        return linkHandlerBuilder;
+    }
+    
+    /**
+     * Returns the name of the video.
+     * @param url The url of the video.
+     * @return Returns the title of the video.
+     */
+    private String getVideoName(String url) throws Exception{
+        final String responseString = NHttpClientUtils.getData(url, NHttpClient.getNewInstance());
+        Document doc = Jsoup.parse(responseString);
+        return doc.select("meta[name=title]").attr("content");
+    }
+    
+    /**
      * Use cliconverter.cc service to get the urls.
      * @param url the youtube url.
-     * @return An ArrayList<String> with all the urls found for this video.
+     * @return A BasicLinkHandler.Builder with all the urls found for this video.
      */
     private BasicLinkHandler.Builder clipConverterExtraction(TrialLinkHandler tlh)throws Exception{
         return clipConverterExtraction(tlh, 0);
