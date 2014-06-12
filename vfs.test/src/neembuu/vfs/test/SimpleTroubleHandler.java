@@ -37,8 +37,9 @@ public final class SimpleTroubleHandler implements TroubleHandler{
     }
     
     @Override
-    public void cannotCreateANewConnection(NewConnectionParams ncp, int numberOfRetries) {
-        JOptionPane.showMessageDialog(fp.getJFrame(), ncp.toString(), "Internet problem : retries "+numberOfRetries+" times",JOptionPane.ERROR_MESSAGE);
+    public void cannotCreateANewConnection(NewConnectionParams ncp, int numberOfRetries,Throwable reason) {
+        JOptionPane.showMessageDialog(fp.getJFrame(), ncp.toString()+"\n"+reason.getMessage(),
+                "Internet problem : retries "+numberOfRetries+" times",JOptionPane.ERROR_MESSAGE);
     }
 
     @Override

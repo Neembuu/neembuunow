@@ -43,10 +43,7 @@ import org.jsoup.nodes.Document;
  * I'm using the method explained <a href="http://jetcracker.wordpress.com/2013/10/29/vimeo-direct-download-link-java/">here</a>.
  * @author davidepastore
  */
-@ELHProvider(
-        checkingRegex = VimeoLinkHandlerProvider.REG_EXP,
-        minimumReleaseVerReq = 1398604095683L
-)
+@ELHProvider(checkingRegex = VimeoLinkHandlerProvider.REG_EXP)
 public class VimeoLinkHandlerProvider implements LinkHandlerProvider {
     
     private static final Logger LOGGER = LoggerUtil.getLogger(VimeoLinkHandlerProvider.class.getName());  // all logs go into an html file

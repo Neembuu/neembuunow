@@ -31,11 +31,18 @@ public final class BasicPropertyProvider implements PropertyProvider{
         Object v = map.put(k,property); if(v==null){return PROPERTY_NOT_FOUND;}
         return (long)v;
     }
-
+    
+    public boolean putBooleanPropertyValue(BooleanProperty k, boolean property) {
+        Object v = map.put(k,property); if(v==null){return false;}
+        return (boolean)v;
+    }
+    
     public String putStringPropertyValue(StringProperty k, String property) {
         Object v = map.put(k,property);
         return (String)v;
     }
+    
+    
     
     @Override
     public long getLongPropertyValue(LongProperty k) {
@@ -47,6 +54,12 @@ public final class BasicPropertyProvider implements PropertyProvider{
     public String getStringPropertyValue(StringProperty k) {
         Object v = map.get(k);
         return (String)v;
+    }
+
+    @Override
+    public boolean getBooleanPropertyValue(BooleanProperty k) {
+        Object v = map.get(k); if(v==null){return false;}
+        return (boolean)v;
     }
     
 }

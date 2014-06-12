@@ -776,6 +776,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         @Override public void repaintProgressBar() {progress.progress().repaint(); } };
     
     final CloseActionUIA closeActionUIA = new CloseActionUIA() {
+        @Override public void saveButton_reset(){ rightControlsPanel.getSaveBtn().setVisible(false);} 
         @Override public void overlay_setVisible(boolean show) { overlay.setVisible(show); }
         @Override public void indefiniteOverlay(boolean show) {indefiniteProgress.setVisible(show);}
         @Override public void border_setColor(Color c) {border.setColor(c);}

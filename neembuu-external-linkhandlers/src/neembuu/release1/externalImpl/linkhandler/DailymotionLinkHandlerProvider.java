@@ -46,11 +46,7 @@ import org.json.JSONObject;
  * I'm using the method explained <a href="https://github.com/rg3/youtube-dl/blob/master/youtube_dl/extractor/dailymotion.py">here</a>.
  * @author davidepastore
  */
-@ELHProvider(
-        checkingRegex = DailymotionLinkHandlerProvider.REG_EXP,
-        minimumReleaseVerReq = 1398604095683L,
-        isBroken = true
-)
+@ELHProvider( checkingRegex = DailymotionLinkHandlerProvider.REG_EXP,isBroken = true)
 public class DailymotionLinkHandlerProvider implements LinkHandlerProvider {
     
     private static final Logger LOGGER = LoggerUtil.getLogger(DailymotionLinkHandlerProvider.class.getName());

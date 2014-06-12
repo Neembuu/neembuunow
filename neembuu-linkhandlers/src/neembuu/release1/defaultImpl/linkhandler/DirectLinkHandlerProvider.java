@@ -18,6 +18,7 @@
 
 package neembuu.release1.defaultImpl.linkhandler;
 
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
@@ -25,6 +26,7 @@ import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProvider;
 import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.httpclient.NHttpClient;
+import neembuu.util.CombineExceptions;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -36,7 +38,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 public class DirectLinkHandlerProvider implements LinkHandlerProvider {    
     private static final Logger LOGGER = LoggerUtil.getLogger(DirectLinkHandlerProvider.class.getName());
     
-    private LinkHandler getDirectLinkHandler(String url)throws Exception{
+    private static final int RETRY_COUNT = 5;
+    
+    private LinkHandler getDirectLinkHandler(String url, int attempt)throws Exception{
         
         String fileName = url.substring(url.lastIndexOf('/')+1);
         
@@ -132,7 +136,23 @@ public class DirectLinkHandlerProvider implements LinkHandlerProvider {
 
     @Override
     public LinkHandler getLinkHandler(TrialLinkHandler trialLinkHandler) throws Exception{
-        return getDirectLinkHandler(trialLinkHandler.getReferenceLinkString());
+        LinkHandler lh = null;
+        ArrayList<Exception> es = new ArrayList<>();
+        for (int i = 0; i < RETRY_COUNT; i++) {
+            try{
+                lh = getDirectLinkHandler(trialLinkHandler.getReferenceLinkString(),i);
+            }catch(Exception a){
+                es.add(a);
+                lh = null;
+            }
+            if(lh!=null){
+                return lh;
+            }
+        }
+        
+        //es.add(new Exception("Eww!"));
+        
+        throw CombineExceptions.combine(es);
     }
 
         

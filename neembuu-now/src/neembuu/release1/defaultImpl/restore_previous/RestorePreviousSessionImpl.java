@@ -23,11 +23,13 @@ import java.util.List;
 import neembuu.diskmanager.DiskManager;
 import neembuu.diskmanager.FindPreviousSessionCallback;
 import neembuu.diskmanager.Session;
+import neembuu.release1.api.IndefiniteTask;
 import neembuu.release1.api.linkgroup.LinkGroup;
 import neembuu.release1.api.linkgroup.LinkGroupMakers;
 import neembuu.release1.api.ui.AddLinkUI;
 import neembuu.release1.api.ui.LinkGroupUICreator;
 import neembuu.release1.api.ui.AddLinkUI.Lock;
+import neembuu.release1.api.ui.IndefiniteTaskUI;
 
 /**
  *
@@ -37,15 +39,20 @@ public class RestorePreviousSessionImpl implements FindPreviousSessionCallback {
     private final DiskManager dm;
     private final LinkGroupUICreator linkGroupUICreator;
     private final Lock addUILock;
+    private final IndefiniteTaskUI itui;
 
+    private volatile IndefiniteTask it = null;
+    
     public RestorePreviousSessionImpl(DiskManager dm, LinkGroupUICreator linkGroupUICreator,
-            AddLinkUI addLinkUI) {
-        this.dm = dm; 
+            AddLinkUI addLinkUI,IndefiniteTaskUI itui) {
+        this.dm = dm; this.itui = itui;
         this.linkGroupUICreator = linkGroupUICreator; this.addUILock = addLinkUI.getLock();
     }
 
     
     public void checkAndRestoreFromPrevious(){
+        it = itui.showIndefiniteProgress("Restoring previous session");
+        it.done(true, 10000);//10 seconds max.
         addUILock.lock(true);//no chance of race condition
         // this is to prevent user from adding new links while
         // we are scanning old session. The software WILL definitely
@@ -81,6 +88,11 @@ public class RestorePreviousSessionImpl implements FindPreviousSessionCallback {
         }
         linkGroupUICreator.createUIFor(lgs,false);
         addUILock.lock(false);
+        
+        IndefiniteTask it_l = it;
+        if(it_l!=null){
+            it_l.done(true, 0);
+        }
     }
     
     private void deleteFailedSessions(Session s){

@@ -24,6 +24,7 @@ import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProvider;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.log.LoggerUtil;
+import neembuu.release1.api.ui.IndefiniteTaskUI;
 
 /**
  *
@@ -32,8 +33,13 @@ import neembuu.release1.api.log.LoggerUtil;
 public class ExternalLinkHandlersProvider implements LinkHandlerProvider{
     
     private final ArrayList<LazyLinkHandlersProvider> l = new ArrayList<>();
+    private final IndefiniteTaskUI itui;
     
     private static final Logger L = LoggerUtil.getLogger(ExternalLinkHandlersProvider.class.getName());
+
+    public ExternalLinkHandlersProvider(IndefiniteTaskUI itui) {
+        this.itui = itui;
+    }
 
     @Override public TrialLinkHandler tryHandling(String url) {
         if(url==null)throw new IllegalArgumentException("URL is null");

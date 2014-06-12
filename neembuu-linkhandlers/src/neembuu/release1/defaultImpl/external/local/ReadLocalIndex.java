@@ -20,6 +20,7 @@ package neembuu.release1.defaultImpl.external.local;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import neembuu.release1.defaultImpl.external.ELHEntry;
 import neembuu.release1.defaultImpl.external.ELHEntryImpl;
 import org.json.JSONArray;
@@ -83,6 +84,32 @@ public class ReadLocalIndex {
             dependenciesURL[i] = dependenciesURLArray.getString(i);
         }elhei.setDependenciesURL(dependenciesURL);
         
+        JSONArray dependenciesLocalPathArray = jsono.getJSONArray("dependenciesLocalPath");
+        String[]dependenciesLocalPath=new String[dependenciesLocalPathArray.length()];
+        for (int i = 0; i < dependenciesLocalPathArray.length(); i++) {
+            dependenciesLocalPath[i] = dependenciesLocalPathArray.getString(i);
+        }elhei.setDependenciesLocalPath(dependenciesLocalPath);
+        
         return elhei;
+    }
+    
+    public static void main(String[] args) throws Exception{
+        Path p = Paths.get("F:\\neembuu\\export_external_plugins\\localindex.json");
+        JSONObject jsono = getContents(p);
+        LocalExternalLinkHandlers lelh = make(jsono);
+        
+        System.out.println(lelh.getCreatedBy());
+        System.out.println(lelh.getCreationTime());
+        System.out.println(lelh.getHashingAlgorithm());
+        for (int i = 0; i < lelh.getHandlers().length; i++) {
+            System.out.println("-------------------------");
+            System.out.println(lelh.getHandlers()[i].getClassName());
+            System.out.println(lelh.getHandlers()[i].getCheckingRegex());
+            System.out.println(lelh.getHandlers()[i].getDependenciesLocalPath()[0]);
+            System.out.println(lelh.getHandlers()[i].getDependenciesURL()[0]);
+            System.out.println(lelh.getHandlers()[i].getLastWorkingOn());
+            System.out.println(lelh.getHandlers()[i].getMinimumReleaseVerReq());
+            System.out.println(lelh.getHandlers()[i].getResourcesHash()[0]);
+        }
     }
 }

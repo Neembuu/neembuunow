@@ -27,8 +27,11 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.Timer;
 import neembuu.release1.api.ui.MainComponent;
+import neembuu.swing.HiddenBorderButton;
+import neembuu.swing.TextBubbleBorder;
 
 /**
  *
@@ -40,7 +43,7 @@ public class ChooseVariantTimeOut extends javax.swing.JPanel {
     private Entry selected;
     
     public static interface Entry {
-        String type(); String speed();
+        String type(); String speed(); boolean hidden();
     }
     
     ChooseVariantTimeOut(
@@ -49,15 +52,38 @@ public class ChooseVariantTimeOut extends javax.swing.JPanel {
         this.jd = jd; this.waitDuration = waitDuration;
         selected = defaultOption;
         initComponents();
+        initHiddenPanel();
+        showHiddenButton.setForeground(Colors.CONTROL_ICONS);
         
-        int i = 1;
-        addSpace(10, i); i++;
-        for (Entry entry : options) {
-            addSpace(5, i); i++;
-            addEntry(entry, defaultOption==entry,i); i++;
-        }
+        addEntries(defaultOption, options);
         
         t.start();
+    }
+    
+    private void initHiddenPanel(){
+        TextBubbleBorder border = new TextBubbleBorder(Colors.BORDER , 4, 16, 0);
+        border.getBorderInsets(null).bottom = 8;
+        border.getBorderInsets(null).top = 8;
+        border.getBorderInsets(null).right = 1;
+        border.getBorderInsets(null).left = 1;
+        variantsPanel_hidden.setBorder(border);
+        variantsPanel_hidden.setVisible(false);
+        //border.setVisible(false);
+    }
+    
+    private void addEntries(Entry defaultOption,List<Entry> options){
+        int i = 1;
+        addSpace(10, i,variantsPanel);
+        addSpace(10, i,variantsPanel_hidden); i++; //common
+        for (Entry entry : options) {
+            if(entry.hidden()){
+                addSpace(5, i,variantsPanel_hidden); i++;
+                addEntry(entry, defaultOption==entry,i,variantsPanel_hidden);
+            }else {
+                addSpace(5, i,variantsPanel); i++;
+                addEntry(entry, defaultOption==entry,i,variantsPanel);
+            }i++;
+        }
     }
     
     private final Timer t = new Timer(300, new ActionListener() {
@@ -74,12 +100,13 @@ public class ChooseVariantTimeOut extends javax.swing.JPanel {
         }
     });
 
-    public static Entry newEntry(final String type,final long sizeInBytes, long durationInMillisec){
+    public static Entry newEntry(final String type,final long sizeInBytes, long durationInMillisec, final boolean hidden){
         double s = sizeInBytes/(durationInMillisec/1000d);
         final String speedToStr = toString(s);
         return new Entry() {
             @Override public String type() { return type; }
             @Override public String speed() { return speedToStr; }
+            @Override public boolean hidden() { return hidden; }
         };
     }
     
@@ -130,8 +157,7 @@ public class ChooseVariantTimeOut extends javax.swing.JPanel {
                 x.selected = null; x.t.stop(); jd.setVisible(false);jd.dispose();
             }});
         jd.getContentPane().add(x);        
-        jd.setSize(x.getPreferredSize().width,
-                x.getPreferredSize().height + 50); 
+        adjustSize(jd, x);
         //jd.setResizable(false);
         jd.setVisible(true);
 
@@ -152,6 +178,10 @@ public class ChooseVariantTimeOut extends javax.swing.JPanel {
         variantsPanel = new javax.swing.JPanel();
         typeLabel = new javax.swing.JLabel();
         speedRequiredLabel = new javax.swing.JLabel();
+        showHiddenButton = HiddenBorderButton.make("Show other qualities");
+        variantsPanel_hidden = new javax.swing.JPanel();
+        typeLabel1 = new javax.swing.JLabel();
+        speedRequiredLabel1 = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
@@ -173,6 +203,30 @@ public class ChooseVariantTimeOut extends javax.swing.JPanel {
         gridBagConstraints.gridy = 0;
         variantsPanel.add(speedRequiredLabel, gridBagConstraints);
 
+        showHiddenButton.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        showHiddenButton.setText(org.openide.util.NbBundle.getMessage(ChooseVariantTimeOut.class, "ChooseVariantTimeOut.showHiddenButton.text")); // NOI18N
+        showHiddenButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showHiddenButtonActionPerformed(evt);
+            }
+        });
+
+        variantsPanel_hidden.setLayout(new java.awt.GridBagLayout());
+
+        typeLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        typeLabel1.setText(org.openide.util.NbBundle.getMessage(ChooseVariantTimeOut.class, "ChooseVariantTimeOut.typeLabel1.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        variantsPanel_hidden.add(typeLabel1, gridBagConstraints);
+
+        speedRequiredLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        speedRequiredLabel1.setText(org.openide.util.NbBundle.getMessage(ChooseVariantTimeOut.class, "ChooseVariantTimeOut.speedRequiredLabel1.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        variantsPanel_hidden.add(speedRequiredLabel1, gridBagConstraints);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -181,37 +235,54 @@ public class ChooseVariantTimeOut extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(automaticallyOpenWarningMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE)
-                    .addComponent(variantsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(variantsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(variantsPanel_hidden, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(showHiddenButton, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(77, 77, 77))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(variantsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
+                .addContainerGap()
+                .addComponent(variantsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(showHiddenButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(variantsPanel_hidden, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(automaticallyOpenWarningMessage)
-                .addContainerGap())
+                .addGap(7, 7, 7))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void showHiddenButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showHiddenButtonActionPerformed
+        variantsPanel_hidden.setVisible(!variantsPanel_hidden.isVisible());
+        adjustSize(jd, this);
+    }//GEN-LAST:event_showHiddenButtonActionPerformed
+
+    private static void adjustSize(JDialog jd, ChooseVariantTimeOut cvto){
+        jd.setSize(cvto.getPreferredSize().width + 20,
+                cvto.getPreferredSize().height + 50);
+    }
     
-    
-    private void addSpace(int s, int i){
+    private void addSpace(int s, int i, JPanel panel){
         java.awt.GridBagConstraints gridBagConstraints;
         
         javax.swing.Box.Filler filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, s), new java.awt.Dimension(0, s), new java.awt.Dimension(32767, s));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = i;
-        variantsPanel.add(filler1, gridBagConstraints);
+        panel.add(filler1, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = i;
-        variantsPanel.add(filler1, gridBagConstraints);
+        panel.add(filler1, gridBagConstraints);
     }
     
-    private void addEntry(final Entry entry,boolean default_,int i){
+    private void addEntry(final Entry entry,boolean default_,int i, JPanel panel){
         java.awt.GridBagConstraints gridBagConstraints;
         
         JButton typeSelector = new JButton(entry.type());
@@ -232,20 +303,24 @@ public class ChooseVariantTimeOut extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = i;
-        variantsPanel.add(typeSelector, gridBagConstraints);
+        panel.add(typeSelector, gridBagConstraints);
 
         speedInfo.setText(entry.speed()); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = i;
-        variantsPanel.add(speedInfo, gridBagConstraints);
+        panel.add(speedInfo, gridBagConstraints);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel automaticallyOpenWarningMessage;
+    private javax.swing.JButton showHiddenButton;
     private javax.swing.JLabel speedRequiredLabel;
+    private javax.swing.JLabel speedRequiredLabel1;
     private javax.swing.JLabel typeLabel;
+    private javax.swing.JLabel typeLabel1;
     private javax.swing.JPanel variantsPanel;
+    private javax.swing.JPanel variantsPanel_hidden;
     // End of variables declaration//GEN-END:variables
 
     public static void main(String[] args) {
@@ -253,12 +328,12 @@ public class ChooseVariantTimeOut extends javax.swing.JPanel {
         
         List<Entry> es = new LinkedList<>();
         
-        Entry e = newEntry("480 P", 50*1024, 122);
+        Entry e = newEntry("480 P", 50*1024, 122,false);
         
-        es.add(newEntry("320 P", 25*1024, 122));
+        es.add(newEntry("320 P", 25*1024, 122,true));
         es.add(e);
-        es.add(newEntry("720 P", 100*1024, 122));
-        es.add(newEntry("1080 P", 300*1024, 122));
+        es.add(newEntry("720 P", 100*1024, 122,false));
+        es.add(newEntry("1080 P", 300*1024, 122,false));
         
         Entry x = showMessage(null, 200, e, es);
         System.out.println("x="+x.type());

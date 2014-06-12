@@ -7,6 +7,7 @@
 package neembuu.vuze;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -71,8 +72,8 @@ public class DoStuff {
         
         for (Download d : downloads) {
             System.out.println("Download: " + d.getName());
-            if(d.getName().contains("3")){               
-                DownloadWrapSFC dwsfc = new DownloadWrapSFC(d, 0);
+            if(d.getName().contains("X-")){               
+                DownloadWrapSFC dwsfc = new DownloadWrapSFC(d, 1);
                 System.out.println(dwsfc.getName());
                 System.out.println(dwsfc.getFileSize());
                 

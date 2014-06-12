@@ -19,7 +19,6 @@ package neembuu.release1.ui.actions;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JOptionPane;
 import neembuu.release1.api.RealFileProvider;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.file.PropertyProvider;
@@ -79,6 +78,10 @@ public class MultiVariantOpenAction implements OpenAction, CallBack{
             
             double delta = downloadSpeed - speedRequired;
             
+            if(file.getPropertyProvider().getBooleanPropertyValue(PropertyProvider.BooleanProperty.UNSTABLE_VARIANT)){
+                continue;
+            }
+            
             if(delta< previous_delta && delta >= 0){
                 idealFile = file; previous_delta = delta;
             }
@@ -89,7 +92,9 @@ public class MultiVariantOpenAction implements OpenAction, CallBack{
         ChooseVariantTimeOut.Entry defaultOption = ChooseVariantTimeOut.newEntry(
             sdef, 
             idealFile.getMinimumFileInfo().getFileSize(),
-            idealFile.getPropertyProvider().getLongPropertyValue(PropertyProvider.LongProperty.MEDIA_DURATION_IN_MILLISECONDS));
+            idealFile.getPropertyProvider().getLongPropertyValue(PropertyProvider.LongProperty.MEDIA_DURATION_IN_MILLISECONDS),
+            false
+        );
         
         ArrayList<ChooseVariantTimeOut.Entry> entries 
                 = new ArrayList<>();
@@ -103,7 +108,9 @@ public class MultiVariantOpenAction implements OpenAction, CallBack{
                 entries.add(ChooseVariantTimeOut.newEntry(
                     s, 
                     file.getMinimumFileInfo().getFileSize(),
-                    file.getPropertyProvider().getLongPropertyValue(PropertyProvider.LongProperty.MEDIA_DURATION_IN_MILLISECONDS)));
+                    file.getPropertyProvider().getLongPropertyValue(PropertyProvider.LongProperty.MEDIA_DURATION_IN_MILLISECONDS),
+                    file.getPropertyProvider().getBooleanPropertyValue(PropertyProvider.BooleanProperty.UNSTABLE_VARIANT)
+                ));
             }
         }
         ChooseVariantTimeOut.Entry choice = ChooseVariantTimeOut.showMessage(mainComponent, 50, defaultOption, entries);

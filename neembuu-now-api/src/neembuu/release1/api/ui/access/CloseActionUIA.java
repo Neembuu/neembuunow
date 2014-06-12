@@ -30,6 +30,7 @@ public interface CloseActionUIA {
     void overlay_setVisible(boolean show);
     void indefiniteOverlay(boolean show);
     void border_setColor(Color c);
+    void saveButton_reset();
     JPanel rightControlsPanel();
     JLabel fileNameLabel();
     OpenButton openButton();
