@@ -32,9 +32,10 @@ public interface TroubleHandler {
      * In default implementation the file is simply unmounted.
      * @param ncp The parameters of new connection.
      * @param numberOfRetries Number of attempts made to make a new connection
+     * @param reason may be null
      */
     void cannotCreateANewConnection(
-            NewConnectionParams ncp, int numberOfRetries);
+            NewConnectionParams ncp, int numberOfRetries,Throwable reason);
     
     /**
      * This is called when a read request has been pending since a long time.

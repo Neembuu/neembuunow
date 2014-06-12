@@ -22,6 +22,8 @@ import neembuu.release1.ui.linkcontainer.LinksContainer;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.LinkedList;
@@ -30,6 +32,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import neembuu.release1.api.IndefiniteTask;
 import neembuu.release1.api.open.OpenerAccess;
 import neembuu.release1.api.ui.AddLinkUI;
@@ -120,9 +123,13 @@ public final class NeembuuUI {
     }
     
     private IndefiniteTask showIndefiniteProgress(String message){
-        IndefTask it = new IndefTask(message);
-        indefiniteTasks.add(it);
-        updateIndefTasks();
+        final IndefTask it = new IndefTask(message);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override public void run() {
+                indefiniteTasks.add(it);
+                updateIndefTasks();
+            }
+        });
         return it;
     }
     
@@ -188,36 +195,50 @@ public final class NeembuuUI {
             this.message = message;
         }
         
-        @Override
-        public String displayMessage() {
+        @Override public String displayMessage() {
             return message;
         }
 
-        @Override
-        public long submittedOn() {
+        @Override public long submittedOn() {
             return submittedOn;
         }
 
-        @Override
-        public long completedOn() {
+        @Override public long completedOn() {
             if(!hasCompleted()){
                 throw new IllegalStateException("Task not completed");
             }
             return finishedOn.get();
         }
 
-        @Override
-        public void done() throws IllegalStateException {
+        @Override public void done(boolean suppress,int delay) throws IllegalStateException {
             if(!finishedOn.compareAndSet(-1, System.currentTimeMillis())){
-                throw new IllegalStateException("Task alreadt completed on "+finishedOn.get());
+                if(!suppress){
+                    throw new IllegalStateException("Task already completed on "+finishedOn.get());
+                }//else return;
             }
-            indefiniteTasks.remove(this);
-            updateIndefTasks();
+            final Runnable t = new Runnable() { @Override public void run() {
+                        indefiniteTasks.remove(IndefTask.this);
+                        updateIndefTasks(); 
+            }};
+            
+            if(delay<=0){
+                SwingUtilities.invokeLater(t);
+            }else {
+                Timer timer = new Timer(delay, new ActionListener() {
+                    @Override public void actionPerformed(ActionEvent e) {
+                        t.run();
+                        ((Timer)e.getSource()).stop();
+                    }
+                });timer.start();
+            }
+        }
+        
+        @Override public boolean hasCompleted() {
+            return finishedOn.get() > 0;
         }
 
-        @Override
-        public boolean hasCompleted() {
-            return finishedOn.get() > 0;
+        @Override public void done() throws IllegalStateException{
+            done(false,-1);
         }
         
     }

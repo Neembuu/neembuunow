@@ -74,9 +74,17 @@ public final class BasicOnlineFile implements OnlineFile {
         public Builder putLongPropertyValue(PropertyProvider.LongProperty k, long property) {
             bpp.putLongPropertyValue(k, property);return this;
         }
+        
+        public PropertyProvider propertyProvider(){
+            return bpp;
+        }
 
         public Builder putStringPropertyValue(PropertyProvider.StringProperty k, String property) {
             bpp.putStringPropertyValue(k, property);return this;
+        }
+        
+        public Builder putBooleanPropertyValue(PropertyProvider.BooleanProperty k, boolean property) {
+            bpp.putBooleanPropertyValue(k, property);return this;
         }
         
         public static Builder create(){

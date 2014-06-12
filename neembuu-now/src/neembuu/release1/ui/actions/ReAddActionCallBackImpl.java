@@ -22,7 +22,6 @@ import neembuu.release1.api.ui.access.CloseActionUIA;
 import neembuu.release1.api.ui.linkpanel.ProgressProvider;
 import neembuu.release1.api.ui.actions.ChangeDownloadModeAction;
 import neembuu.release1.api.ui.actions.ReAddAction;
-import neembuu.vfs.file.FileBeingDownloaded;
 import neembuu.vfs.file.MinimumFileInfo;
 
 

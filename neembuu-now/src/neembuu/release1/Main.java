@@ -42,6 +42,7 @@ import neembuu.release1.app.EnsureSingleInstance;
 import neembuu.release1.app.FlashGotDownloadCommand;
 import neembuu.release1.app.MainCommandsListener;
 import neembuu.release1.app.SingleInstanceCheckCallbackImpl;
+import neembuu.release1.defaultImpl.external.ExternalLinkHandlersProvider;
 import neembuu.release1.open.OpenerImpl;
 import neembuu.release1.ui.InitLookAndFeel;
 import neembuu.release1.ui.NeembuuUI;
@@ -97,7 +98,8 @@ public final class Main {
     
     private void initCommandsMonitor(){
         MainCommandsListener  mcl = new MainCommandsListener();
-        FlashGotDownloadCommand fgdc = new FlashGotDownloadCommand(nui.getLinkGroupUICreator(),nui.getMainComponent());
+        FlashGotDownloadCommand fgdc = new FlashGotDownloadCommand(
+                nui.getLinkGroupUICreator(),nui.getMainComponent(),nui.getIndefiniteTaskUI());
         mcl.register(fgdc.defaultExtension(), fgdc);
         DirectoryWatcherService dws = new DirectoryWatcherServiceImpl(mcl);
         dws.startService();
@@ -126,7 +128,7 @@ public final class Main {
     private void restorePreviousSession(){
         nui.getIndefiniteTaskUI();
         RestorePreviousSessionImpl rpsi = new RestorePreviousSessionImpl(diskManager, 
-                nui.getLinkGroupUICreator(),nui.getAddLinkUI());
+                nui.getLinkGroupUICreator(),nui.getAddLinkUI(),nui.getIndefiniteTaskUI());
         rpsi.checkAndRestoreFromPrevious();
     }
     
@@ -145,9 +147,9 @@ public final class Main {
     private void initLinkHandlerProviders(){
         // move out of this jar
         /*LinkHandlerProviders.registerProvider(new DailymotionLinkHandlerProvider());
-        LinkHandlerProviders.registerProvider(new VimeoLinkHandlerProvider());
-        LinkHandlerProviders.registerProvider(new YoutubeLinkHandlerProvider());*/
-        
+        LinkHandlerProviders.registerProvider(new VimeoLinkHandlerProvider());*/
+        //LinkHandlerProviders.registerProvider(new YoutubeLinkHandlerProvider());
+        LinkHandlerProviders.registerProvider(new ExternalLinkHandlersProvider(nui.getIndefiniteTaskUI()));
         //DefaultLinkHandler is the default handler
         LinkHandlerProviders.registerDefaultProvider(new DirectLinkHandlerProvider());
     }

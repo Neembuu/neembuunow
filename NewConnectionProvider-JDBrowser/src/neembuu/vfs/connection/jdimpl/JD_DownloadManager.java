@@ -18,11 +18,10 @@ package neembuu.vfs.connection.jdimpl;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
-//import jd.plugins.DownloadLink;
 import java.util.logging.Logger;
+import neembuu.util.Throwables;
 import neembuu.vfs.connection.NewConnectionParams;
 import neembuu.vfs.connection.NewConnectionProvider;
-import org.appwork.utils.logging.Log;
 
 
 /**
@@ -60,6 +59,10 @@ public final class JD_DownloadManager
     }
     
     private void connectionsRequested() {
+        if(connection_list.size()>50){
+            LOGGER.info("Too many connections have already been requested");
+            return;
+        }
         String message = "++++++++++ConnectionsRequested+++++++++\n";
         for (JDHTTPConnection e : connection_list) {
             message = message + e.getConnectionParams().toString() + "\n";
@@ -76,15 +79,8 @@ public final class JD_DownloadManager
     
     @Override
     public final void provideNewConnection(final NewConnectionParams connectionParams) {
-        class StartNewJDBrowserConnectionThread extends Thread {
-
-            StartNewJDBrowserConnectionThread() {
-                //always name thread, otherwise it can be extremely difficult to debug
-                super("StartNewJDBrowserConnectionThread{" + connectionParams + "}");
-            }
-
-            @Override
-            public final void run() {
+        Throwables.start(new Runnable() {
+            @Override public void run() {
                 try {
                     JDHTTPConnection c = new JDHTTPConnection(
                             JD_DownloadManager.this,
@@ -93,12 +89,11 @@ public final class JD_DownloadManager
                     connectionsRequested();
                     c.connectAndSupply();
                 } catch (Exception e) {
-                    Log.L.log(Level.INFO, "Problem in new connection ", e);
+                    LOGGER.log(Level.INFO, "Problem in new connection ", e);
                 }
             }
-        }
-
-        new StartNewJDBrowserConnectionThread().start();
+        }, "StartNewJDBrowserConnectionThread{" + connectionParams + "}");
+        //always name thread, otherwise it can be extremely difficult to debug
     }
     
     @Override

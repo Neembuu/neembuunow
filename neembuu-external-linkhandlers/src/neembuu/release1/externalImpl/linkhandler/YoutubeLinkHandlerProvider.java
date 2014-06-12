@@ -40,7 +40,7 @@ import org.apache.http.util.EntityUtils;
 import davidepastore.StringUtils;
 import java.net.URLEncoder;
 import neembuu.release1.api.log.LoggerUtil;
-import neembuu.release1.defaultImpl.external.ExternalLinkHandlerProviderAnnotation;
+import neembuu.release1.defaultImpl.external.ELHProvider;
 import neembuu.release1.defaultImpl.linkhandler.BasicLinkHandler;
 import neembuu.release1.defaultImpl.linkhandler.Utils;
 import org.apache.http.client.methods.HttpGet;
@@ -56,15 +56,14 @@ import org.jsoup.select.Elements;
  *
  * @author davidepastore
  */
-@ExternalLinkHandlerProviderAnnotation(
-        checkingRegex = "https?://(www.youtube.com/watch\\?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=]*)?",
-        minimumReleaseVerReq = 1398604095683L
-)
+@ELHProvider(checkingRegex = YoutubeLinkHandlerProvider.REG_EXP)
 public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
     private static final Logger LOGGER = LoggerUtil.getLogger(YoutubeLinkHandlerProvider.class.getName()); // all logs go into an html file
     
     private final String K_CHALLENGE_URL = "https://www.google.com/recaptcha/api/challenge?k=";
     private final String K_CHALLENGE_CODE = "6LcVessSAAAAAH73irTtpZYKknjeBvN3nuUzJ2G3";
+    
+    static final String REG_EXP = "https?://(www.youtube.com/watch\\?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=]*)?";
     
     @Override
     public TrialLinkHandler tryHandling(final String url) {
@@ -391,6 +390,9 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
                     String type = fileName.substring(fileName.indexOf("(")+1);
                     type = type.substring(0,type.indexOf(")"));
                     fileBuilder.putStringPropertyValue(PropertyProvider.StringProperty.VARIANT_DESCRIPTION, type);
+                    if(type.contains("480")||type.contains("1080")){
+                        fileBuilder.putBooleanPropertyValue(PropertyProvider.BooleanProperty.UNSTABLE_VARIANT, true);
+                    }
                     System.out.println("type="+type);
                 }catch(Exception a){
                     a.printStackTrace();

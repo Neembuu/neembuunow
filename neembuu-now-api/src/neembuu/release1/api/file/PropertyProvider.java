@@ -29,9 +29,13 @@ public interface PropertyProvider {
     public static enum StringProperty {
         VARIANT_DESCRIPTION,
     }
+    public static enum BooleanProperty {
+        UNSTABLE_VARIANT,
+    }
     
     long PROPERTY_NOT_FOUND = -1;
     
     long getLongPropertyValue(LongProperty k);
     String getStringPropertyValue(StringProperty k);
+    boolean getBooleanPropertyValue(BooleanProperty k);
 }

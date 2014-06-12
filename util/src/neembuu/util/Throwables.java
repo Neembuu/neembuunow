@@ -26,6 +26,13 @@ public enum Throwables {
         STARTING_THREAD.set(t);
     }
 
+    public static void addStartingThrowableAsSuppressed(Exception a){
+        Throwable c = STARTING_THREAD.get();
+        if(c!=null){
+            a.addSuppressed(c);
+        }
+    }
+    
     public static Throwable getStartingThrowable() {
         return STARTING_THREAD.get();
     }

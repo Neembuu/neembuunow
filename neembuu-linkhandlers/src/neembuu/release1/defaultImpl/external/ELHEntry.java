@@ -21,10 +21,13 @@ package neembuu.release1.defaultImpl.external;
  *
  * @author Shashank Tulsyan
  */
-public interface ExternalLinkHandlerEntry {
+public interface ELHEntry {
     String getCheckingRegex();
-    String getCheckingJavaCode();
     String getClassName();
     String[]getResourcesHash();
     String[]getDependenciesURL();
+    long getLastWorkingOn();
+    boolean isBroken();
+    long getMinimumReleaseVerReq();
+    String[]getDependenciesLocalPath();
 }

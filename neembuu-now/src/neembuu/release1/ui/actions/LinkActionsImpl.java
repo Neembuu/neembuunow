@@ -34,6 +34,7 @@ import neembuu.release1.api.ui.actions.ReAddAction;
 import neembuu.release1.api.ui.actions.ReAddAction.CallBack;
 import neembuu.release1.api.ui.actions.SaveAction;
 import neembuu.release1.ui.Colors;
+import neembuu.util.MessageFromException;
 import neembuu.util.Throwables;
 
 /**
@@ -120,6 +121,7 @@ public class LinkActionsImpl {
             ui.contract();ui.openButton().setVisible(false);
             if(!onlyUI)closeActionProcess(false,false);
         }else /*open*/{
+            ui.saveButton_reset();
             boolean success;
             try{success = createNewVirtualFile();}catch(Exception a){ a.printStackTrace(); success=false;}
             if(!success){ //undo UI changes
@@ -130,6 +132,7 @@ public class LinkActionsImpl {
             ui.fileNameLabel().setForeground(Color.BLACK);
             ui.fileNameLabel().setText(connectionFile.getMinimumFileInfo().getName());
             ui.openButton().setVisible(true);
+
             
             connectionFile.addToFileSystem();
 
@@ -185,10 +188,11 @@ public class LinkActionsImpl {
         try{
             connectionFile = neembuuFileCreator.create();
         }catch(Exception a){
+            //Add a button "report error here"
             mainComponent.newMessage().error()
-                .setMessage("Sorry! There is nothing you \n"
-                    + "can do about it.\n"
-                    + "Reason : "+a.getMessage())
+                .setMessage("Sorry this file seems to be acting up.\n"
+                        + "Could you please try another link?\n"
+                    + "Failure reason : "+MessageFromException.make(a))
                 .setTitle("Could not make virtual file")
                 .show();
             a.printStackTrace();
@@ -204,6 +208,6 @@ public class LinkActionsImpl {
         return true;
     }
     
-    
+
     
 }

@@ -499,8 +499,8 @@ final class BasicRegionHandler
                 myConnection = null; 
                 working = false ; 
             }
-            
-            file.getTroubleHandler().cannotCreateANewConnection(ncp,retryCount);
+            downloadThreadLogger.log(Level.SEVERE,"Connection failed - "+ncp.toString(),reason);
+            file.getTroubleHandler().cannotCreateANewConnection(ncp,retryCount,reason);
         }
     }
 

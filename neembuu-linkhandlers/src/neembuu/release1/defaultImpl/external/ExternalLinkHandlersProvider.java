@@ -24,6 +24,7 @@ import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProvider;
 import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.log.LoggerUtil;
+import neembuu.release1.api.ui.IndefiniteTaskUI;
 
 /**
  *
@@ -31,13 +32,19 @@ import neembuu.release1.api.log.LoggerUtil;
  */
 public class ExternalLinkHandlersProvider implements LinkHandlerProvider{
     
-    private final ArrayList<LinkHandlersProviderWrapper> l = new ArrayList<>();
+    private final ArrayList<LazyLinkHandlersProvider> l = new ArrayList<>();
+    private final IndefiniteTaskUI itui;
     
     private static final Logger L = LoggerUtil.getLogger(ExternalLinkHandlersProvider.class.getName());
 
+    public ExternalLinkHandlersProvider(IndefiniteTaskUI itui) {
+        this.itui = itui;
+    }
+
     @Override public TrialLinkHandler tryHandling(String url) {
-        for (LinkHandlersProviderWrapper lhpw : l) {
-            if(lhpw.canHandle(url)){
+        if(url==null)throw new IllegalArgumentException("URL is null");
+        for (LazyLinkHandlersProvider lhpw : l) {
+            if(lhpw.canHanle(url)){
                 return lhpw.singleton().tryHandling(url);
             }
         }
@@ -46,7 +53,7 @@ public class ExternalLinkHandlersProvider implements LinkHandlerProvider{
     }
 
     @Override public LinkHandler getLinkHandler(TrialLinkHandler trialLinkHandler) throws Exception {
-        for (LinkHandlersProviderWrapper lhpw : l) {
+        for (LazyLinkHandlersProvider lhpw : l) {
             LinkHandler lh=null;
             try{
                 lh = lhpw.singleton().getLinkHandler(trialLinkHandler);

@@ -18,8 +18,6 @@ package neembuu.vfs.connection.jdimpl;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.logging.Level;
 import jd.http.Browser;
 import jd.http.Request;

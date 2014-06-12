@@ -17,36 +17,29 @@
 
 package neembuu.release1.defaultImpl.external;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 /**
  *
  * @author Shashank Tulsyan
  */
-public class ExternalLinkHandlers {
-    private final ExternalLinkHandlerEntry[] handlers;
-    private final long creationTime = System.currentTimeMillis();
-    private final String createdBy;
-    private final String hashingAlgorithm;
-
-    public ExternalLinkHandlers(ExternalLinkHandlerEntry[] handlers, String createdBy, String hashingAlgorithm) {
-        this.handlers = handlers;
-        this.createdBy = createdBy;
-        this.hashingAlgorithm = hashingAlgorithm;
-    }
-
-    public ExternalLinkHandlerEntry[] getHandlers() {
-        return handlers;
-    }
-
-    public long getCreationTime() {
-        return creationTime;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public String getHashingAlgorithm() {
-        return hashingAlgorithm;
-    }
-    
+@Retention(RetentionPolicy.RUNTIME)
+//@Target(ElementType.TYPE)
+public @interface ELHProvider {
+    /**
+     * @return If url.matches(checkingRegex())==true implies that
+     * this link handler can handle the given url.
+     */
+    String checkingRegex();
+    /**
+     * @return The minimum version of NeembuuNow required for this plugin
+     * to function properly. Refer {@link neembuu.release1.app.Application#releaseTime(long time) } 
+     */
+    long minimumReleaseVerReq() default 1398604095683L;
+    /**
+     * @return true if it is known that this plugin is broken, and the same needs to be notified
+     * to the users
+     */
+    boolean isBroken() default false;
 }

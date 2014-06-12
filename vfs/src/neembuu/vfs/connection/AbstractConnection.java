@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import neembuu.util.Throwables;
 import net.jcip.annotations.GuardedBy;
 
 /**
@@ -129,6 +130,7 @@ public abstract class AbstractConnection extends OutputStream
         try{
             setAsDead();
         }catch(Exception a){
+            Throwables.addStartingThrowableAsSuppressed(a);
             downloadThreadLogger.log(Level.WARNING,"", a);
         }
     }

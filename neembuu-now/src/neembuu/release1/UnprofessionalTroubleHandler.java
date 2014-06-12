@@ -18,14 +18,15 @@ package neembuu.release1;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import jpfm.JPfmError;
 import jpfm.operations.AlreadyCompleteException;
 import jpfm.operations.readwrite.ReadRequest;
 import neembuu.release1.api.IndefiniteTask;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.ui.IndefiniteTaskUI;
 import neembuu.release1.api.ui.MainComponent;
-import neembuu.release1.api.ui.Message;
 import neembuu.vfs.connection.NewConnectionParams;
 import neembuu.vfs.file.TroubleHandler;
 
@@ -44,10 +45,25 @@ public final class UnprofessionalTroubleHandler implements TroubleHandler{
     }
     
     
-    private volatile Message cannotCreateNewConnectionMessage = null;
     
+    private volatile IndefiniteTask tryingToConnect = null;
     @Override
-    public void cannotCreateANewConnection(NewConnectionParams ncp, int numberOfRetries) {
+    public void cannotCreateANewConnection(NewConnectionParams ncp, int numberOfRetries,Throwable reason) {
+        IndefiniteTask tryingToConnect_l = tryingToConnect; //avoid race
+        if(tryingToConnect_l!=null){
+            tryingToConnect_l.done(true,0);
+        }
+        tryingToConnect_l = indefiniteTaskUI.showIndefiniteProgress(
+                "Cannot connect : retrying" );
+        tryingToConnect = tryingToConnect_l;
+        LoggerUtil.L().log(Level.SEVERE,"Cannot connect : tried "+numberOfRetries+" times."+ncp.toString(),
+                reason);
+        final IndefiniteTask toKill = tryingToConnect_l;
+        toKill.done(true,1000);
+        
+    }
+    /*private volatile Message cannotCreateNewConnectionMessage = null;
+    public void cannotCreateANewConnection_old(NewConnectionParams ncp, int numberOfRetries) {
         Message m = cannotCreateNewConnectionMessage ; // avoid race
         if(m==null){
             m = cannotCreateNewConnectionMessage = mainComponent.newMessage().error()
@@ -61,9 +77,9 @@ public final class UnprofessionalTroubleHandler implements TroubleHandler{
             m.setMessage(" There is some problem in your internet connection "+ncp.toString());
         }
         
-    }
+    }*/
 
-    private IndefiniteTask buffering = null;
+    private volatile IndefiniteTask buffering = null;
     
     @Override
     public void readRequestsPendingSinceALongTime(List<ReadRequest> pendingReadRequest, long atleastMillisec) {

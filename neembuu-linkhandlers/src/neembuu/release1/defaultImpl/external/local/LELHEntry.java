@@ -17,14 +17,14 @@
 
 package neembuu.release1.defaultImpl.external.local;
 
-import neembuu.release1.defaultImpl.external.ExternalLinkHandlerEntry;
+import neembuu.release1.defaultImpl.external.ELHEntry;
 
 /**
  *
  * @author Shashank Tulsyan
  */
-public interface LocalExternalLinkHandlerEntry {
-    ExternalLinkHandlerEntry getExternalLinkHandlerEntry();
+public interface LELHEntry {
+    ELHEntry getExternalLinkHandlerEntry();
     String[]getLocalResourcePaths();
     String[]getHashes();
 }

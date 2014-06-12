@@ -27,4 +27,5 @@ public interface IndefiniteTask {
     long completedOn();
     boolean hasCompleted();
     void done()throws IllegalStateException;
+    void done(boolean suppress,int delay)throws IllegalStateException;
 }
