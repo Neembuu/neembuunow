@@ -57,28 +57,33 @@ public final class LinkHandlerProviders {
         defaultLinkProvider = fnasp;
     }
 
+    private static LinkHandlerProvider[]providersCopy(){
+        synchronized (providers){
+            return providers.toArray(new LinkHandlerProvider[providers.size()]);
+        }
+    }
+    
     public static TrialLinkHandler getWhichCanHandleOrDefault(String url){
 //        printProviders();
-        TrialLinkHandler trialLinkHandler;
-        synchronized (providers){
-            for(LinkHandlerProvider fnasp : providers){
-                trialLinkHandler = fnasp.tryHandling(url);
-                if(trialLinkHandler!=null && trialLinkHandler.canHandle()){
-                    System.out.println(fnasp.getClass().getSimpleName() + " is handling " + url);
-                    LOGGER.log(Level.INFO, "{0} is handling {1}", new Object[]{fnasp.getClass().getSimpleName(), url});
-                    return trialLinkHandler;
-                }
-            }
-            
-            //Check if the default provider can handle this link
-            trialLinkHandler = defaultLinkProvider.tryHandling(url);
-            if(trialLinkHandler.canHandle()){
+        TrialLinkHandler trialLinkHandler;        
+        
+        for(LinkHandlerProvider fnasp : providersCopy()){
+            trialLinkHandler = fnasp.tryHandling(url);
+            if(trialLinkHandler!=null && trialLinkHandler.canHandle()){
+                System.out.println(fnasp.getClass().getSimpleName() + " is handling " + url);
+                LOGGER.log(Level.INFO, "{0} is handling {1}", new Object[]{fnasp.getClass().getSimpleName(), url});
                 return trialLinkHandler;
             }
-            
-            return new FailureTrialLinkHandler(url);
-            //return providers.iterator().next().tryHandling(url);
         }
+
+        //Check if the default provider can handle this link
+        trialLinkHandler = defaultLinkProvider.tryHandling(url);
+        if(trialLinkHandler.canHandle()){
+            return trialLinkHandler;
+        }
+
+        return new FailureTrialLinkHandler(url);
+        //return providers.iterator().next().tryHandling(url);
     }
     
     
@@ -91,22 +96,20 @@ public final class LinkHandlerProviders {
         // also if both work, there should be a way to give preferance to one of them.
         // like some kind of priority/ranking flag
         if(!trialLinkHandler.canHandle())defaultLinkProvider.getLinkHandler(trialLinkHandler);
-        synchronized (providers){
-            for(LinkHandlerProvider fnasp : providers){
-                LinkHandler lh = fnasp.getLinkHandler(trialLinkHandler);
-                if(lh!=null){return lh;}
-            }
-            return defaultLinkProvider.getLinkHandler(trialLinkHandler); // may be null
+        for(LinkHandlerProvider fnasp : providersCopy()){
+            LinkHandler lh = fnasp.getLinkHandler(trialLinkHandler);
+            if(lh!=null){return lh;}
         }
+        return defaultLinkProvider.getLinkHandler(trialLinkHandler); // may be null
     }
     /**
      * To check the order.
      */
     public static void printProviders(){
-        for(int i = 0; i < providers.size(); i++){
-            System.out.println(providers.toArray()[i].getClass().getSimpleName());
+        LinkHandlerProvider[] lhps =  providersCopy();
+        for (LinkHandlerProvider lhp : lhps) {
+            System.out.println(lhp.getClass().getSimpleName());
         }
-        
     }
     
     private static final class FailureTrialLinkHandler implements TrialLinkHandler {

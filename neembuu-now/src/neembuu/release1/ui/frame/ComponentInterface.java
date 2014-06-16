@@ -28,6 +28,7 @@ public interface ComponentInterface {
     Rectangle getBounds();
     void setLocation(int x, int y);
     void setCursor(Cursor c);
+    Cursor getCursor();
     int minimumWidth();
     int minimumHeight();
     boolean resizable();

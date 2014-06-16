@@ -22,6 +22,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import neembuu.release1.ui.InitLookAndFeel;
 
 /**
@@ -31,11 +32,12 @@ import neembuu.release1.ui.InitLookAndFeel;
 public class JFrameDecorator {
     public JFrame fr;
     private final FrameDecoration fd;
+    private final MouseHandler mh;
 
     public JFrameDecorator(final JFrame fr) {
         fr.setUndecorated(true);
         fr.setSize(100, 100);
-        fd = new FrameDecoration();
+        fd = new FrameDecoration(make());
         fd.getCustomJFrame().b3().setVisible(false);
         fd.getCustomJFrame().b2().setVisible(false);
         
@@ -49,7 +51,7 @@ public class JFrameDecorator {
         fr.getContentPane().add(fd);
         
         FDCI fdci = new FDCI(fd, fr);
-        MouseHandler mh = new MouseHandler(fdci);
+        mh = new MouseHandler(fdci);
         
         fd.getCustomJFrame().frameOutside().addMouseMotionListener(mh);
         fd.getCustomJFrame().frameOutside().addMouseListener(mh);
@@ -65,6 +67,20 @@ public class JFrameDecorator {
 
     public JFrame getJFrame() {
         return fr;
+    }
+    
+    public interface ContentArea_add_callback { 
+        void contentArea_add(JPanel toAdd);
+    }
+    
+    public ContentArea_add_callback make(){
+        return new ContentArea_add_callback(){
+            @Override public void contentArea_add(JPanel toAdd) {
+                System.out.println("adding");
+                toAdd.addMouseListener(mh.normalize(3, 3));
+                toAdd.addMouseMotionListener(mh.normalize(3, 3));
+            }
+        };
     }
             
     public static void main(String[] args) {

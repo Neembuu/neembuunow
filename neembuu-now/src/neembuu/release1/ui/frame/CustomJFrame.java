@@ -29,7 +29,7 @@ public interface CustomJFrame {
     javax.swing.JPanel frameBorder();
     javax.swing.JPanel frameControls();
     javax.swing.JPanel headerRegion();
-    javax.swing.JPanel contentArea();
+    void contentArea_add(javax.swing.JPanel toAdd);
     javax.swing.JLabel icon();
     javax.swing.JLabel title();
 }

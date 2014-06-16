@@ -17,6 +17,7 @@
 
 package neembuu.release1.versioning.first_time_user;
 
+import neembuu.release1.api.settings.Settings;
 import neembuu.release1.api.ui.AddLinkUI;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.Message;
@@ -29,20 +30,20 @@ import neembuu.util.Throwables;
  * @author Shashank Tulsyan
  */
 public class FirstTimeUser {
+    private final AddLinkUI alui;
     private final MainComponent mc;
+    private final Settings settings;
     
     private final int maximumNotificationCount = 4;
     
-    private final AddLinkUI alui;
-    
     private final int timeout = 20000;
 
-    FirstTimeUser(AddLinkUI alui,MainComponent mc) {
-        this.alui = alui; this.mc = mc;
+    FirstTimeUser(AddLinkUI alui,MainComponent mc,Settings settings) {
+        this.alui = alui; this.mc = mc; this.settings = settings;
     }
     
-    public static void handleUser(AddLinkUI alui,MainComponent mc){
-        final FirstTimeUser hu =  new FirstTimeUser(alui,mc);
+    public static void handleUser(AddLinkUI alui,MainComponent mc,Settings settings){
+        final FirstTimeUser hu =  new FirstTimeUser(alui,mc,settings);
         Throwables.start(new Runnable() {
             @Override public void run() {
                 hu.handle();
@@ -51,18 +52,18 @@ public class FirstTimeUser {
     }
     
     public void handle(){
-        boolean userSawDemo = SettingsImpl.I().getBoolean("user","saw_demo");
+        boolean userSawDemo = settings.getBoolean("user","saw_demo");
         if(userSawDemo)return;
-        long demoNotificationCount = SettingsImpl.I().getLong("user","demo_notification_count");
+        long demoNotificationCount = settings.getLong("user","demo_notification_count");
         if(demoNotificationCount>=maximumNotificationCount)return;
         boolean showUserDemo = askUser();
         demoNotificationCount++;
-        SettingsImpl.I().setLong(demoNotificationCount,"user","demo_notification_count");
+        settings.setLong(demoNotificationCount,"user","demo_notification_count");
         if(!showUserDemo)return;
         
         showDemo();
         
-        SettingsImpl.I().setBoolean(true,"user","saw_demo");
+        settings.setBoolean(true,"user","saw_demo");
     }
     
     private boolean askUser(){
@@ -118,9 +119,9 @@ public class FirstTimeUser {
         String samplelink = OnlineSettingImpl.get("samplelink", "version.xml");
         System.out.println("obtained sample link = "+samplelink);
         if(samplelink!=null){
-            SettingsImpl.I().set(samplelink,"samplelink");
+            settings.set(samplelink,"samplelink");
         }
-        samplelink = SettingsImpl.I().get("samplelink");
+        samplelink = settings.get("samplelink");
         return samplelink;
     }
 }

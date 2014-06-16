@@ -36,6 +36,7 @@ import neembuu.release1.defaultImpl.linkhandler.DirectLinkHandlerProvider;
 import neembuu.release1.defaultImpl.log.LoggerServiceProviderImpl;
 import neembuu.release1.defaultImpl.restore_previous.RestorePreviousSessionImpl;
 import neembuu.release1.api.log.LoggerUtil;
+import neembuu.release1.api.settings.Settings;
 import neembuu.release1.app.DirectoryWatcherService;
 import neembuu.release1.app.DirectoryWatcherServiceImpl;
 import neembuu.release1.app.EnsureSingleInstance;
@@ -44,6 +45,7 @@ import neembuu.release1.app.MainCommandsListener;
 import neembuu.release1.app.SingleInstanceCheckCallbackImpl;
 import neembuu.release1.defaultImpl.external.ExternalLinkHandlersProvider;
 import neembuu.release1.open.OpenerImpl;
+import neembuu.release1.settings.SettingsImpl;
 import neembuu.release1.ui.InitLookAndFeel;
 import neembuu.release1.ui.NeembuuUI;
 import neembuu.release1.versioning.CheckUpdate;
@@ -61,11 +63,13 @@ public final class Main {
     private final MountManager mountManager;
     private final DiskManager diskManager;
     private final ClipboardMonitor clipboardMonitor;
+    private final Settings settings;
     
     private static boolean lazyUI = false;
     
     public Main() {
-        this.nui = new NeembuuUI();
+        settings = SettingsImpl.I(this);//safe
+        this.nui = new NeembuuUI(settings);
         //Application.setMainComponent(new NonUIMainComponent());
         Application.setMainComponent(nui.getMainComponent());
         
@@ -122,7 +126,7 @@ public final class Main {
         
         AddLinksFromClipboardImpl.createAndStart(nui.getAddLinkUI(), clipboardMonitor);
         CheckUpdate.checkLater(nui.getMainComponent());
-        FirstTimeUser.handleUser(nui.getAddLinkUI(),nui.getMainComponent());
+        FirstTimeUser.handleUser(nui.getAddLinkUI(),nui.getMainComponent(),settings);
     }
     
     private void restorePreviousSession(){
