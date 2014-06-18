@@ -48,6 +48,10 @@ final class FDCI implements ComponentInterface {
     @Override public void setCursor(Cursor c) {
         jf.setCursor(c);
     }
+    
+    @Override public Cursor getCursor() {
+        return jf.getCursor();
+    }
 
     @Override public int minimumWidth() {
         return 0;

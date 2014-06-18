@@ -28,6 +28,7 @@ import neembuu.release1.api.linkhandler.TrialLinkHandler;
 import neembuu.release1.api.linkgroup.TrialLinkGroup;
 import neembuu.release1.api.linkgroup.LinkGrouperResults;
 import neembuu.release1.api.linkparser.LinkParserResult;
+import neembuu.release1.api.settings.Settings;
 import neembuu.release1.api.ui.AddLinkUI;
 import neembuu.release1.api.ui.IndefiniteTaskUI;
 import neembuu.release1.api.ui.ExpandableUIContainer;
@@ -52,13 +53,14 @@ public class AddLinkAction implements Runnable, LinkGroupUICreator {
     private RealFileProvider realFileProvider;
     private MinimalistFileSystem minimalistFileSystem;
     private final AddLinkUI addLinkUI;
+    private final Settings settings;
     
     public AddLinkAction(IndefiniteTaskUI indefiniteTaskUI,
             ExpandableUIContainer luic1,
             MainComponent mainComponent,
-            AddLinkUI addLinkUI) {
+            AddLinkUI addLinkUI,Settings settings) {
         this.addLinkUI = addLinkUI;
-        
+        this.settings = settings;
         this.indefiniteTaskUI = indefiniteTaskUI;
         this.luic1 = luic1;
         this.mainComponent = mainComponent;
@@ -165,7 +167,7 @@ public class AddLinkAction implements Runnable, LinkGroupUICreator {
                 luic1, mainComponent, realFileProvider, 
                 minimalistFileSystem,linkGroup,new DownloadSpeedProvider(){
                     @Override public double getDownloadSpeed_KiBps(){return 56;}},
-                this);
+                this,settings);
             
             if(openableEUI==null){return;}
             ((LinksContainer)luic1).addUI(openableEUI, 0);

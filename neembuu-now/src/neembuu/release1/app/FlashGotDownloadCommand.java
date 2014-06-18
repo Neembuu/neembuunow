@@ -57,6 +57,7 @@ public class FlashGotDownloadCommand implements FileCommands{
         if(! ValidExtension.equalsIgnoreCase(extension))return false;
         
         final IndefiniteTask it = itui.showIndefiniteProgress("Adding file send by flashgot");
+        it.done(true,10*1000);//ten seconds max
         try{
             final FlashGotTemplate fgt = new FlashGotTemplate(file);
             try{Files.delete(file);}catch(IOException a){/**/} 
@@ -67,7 +68,7 @@ public class FlashGotDownloadCommand implements FileCommands{
             return true;
         }catch(Exception jsone){
             reportFailure(jsone, creationTime);
-            if(!it.hasCompleted())it.done();
+            it.done(true,0);
             return false;
         }
     }
@@ -80,9 +81,10 @@ public class FlashGotDownloadCommand implements FileCommands{
                 success = true;
             }catch(Exception a){
                 reportFailure(a, creationTime);
-                if(!it.hasCompleted())it.done();
+                it.done(true,0);
             }
             if(!success){
+                it.done(true,0);
                 // :P file has already been deleted
             }
         }catch(Exception a){a.printStackTrace(System.err);}

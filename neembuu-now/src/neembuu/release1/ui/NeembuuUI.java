@@ -35,6 +35,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import neembuu.release1.api.IndefiniteTask;
 import neembuu.release1.api.open.OpenerAccess;
+import neembuu.release1.api.settings.Settings;
 import neembuu.release1.api.ui.AddLinkUI;
 import neembuu.release1.api.ui.HeightProperty;
 import neembuu.release1.api.ui.IndefiniteTaskUI;
@@ -57,6 +58,7 @@ public final class NeembuuUI {
     private final MainPanel mp;
     private final LinksContainer lc;
     private final AddLinkAction ala;
+    private final Settings settings;
     
     private MountManager mm;
     private OpenerAccess openerA;
@@ -73,13 +75,14 @@ public final class NeembuuUI {
         @Override public JButton neembuuVirtualFolderButton() {
             return mp.neembuuVirtualFolderButton; }};
     
-    public NeembuuUI() {
+    public NeembuuUI(Settings settings) {
+        this.settings = settings;
         mainComponent = new MainComponentImpl(jf);
         this.mp = new MainPanel(addLinksAction,mainComponent,listener);
         this.lc = new LinksContainer(mp,mp.linksPanel);
         lc.heightProperty().addListener(listener);
         ala = new AddLinkAction(getIndefiniteTaskUI(),getLinksContainer(),
-                getMainComponent(),mp.getAddLinkUI());
+                getMainComponent(),mp.getAddLinkUI(),settings);
         mp.neembuuVirtualFolderButton.setEnabled(false);
     }
 
@@ -97,7 +100,7 @@ public final class NeembuuUI {
         initJFrame();
         ala.initialize(mm.getRealFileProvider(),mm.getMinimalistFileSystem());
         JFrameDecorator fd = new JFrameDecorator(jf);
-        fd.getFrameDecoration().getCustomJFrame().contentArea().add(mp);
+        fd.getFrameDecoration().getCustomJFrame().contentArea_add(mp);
         //fd.getContentPane().add(mp);
         jf.setVisible(true);
     }

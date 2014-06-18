@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import static java.nio.file.StandardOpenOption.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import neembuu.release1.Main;
 import neembuu.release1.app.Application;
 import neembuu.release1.api.log.LoggerUtil;
 
@@ -37,7 +38,9 @@ import neembuu.release1.api.log.LoggerUtil;
  */
 public class SettingsImpl implements Settings {
     
-    public static Settings I(){
+    public static Settings I(Main m){
+        if(m==null)throw new IllegalArgumentException("Not called from main, "
+                + "you don't have access to this");
         return new SettingsImpl();
     }
     

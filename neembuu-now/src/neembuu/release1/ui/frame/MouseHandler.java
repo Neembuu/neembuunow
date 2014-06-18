@@ -23,6 +23,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import neembuu.util.Throwables;
 
 /**
  *
@@ -36,13 +37,21 @@ public class MouseHandler implements  MouseListener,MouseMotionListener  {
     private Point p_previous_absolute = null;
     
     private MouseLocation mouseLocation = MouseLocation.C;
+    private volatile long lastME;
+    
+    private volatile Thread th;
 
     public MouseHandler(ComponentInterface component) {
         this.component = component;
+        th = Throwables.start(new Runnable() { @Override public void run() {
+                resetMouseThread();
+            }
+        },"Mouse cursor reset thread",true);
     }
     
     @Override
     public void mouseDragged(MouseEvent mouseevent) {
+        lastME = System.currentTimeMillis();
         if(mouseevent.isConsumed())return;
         final Point p_final = mouseevent.getLocationOnScreen();    //global location of mouse pointer
         int dw = p_final.x - p_previous_absolute.x;
@@ -78,36 +87,45 @@ public class MouseHandler implements  MouseListener,MouseMotionListener  {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        System.out.println(e);
+        lastME = System.currentTimeMillis();
         int mx = e.getX(), my=e.getY();
         int h = component.getHeight(), w=component.getWidth();
-        System.out.println("w="+w+" h="+h);
+        //System.out.println("loc="+mouseLocation+" "+e);
+        //System.out.println("w="+w+" h="+h);
         
         final int xa=8,yb=8;
         int a = 8; int b  = 8;
         
         if(component.resizable()){
             if(mx>xa && mx<w-xa && my > yb && my < h-yb ){
-                if(mouseLocation!=MouseLocation.C){
+                //if(mouseLocation!=MouseLocation.C){
                     mouseLocation=MouseLocation.C; 
                     component.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                }
+                //}
             }if(atCornerBorder(mx, my, a, b, MouseLocation.NW) ){
-                if(mouseLocation!=MouseLocation.NW){mouseLocation=MouseLocation.NW; component.setCursor(Cursor.getPredefinedCursor(Cursor.NW_RESIZE_CURSOR));}
+                //if(mouseLocation!=MouseLocation.NW){
+                    mouseLocation=MouseLocation.NW; component.setCursor(Cursor.getPredefinedCursor(Cursor.NW_RESIZE_CURSOR));
             }if(mx<xa && my > b && my < h-b){
-                if(mouseLocation!=MouseLocation.W){mouseLocation=MouseLocation.W; component.setCursor(Cursor.getPredefinedCursor(Cursor.W_RESIZE_CURSOR));}
+                //if(mouseLocation!=MouseLocation.W){
+                    mouseLocation=MouseLocation.W; component.setCursor(Cursor.getPredefinedCursor(Cursor.W_RESIZE_CURSOR));
             }if(atCornerBorder(mx, my, a, h-b, MouseLocation.SW) ){
-                if(mouseLocation!=MouseLocation.SW){mouseLocation=MouseLocation.SW; component.setCursor(Cursor.getPredefinedCursor(Cursor.SW_RESIZE_CURSOR));}
+                //if(mouseLocation!=MouseLocation.SW){
+                    mouseLocation=MouseLocation.SW; component.setCursor(Cursor.getPredefinedCursor(Cursor.SW_RESIZE_CURSOR));
             }if(mx>a && mx<w-a && my >= h-yb){
-                if(mouseLocation!=MouseLocation.S){mouseLocation=MouseLocation.S; component.setCursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR));}
+                //if(mouseLocation!=MouseLocation.S){
+                    mouseLocation=MouseLocation.S; component.setCursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR));
             }if(atCornerBorder(mx, my, w-a, h-b, MouseLocation.SE)){
-                if(mouseLocation!=MouseLocation.SE){mouseLocation=MouseLocation.SE; component.setCursor(Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR));}
+                //if(mouseLocation!=MouseLocation.SE){
+                    mouseLocation=MouseLocation.SE; component.setCursor(Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR));
             }if(mx>=w-xa && my > b && my < h-b){
-                if(mouseLocation!=MouseLocation.E){mouseLocation=MouseLocation.E; component.setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));}
+                //if(mouseLocation!=MouseLocation.E){
+                mouseLocation=MouseLocation.E; component.setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
             }if(atCornerBorder(mx, my, w-a, b, MouseLocation.NE)){
-                if(mouseLocation!=MouseLocation.NE){mouseLocation=MouseLocation.NE; component.setCursor(Cursor.getPredefinedCursor(Cursor.NE_RESIZE_CURSOR));}
+                //if(mouseLocation!=MouseLocation.NE){
+                mouseLocation=MouseLocation.NE; component.setCursor(Cursor.getPredefinedCursor(Cursor.NE_RESIZE_CURSOR));
             }if(mx>a && mx<w-a && my < yb ){
-                if(mouseLocation!=MouseLocation.N){mouseLocation=MouseLocation.N; component.setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));}
+                //if(mouseLocation!=MouseLocation.N){
+                mouseLocation=MouseLocation.N; component.setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
             }
         }
         //System.out.println("("+mx+","+my+")"+" "+h+" "+w+" " +mouseLocation);
@@ -145,19 +163,31 @@ public class MouseHandler implements  MouseListener,MouseMotionListener  {
     }
     
     @Override
-    public void mouseClicked(MouseEvent e) {}
+    public void mouseClicked(MouseEvent e) {
+        lastME = System.currentTimeMillis();
+    }
 
     @Override
     public void mouseEntered(MouseEvent e) {
+        lastME = System.currentTimeMillis();
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        //component.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        lastME = System.currentTimeMillis();
+        /*final long thisME = lastME;
+        Throwables.start(new Runnable() { @Override public void run() {
+                try{Thread.sleep(1000);}catch(Exception a){}
+                if(thisME < lastME)return;
+                mouseLocation = MouseLocation.C;
+                component.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+        },"Mouse exited event");*/
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
+        lastME = System.currentTimeMillis();
         if(e.isConsumed())return;
         p_initial = e.getPoint();
         p_previous_absolute = e.getLocationOnScreen();
@@ -168,6 +198,7 @@ public class MouseHandler implements  MouseListener,MouseMotionListener  {
 
     @Override
     public void mouseReleased(MouseEvent mouseEvent) {
+        lastME = System.currentTimeMillis();
         /*if(mouseEvent.isConsumed())return;
         final Dimension screendim = Toolkit.getDefaultToolkit ().getScreenSize();
         final int x= component.getLocation_x(),y=component.getLocation_y();
@@ -206,7 +237,7 @@ public class MouseHandler implements  MouseListener,MouseMotionListener  {
 
             @Override public void mouseExited(MouseEvent e) {
                 e.translatePoint(x_offset, y_offset);
-                MouseHandler.this.mouseExited(e); 
+                //MouseHandler.this.mouseExited(e); 
             }
 
             @Override public void mouseMoved(MouseEvent e) {
@@ -225,5 +256,24 @@ public class MouseHandler implements  MouseListener,MouseMotionListener  {
             }
             
         };
+    }
+    
+    private void resetMouseThread(){
+        while(Thread.currentThread()==th){
+            long diff = System.currentTimeMillis() - lastME;
+            if(diff > 5000){
+                lastME += diff;
+                try{
+                    Cursor d = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+                    mouseLocation=MouseLocation.C;
+                    if(component.getCursor()!=d)
+                        component.setCursor(d);
+                }catch(Exception a){
+                    Throwables.addStartingThrowableAsSuppressed(a);
+                    a.printStackTrace();
+                }
+            }
+            try{Thread.sleep(300);}catch(Exception a){}
+        }
     }
 }

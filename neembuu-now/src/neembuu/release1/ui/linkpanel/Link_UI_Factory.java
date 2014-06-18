@@ -21,6 +21,7 @@ import neembuu.release1.defaultImpl.file.split.SplitMergeNeembuuFileCreator;
 import neembuu.release1.defaultImpl.file.SimpleNeembuuFileCreator;
 import neembuu.release1.api.RealFileProvider;
 import neembuu.release1.api.linkgroup.LinkGroup;
+import neembuu.release1.api.settings.Settings;
 import neembuu.release1.api.ui.ExpandableUIContainer;
 import neembuu.release1.api.ui.LinkGroupUICreator;
 import neembuu.release1.api.ui.linkpanel.Graph;
@@ -59,8 +60,9 @@ public final class Link_UI_Factory {
     private final LinkGroup linkGroup;
     private final DownloadSpeedProvider speedProvider;
     private final LinkGroupUICreator linkUIMaker;
+    private final Settings settings;
     
-    public Link_UI_Factory(ExpandableUIContainer luic1, MainComponent mainComponent, RealFileProvider realFileProvider, MinimalistFileSystem root, LinkGroup linkGroup, DownloadSpeedProvider downloadSpeedProvider,LinkGroupUICreator linkGroupUICreator) {
+    public Link_UI_Factory(ExpandableUIContainer luic1, MainComponent mainComponent, RealFileProvider realFileProvider, MinimalistFileSystem root, LinkGroup linkGroup, DownloadSpeedProvider downloadSpeedProvider,LinkGroupUICreator linkGroupUICreator,Settings settings) {
         this.luic1 = luic1;
         this.mainComp = mainComponent;
         this.realFileProvider = realFileProvider;
@@ -68,17 +70,18 @@ public final class Link_UI_Factory {
         this.linkGroup = linkGroup;
         this.speedProvider = downloadSpeedProvider;
         this.linkUIMaker = linkGroupUICreator;
+        this.settings = settings;
     }
     
     public static OpenableEUI make(ExpandableUIContainer luic1, 
             MainComponent mainComponent, RealFileProvider realFileProvider,
-            MinimalistFileSystem root,LinkGroup linkGroup, 
-            DownloadSpeedProvider downloadSpeedProvider,LinkGroupUICreator linkGroupUICreator){
+            MinimalistFileSystem root,LinkGroup linkGroup, DownloadSpeedProvider downloadSpeedProvider,
+            LinkGroupUICreator linkGroupUICreator, Settings settings){
         int size = linkGroup.getAbsorbedLinks().size();
         if(size==0)return null;
         
         Link_UI_Factory factory = new Link_UI_Factory(luic1, mainComponent, realFileProvider, 
-                root, linkGroup, downloadSpeedProvider, linkGroupUICreator);
+                root, linkGroup, downloadSpeedProvider, linkGroupUICreator,settings);
         
         OpenableEUI openableEUI;
         if(size > 1){
@@ -102,7 +105,7 @@ public final class Link_UI_Factory {
         
         OpenActionImpl open = new OpenActionImpl(realFileProvider, mainComp);
         LinkActionsImpl actions = new LinkActionsImpl(linkGroup.getSession(),
-                lp.closeActionUIA, remover, mainComp, fileCreator, open);
+                lp.closeActionUIA, remover, mainComp, fileCreator, open,settings);
         ProgressImpl progress = makeProgress(lp,actions.getSave());
         
         addCallbacks(actions, open, lp, progress, changeDownloadMode, null, true, actions.getSave());
@@ -125,11 +128,11 @@ public final class Link_UI_Factory {
 
         SplitMergeNeembuuFileCreator fileCreator = new SplitMergeNeembuuFileCreator(linkGroup, root);
         
-        SaveAction_forVariants save = new SaveAction_forVariants(mainComp, lp.progressUIA);
+        SaveAction_forVariants save = new SaveAction_forVariants(mainComp, lp.progressUIA,settings);
         ProgressImpl progress = makeProgress(lp,save);
         OpenActionImpl open = new OpenActionImpl(realFileProvider, mainComp);
         LinkActionsImpl actions = new LinkActionsImpl(linkGroup.getSession(),
-                lp.closeActionUIA, remover, mainComp, fileCreator, open);
+                lp.closeActionUIA, remover, mainComp, fileCreator, open,settings);
         
         addCallbacks(actions, open, lp, progress, cdma, null, true, save);
         actions.getReAdd().addCallBack(new VariantProgressProvider(lp.progressUIA,save,null,null,true));
@@ -146,7 +149,7 @@ public final class Link_UI_Factory {
     
     public OpenableEUI makeMultiVariantUI() {
         GenericLinkPanel lp = new GenericLinkPanel();
-        SaveAction_forVariants save = new SaveAction_forVariants(mainComp, lp.progressUIA);
+        SaveAction_forVariants save = new SaveAction_forVariants(mainComp, lp.progressUIA,settings);
         VariantProgressProvider vpp = makeProgressForVariant(lp, save);
         ChangeDownloadModeAction changeDownloadModeAction = new ChangeDownloadModeActionImpl(lp.changeDownloadModeUIA);
         RemoveFromUI remover = defaultRemoveFromUI(lp.openableEUI, luic1);
@@ -155,7 +158,7 @@ public final class Link_UI_Factory {
         
         MultiVariantOpenAction open = new MultiVariantOpenAction(realFileProvider, mainComp, speedProvider,lp.progressUIA);
         LinkActionsImpl actions = new LinkActionsImpl(linkGroup.getSession(),
-                lp.closeActionUIA, remover,mainComp, fileCreator,open);
+                lp.closeActionUIA, remover,mainComp, fileCreator,open,settings);
         
         addCallbacks(actions, open, lp, null, changeDownloadModeAction, vpp, false,save);
         actions.getReAdd().addCallBack(vpp);

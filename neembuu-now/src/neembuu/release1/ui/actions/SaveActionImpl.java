@@ -18,13 +18,18 @@
 package neembuu.release1.ui.actions;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.file.Saveable;
 import neembuu.release1.api.log.LoggerUtil;
+import neembuu.release1.api.settings.Settings;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.actions.ReAddAction;
 import neembuu.release1.api.ui.actions.SaveAction;
+import neembuu.util.Throwables;
 
 /**
  *
@@ -33,11 +38,12 @@ import neembuu.release1.api.ui.actions.SaveAction;
 public class SaveActionImpl implements SaveAction,ReAddAction.CallBack{
     private Saveable connectionFile;
     private final MainComponent mainComponent;
+    private final Settings settings;
 
     private String warning = null;
     
-    public SaveActionImpl(MainComponent mainComponent) {
-        this.mainComponent = mainComponent;
+    public SaveActionImpl(MainComponent mainComponent,Settings settings) {
+        this.mainComponent = mainComponent; this.settings = settings;
         /*if(connectionFile==null){
             throw new IllegalArgumentException("Connection file not initialized");
         }*/
@@ -80,16 +86,43 @@ public class SaveActionImpl implements SaveAction,ReAddAction.CallBack{
     }
     
     private void saveFileClicked(){
-        javax.swing.JFileChooser fileChooser = new javax.swing.JFileChooser();
-        fileChooser.setSelectedFile(new File(System.getProperty("java.home")+File.separator+
+        String p = getSaveLocation();
+        
+        final javax.swing.JFileChooser fileChooser = new javax.swing.JFileChooser();
+        fileChooser.setSelectedFile(new File(p+File.separator+
                 connectionFile.getMinimumFileInfo().getName()));
         fileChooser.setFileSelectionMode(javax.swing.JFileChooser.FILES_ONLY);
         int retVal = fileChooser.showSaveDialog(mainComponent.getJFrame());
         if(retVal == javax.swing.JFileChooser.APPROVE_OPTION){
             saveAction(fileChooser.getSelectedFile().getAbsoluteFile());
+            
+            Throwables.start(new Runnable(){@Override public void run() {try{
+                    setSaveLocation(fileChooser);
+                }catch(Exception a){throw new RuntimeException(a);}}});
         }else {
 
         }
+    }
+    
+    private String getSaveLocation(){
+        String p = settings.get("SaveActionImpl","previousSaveLocation");
+        String defaultP = System.getProperty("java.home");
+        if(p==null){
+            return defaultP;
+        }
+        Path pp = Paths.get(p);
+        if(Files.exists(pp)){
+            if(Files.isDirectory(pp)){
+                return p;
+            }
+        }
+        return defaultP;
+    }
+    
+    private void setSaveLocation(final javax.swing.JFileChooser fileChooser)throws java.io.IOException{
+        File f = fileChooser.getSelectedFile();
+        String dir = f.getParent();
+        settings.set(dir,"SaveActionImpl","previousSaveLocation");
     }
 
     @Override public void actionPerformed() {

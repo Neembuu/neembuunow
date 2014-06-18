@@ -20,6 +20,7 @@ package neembuu.release1.ui.frame;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import neembuu.release1.ui.frame.JFrameDecorator.ContentArea_add_callback;
 import neembuu.swing.HiddenBorderButton;
 
 /**
@@ -28,10 +29,12 @@ import neembuu.swing.HiddenBorderButton;
  */
 public class FrameDecoration extends javax.swing.JPanel {
 
+    final ContentArea_add_callback ca;
     /**
      * Creates new form FrameDecoration
      */
-    public FrameDecoration() {
+    public FrameDecoration(final ContentArea_add_callback ca) {
+        this.ca = ca;
         initComponents();
         /*addMouseMotionListener(new MLP("frameOutside"));
         frameBorder.addMouseMotionListener(new MLP("frameBorder"));
@@ -178,7 +181,8 @@ public class FrameDecoration extends javax.swing.JPanel {
             @Override public JButton b1() { return b1;}
             @Override public JButton b2() { return b2;}
             @Override public JButton b3() { return b3;}
-            @Override public JPanel contentArea() { return contentArea;}
+            @Override public void contentArea_add(JPanel toAdd) { 
+                contentArea.add(toAdd); if(ca!=null)ca.contentArea_add(toAdd);}
             @Override public JPanel frameBorder() { return frameBorder;}
             @Override public JPanel frameControls() { return frameControls;}
             @Override public JPanel headerRegion() { return headerRegion;}

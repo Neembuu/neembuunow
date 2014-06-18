@@ -25,6 +25,7 @@ import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.file.NeembuuFileCreator;
 import neembuu.release1.api.log.LoggerUtil;
+import neembuu.release1.api.settings.Settings;
 import neembuu.release1.api.ui.access.CloseActionUIA;
 import neembuu.release1.api.ui.access.RemoveFromUI;
 import neembuu.release1.api.ui.actions.CloseAction;
@@ -77,10 +78,11 @@ public class LinkActionsImpl {
     private final LinkedList<CallBack> callBacks = new LinkedList<CallBack>();
     
     public LinkActionsImpl(Session s,CloseActionUIA ui, RemoveFromUI removeFromUI, 
-            MainComponent mainComponent, NeembuuFileCreator neembuuFileCreator, OpenAction oa) {
+            MainComponent mainComponent, NeembuuFileCreator neembuuFileCreator, OpenAction oa,
+            Settings settings) {
         this.ui = ui;this.removeFromUI = removeFromUI;openAction = oa;this.s=s;
         this.mainComponent = mainComponent; this.neembuuFileCreator = neembuuFileCreator;
-        save = new SaveActionImpl(mainComponent);
+        save = new SaveActionImpl(mainComponent,settings);
     }
     
     public DeleteAction getDelete() {return delete;}
