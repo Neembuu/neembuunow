@@ -39,5 +39,7 @@ public interface Session extends LoggerCreator,SeekableByteChannelCreator {
     
     void delete()throws Exception;
     
+    void clearCachedFileData()throws Exception;
+    
     void close()throws Exception;
 }

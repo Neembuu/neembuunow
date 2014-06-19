@@ -19,6 +19,8 @@ package neembuu.release1;
 
 import neembuu.release1.app.Application;
 import java.io.PrintStream;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import neembuu.release1.mountmanager.MountManager;
 import jpfm.fs.FSUtils;
 import neembuu.diskmanager.DiskManager;
@@ -37,19 +39,23 @@ import neembuu.release1.defaultImpl.log.LoggerServiceProviderImpl;
 import neembuu.release1.defaultImpl.restore_previous.RestorePreviousSessionImpl;
 import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.settings.Settings;
+import neembuu.release1.app.RunningStateListener;
 import neembuu.release1.app.DirectoryWatcherService;
 import neembuu.release1.app.DirectoryWatcherServiceImpl;
 import neembuu.release1.app.EnsureSingleInstance;
 import neembuu.release1.app.FlashGotDownloadCommand;
 import neembuu.release1.app.MainCommandsListener;
+import neembuu.release1.app.RunAttemptListener;
 import neembuu.release1.app.SingleInstanceCheckCallbackImpl;
 import neembuu.release1.defaultImpl.external.ExternalLinkHandlersProvider;
 import neembuu.release1.open.OpenerImpl;
 import neembuu.release1.settings.SettingsImpl;
 import neembuu.release1.ui.InitLookAndFeel;
 import neembuu.release1.ui.NeembuuUI;
+import neembuu.release1.ui.systray.SysTrayImpl;
 import neembuu.release1.versioning.CheckUpdate;
 import neembuu.release1.versioning.first_time_user.FirstTimeUser;
+import neembuu.util.Throwables;
 import neembuu.vfs.file.TroubleHandler;
 
 /**
@@ -64,12 +70,15 @@ public final class Main {
     private final DiskManager diskManager;
     private final ClipboardMonitor clipboardMonitor;
     private final Settings settings;
+    private final SysTrayImpl sysTray;
+    private final SingleInstanceCheckCallbackImpl sicci;
     
     private static boolean lazyUI = false;
     
     public Main() {
         settings = SettingsImpl.I(this);//safe
-        this.nui = new NeembuuUI(settings);
+        sysTray = new SysTrayImpl();
+        this.nui = new NeembuuUI(settings,sysTray);
         //Application.setMainComponent(new NonUIMainComponent());
         Application.setMainComponent(nui.getMainComponent());
         
@@ -87,6 +96,8 @@ public final class Main {
             .build()
         );
         
+        sicci = ensureSingleInstance();
+        
         LinkGroupMakers.initDiskManager(diskManager);
         
         mountManager = new MountManager(
@@ -100,21 +111,54 @@ public final class Main {
         clipboardMonitor = new ClipboardMonitorImpl();
     }
     
+    private SingleInstanceCheckCallbackImpl ensureSingleInstance(){
+        SingleInstanceCheckCallbackImpl sicci1 = new SingleInstanceCheckCallbackImpl();
+        EnsureSingleInstance esi = new EnsureSingleInstance(sicci1);
+        final CountDownLatch cdl = new CountDownLatch(1);
+        sicci1.addAlreadyRunningListener(new RunningStateListener() {
+            @Override public void alreadyRunning(long timeSince) {
+                cdl.countDown();
+            }@Override public boolean solelyRunning(long timeSince) {
+                cdl.countDown(); return true;
+            }
+        });
+        esi.startService();
+        try{
+            boolean ensure = cdl.await(12, TimeUnit.SECONDS);
+            if(!ensure)LoggerUtil.L().info("Could not ensure no instance already running");
+        }catch(Exception a){}
+        return sicci1;
+    }
+    
     private void initCommandsMonitor(){
         MainCommandsListener  mcl = new MainCommandsListener();
         FlashGotDownloadCommand fgdc = new FlashGotDownloadCommand(
-                nui.getLinkGroupUICreator(),nui.getMainComponent(),nui.getIndefiniteTaskUI());
+                nui.getLinkGroupUICreator(),nui.getMainComponent(),
+                nui.getIndefiniteTaskUI_withTrayNotification());
         mcl.register(fgdc.defaultExtension(), fgdc);
-        DirectoryWatcherService dws = new DirectoryWatcherServiceImpl(mcl);
+        final DirectoryWatcherService dws = new DirectoryWatcherServiceImpl(mcl);
         dws.startService();
         dws.forceRescan(System.currentTimeMillis());
-        EnsureSingleInstance esi = new EnsureSingleInstance();
-        esi.setCallback(new SingleInstanceCheckCallbackImpl(dws));
-        esi.startService();
+        
+        sicci.addRunAttemptListener(new RunAttemptListener() {
+            @Override public void attemptedToRun(long time) {
+                Throwables.start(new Runnable() {@Override public void run() {
+                    try{Thread.sleep(2000); nui.getMainComponent().getJFrame().setAlwaysOnTop(false);}
+                    catch(Exception a){throw new RuntimeException(a);}
+                }});
+                nui.getMainComponent().getJFrame().setAlwaysOnTop(true);
+                nui.getMainComponent().getJFrame().setVisible(true);
+                nui.getMainComponent().getJFrame().requestFocus();
+            }});
+        sicci.addRunAttemptListener(new RunAttemptListener() {
+            @Override public void attemptedToRun(long time) {
+                dws.forceRescan(time);
+            }});
     }
     
     private void initialize(){
         clipboardMonitor.startService();
+        sysTray.initTray();
         nui.initialize(mountManager);
         mountManager.initialize();
         initLinkHandlerProviders();
@@ -152,7 +196,7 @@ public final class Main {
         // move out of this jar
         /*LinkHandlerProviders.registerProvider(new DailymotionLinkHandlerProvider());
         LinkHandlerProviders.registerProvider(new VimeoLinkHandlerProvider());*/
-        //LinkHandlerProviders.registerProvider(new YoutubeLinkHandlerProvider());
+        LinkHandlerProviders.registerProvider(new YoutubeLinkHandlerProvider());
         LinkHandlerProviders.registerProvider(new ExternalLinkHandlersProvider(nui.getIndefiniteTaskUI()));
         //DefaultLinkHandler is the default handler
         LinkHandlerProviders.registerDefaultProvider(new DirectLinkHandlerProvider());

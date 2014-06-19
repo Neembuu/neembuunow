@@ -32,6 +32,7 @@ import javax.swing.Timer;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.swing.HiddenBorderButton;
 import neembuu.swing.TextBubbleBorder;
+import neembuu.util.Throwables;
 
 /**
  *
@@ -147,7 +148,8 @@ public class ChooseVariantTimeOut extends javax.swing.JPanel {
 
         }
         final JDialog jd = new JDialog(jf, "Please select a type", true);
-        
+        jd.setAlwaysOnTop(true);
+                
         //jd.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         final ChooseVariantTimeOut x = new ChooseVariantTimeOut(jd, defaultChoice, choices, waitDurationSeconds);
         jd.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -160,7 +162,7 @@ public class ChooseVariantTimeOut extends javax.swing.JPanel {
         adjustSize(jd, x);
         //jd.setResizable(false);
         jd.setVisible(true);
-
+        
         return x.selected;
     }
 
@@ -335,7 +337,12 @@ public class ChooseVariantTimeOut extends javax.swing.JPanel {
         es.add(newEntry("720 P", 100*1024, 122,false));
         es.add(newEntry("1080 P", 300*1024, 122,false));
         
-        Entry x = showMessage(null, 200, e, es);
+        MainComponent mc = new neembuu.release1.ui.mc.MainComponentImpl(new JFrame());
+        mc.getJFrame().setSize(100,100);
+        mc.getJFrame().setVisible(true);
+        try{Thread.sleep(4000);}catch(Exception a){}
+        
+        Entry x = showMessage(mc, 200, e, es);
         System.out.println("x="+x.type());
     }
 }

@@ -21,11 +21,13 @@ import java.awt.Color;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import neembuu.diskmanager.Session;
+import neembuu.release1.api.file.NFExceptionDescriptor;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.file.NeembuuFileCreator;
 import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.settings.Settings;
+import neembuu.release1.api.ui.Message;
 import neembuu.release1.api.ui.access.CloseActionUIA;
 import neembuu.release1.api.ui.access.RemoveFromUI;
 import neembuu.release1.api.ui.actions.CloseAction;
@@ -35,6 +37,7 @@ import neembuu.release1.api.ui.actions.ReAddAction;
 import neembuu.release1.api.ui.actions.ReAddAction.CallBack;
 import neembuu.release1.api.ui.actions.SaveAction;
 import neembuu.release1.ui.Colors;
+import neembuu.release1.user_analytics.UserAnalytics;
 import neembuu.util.MessageFromException;
 import neembuu.util.Throwables;
 
@@ -189,14 +192,31 @@ public class LinkActionsImpl {
         
         try{
             connectionFile = neembuuFileCreator.create();
-        }catch(Exception a){
+        }catch(final Exception a){
             //Add a button "report error here"
-            mainComponent.newMessage().error()
+            Object[]options=new Object[]{"Ok","Report this issue"};
+            Object selectedOption = mainComponent.newMessage().error()
                 .setMessage("Sorry this file seems to be acting up.\n"
                         + "Could you please try another link?\n"
-                    + "Failure reason : "+MessageFromException.make(a))
+                    + "Failure reason : "+MessageFromException.make(a)+"\n"
+                    + "\n"
+                    + "Send this error statement to Neembuu anonymously.")    
                 .setTitle("Could not make virtual file")
-                .show();
+                .setEmotion(Message.Emotion.EMBARRASSED)
+                .setTimeout(15000)
+                .ask(options,0)
+                //.show()
+            ;
+            if(options[1]==selectedOption){
+                Throwables.start(new Runnable() {
+                    @Override public void run() {
+                        NFExceptionDescriptor nfed = neembuuFileCreator instanceof NFExceptionDescriptor?
+                                null:((NFExceptionDescriptor)neembuuFileCreator);
+                        try{UserAnalytics.reportVirtualFileCreationFailure(nfed, a);}
+                        catch(Exception a){ throw new RuntimeException(a); }
+                    }
+                },"Error reporting thread for file="+connectionFile,true);
+            }
             a.printStackTrace();
             return false;
         }
@@ -210,6 +230,5 @@ public class LinkActionsImpl {
         return true;
     }
     
-
     
 }

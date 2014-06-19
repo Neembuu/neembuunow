@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jpfm.volume.vector.VectorDirectory;
+import neembuu.release1.api.file.NFExceptionDescriptor;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.file.OnlineFile;
 import neembuu.release1.api.linkgroup.LinkGroup;
@@ -38,7 +39,7 @@ import neembuu.vfs.file.SeekableConnectionFile;
  *
  * @author Shashank Tulsyan
  */
-public class MultiVariantFileCreator implements NeembuuFileCreator {
+public class MultiVariantFileCreator implements NeembuuFileCreator,NFExceptionDescriptor {
 
     private final LinkGroup linkGroup;
     private final MinimalistFileSystem root;
@@ -52,6 +53,20 @@ public class MultiVariantFileCreator implements NeembuuFileCreator {
         this.root = root;
 
         
+    }
+    
+    @Override
+    public String explainLastError() {
+        try{
+            String s = "";
+            for(TrialLinkHandler tlh : linkGroup.getAbsorbedLinks()){
+                s+=tlh.getReferenceLinkString()+"\n";
+            }
+            return s;
+        }catch(Exception a){
+            a.printStackTrace();
+            return "";
+        }
     }
 
     @Override
@@ -74,11 +89,10 @@ public class MultiVariantFileCreator implements NeembuuFileCreator {
         
         return session;
     }
-    
+        
     private VectorDirectory checkLinks(List<NeembuuFile> connectionFiles)throws Exception{
         TrialLinkHandler trialLinkHandler = linkGroup.getAbsorbedLinks().get(0);
-        LinkHandler linkHandler = 
-            LinkHandlerProviders.getHandler(trialLinkHandler);
+        LinkHandler linkHandler = LinkHandlerProviders.getHandler(trialLinkHandler);
         if(linkHandler==null){
 
             throw new Exception("It seems this website is not\n"

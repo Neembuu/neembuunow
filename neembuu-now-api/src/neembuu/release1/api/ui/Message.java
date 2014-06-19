@@ -21,12 +21,13 @@ package neembuu.release1.api.ui;
  *
  * @author Shashank Tulsyan
  */
-public interface Message {
-    Message error();
-    Message info();
+public interface Message extends MinimalistMessage {
+    @Override Message error();
+    @Override Message info();
+    @Override Message warning();
     
-    Message setTitle(String title);
-    Message setMessage(String message);
+    @Override Message setTitle(String title);
+    @Override Message setMessage(String message);
     
     /**
      * Will automatically close dialog box after timeout milliseconds
@@ -39,18 +40,20 @@ public interface Message {
     Message setPreferredLocation(PreferredLocation pl);
     Message editable();
     
-    void show();
+    @Override void show();
     
     Message showNonBlocking();
     
     void close();
     
     boolean ask();
+    Object ask(Object[]options);
+    Object ask(Object[]options,int indexOfDefaultOption);
     
     String askPassword();
     
     enum Emotion {
-        I_AM_DEAD,
+        I_AM_DEAD,EMBARRASSED,NOT_SURE,EXPERT
     }
     
     enum PreferredLocation {
@@ -59,7 +62,11 @@ public interface Message {
          * be located in a location that it does not hide the 
          * Neembuu UI .
          */
-        Aside
+        Aside,
+        /**
+         * 
+         */
+        OnTopOfAll
     }
 
 }

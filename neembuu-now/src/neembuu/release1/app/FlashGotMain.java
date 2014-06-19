@@ -79,6 +79,15 @@ public class FlashGotMain {
             //try{System.in.read();}catch(Exception a){}
         }
 
+        @Override public void addRunAttemptListener(RunAttemptListener ral) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public void addAlreadyRunningListener(RunningStateListener arl) {
+            throw new UnsupportedOperationException("Not supported yet."); 
+        }
+        
         @Override public void attemptedToRun(long time) { }
 
         @Override public boolean solelyRunning(long time) {

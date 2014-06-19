@@ -188,7 +188,7 @@
                     <Property name="focusable" type="boolean" value="false"/>
                   </Properties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="HiddenBorderButton.make(this, &quot;/neembuu/release1/ui/images/cross.png&quot;, &quot;/neembuu/release1/ui/images/cross_s.png&quot;, false)"/>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="HiddenBorderButton.make(this, &quot;/neembuu/release1/ui/images/tray.png&quot;, &quot;/neembuu/release1/ui/images/tray_s.png&quot;, false)"/>
                   </AuxValues>
                 </Component>
                 <Component class="javax.swing.JButton" name="b3">
@@ -201,7 +201,7 @@
                     <Property name="focusable" type="boolean" value="false"/>
                   </Properties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="HiddenBorderButton.make(this, &quot;/neembuu/release1/ui/images/cross.png&quot;, &quot;/neembuu/release1/ui/images/cross_s.png&quot;, false)"/>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="HiddenBorderButton.make(this, &quot;/neembuu/release1/ui/images/dash.png&quot;, &quot;/neembuu/release1/ui/images/dash_s.png&quot;, false)"/>
                   </AuxValues>
                 </Component>
               </SubComponents>

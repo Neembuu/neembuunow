@@ -21,12 +21,14 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import neembuu.diskmanager.DiskManagerParams;
 import neembuu.diskmanager.FileStorageManager;
@@ -155,6 +157,23 @@ public class DefaultSession implements Session {
     public void delete() throws Exception {
         close();
         NioUtils.deleteDirectory(sessionPath);
+    }
+
+    @Override
+    public void clearCachedFileData() throws Exception {
+        Exception aggregate = null;
+        try (DirectoryStream<Path> ds = Files.newDirectoryStream(sessionPath)){
+            for(Path p : ds){
+                if(Files.isDirectory(p)){
+                    try{NioUtils.deleteDirectory(p);}catch(Exception a){
+                    if(aggregate==null){aggregate = a;}else {aggregate.addSuppressed(a);}}
+                }
+            }
+            
+        } catch (IOException ex) {
+            if(aggregate==null){aggregate = ex;}else {aggregate.addSuppressed(ex);}
+        }
+        if(aggregate!=null)throw aggregate;
     }
     
     @Override

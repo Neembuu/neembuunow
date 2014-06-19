@@ -42,6 +42,9 @@ public interface NeembuuFile extends Saveable{
     
     boolean isCompletelyClosed();
     
+    /**
+     * @return null if this is a file with no variants
+     */
     List<NeembuuFile> getVariants();  
     
     PropertyProvider getPropertyProvider();

@@ -117,6 +117,7 @@ public class MainPanel extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         linkAddStatusLabel = new javax.swing.JLabel();
         addOnlyFilesButton = new javax.swing.JButton();
+        hideButton = HiddenBorderButton.make(this,"images/cross.png", "images/cross_s.png",false);
         linksScrollPane = new javax.swing.JScrollPane();
         linksPanel = new javax.swing.JPanel();
 
@@ -225,6 +226,15 @@ public class MainPanel extends javax.swing.JPanel {
             }
         });
 
+        hideButton.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.hideButton.text")); // NOI18N
+        hideButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        hideButton.setPreferredSize(new java.awt.Dimension(79, 18));
+        hideButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                hideButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout addLinksPanelLayout = new javax.swing.GroupLayout(addLinksPanel);
         addLinksPanel.setLayout(addLinksPanelLayout);
         addLinksPanelLayout.setHorizontalGroup(
@@ -236,7 +246,8 @@ public class MainPanel extends javax.swing.JPanel {
                     .addComponent(listOfLinksScroll, javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, addLinksPanelLayout.createSequentialGroup()
                         .addComponent(jLabel2)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(hideButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, addLinksPanelLayout.createSequentialGroup()
                         .addComponent(addLinksButton, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -247,7 +258,9 @@ public class MainPanel extends javax.swing.JPanel {
             addLinksPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(addLinksPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(addLinksPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(hideButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(linkAddStatusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(5, 5, 5)
@@ -406,6 +419,10 @@ public class MainPanel extends javax.swing.JPanel {
         Main.printPendingRequests();
     }//GEN-LAST:event_upperControlsPaneMouseClicked
 
+    private void hideButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hideButtonActionPerformed
+        showAddLinkUIButtonActionPerformed(evt);
+    }//GEN-LAST:event_hideButtonActionPerformed
+
     private String getLinksText(){
         return listOfLinks.getText();
     }
@@ -450,6 +467,7 @@ public class MainPanel extends javax.swing.JPanel {
     javax.swing.JPanel addLinksPanel;
     private javax.swing.JButton addOnlyFilesButton;
     private javax.swing.JButton helpButton;
+    private javax.swing.JButton hideButton;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel linkAddStatusLabel;
     javax.swing.JPanel linksPanel;

@@ -27,6 +27,7 @@ import neembuu.release1.api.file.Saveable;
 import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.settings.Settings;
 import neembuu.release1.api.ui.MainComponent;
+import neembuu.release1.api.ui.Message;
 import neembuu.release1.api.ui.actions.ReAddAction;
 import neembuu.release1.api.ui.actions.SaveAction;
 import neembuu.util.Throwables;
@@ -86,6 +87,22 @@ public class SaveActionImpl implements SaveAction,ReAddAction.CallBack{
     }
     
     private void saveFileClicked(){
+        Object[]options={"Yes, I understand","No"};
+        Object selected = mainComponent.newMessage()
+                .setTitle("Saving means copying")
+                .setEmotion(Message.Emotion.NOT_SURE)
+                .setTimeout(15000) //15seconds
+                .setMessage("Neembuu does not have the intellegence \n"
+                        + "to judge if saving this particular file \n"
+                        + "would infringe someone\'s right or not.\n"
+                        + "Please proceed only if you understand\n"
+                        + "the risks and are sure that you are\n"
+                        + "not violating terms of use of the website\n"
+                        + "or copyright of the content creator.\n")
+                .ask(options,1);
+        if(selected!=options[0]){
+            return;
+        }
         String p = getSaveLocation();
         
         final javax.swing.JFileChooser fileChooser = new javax.swing.JFileChooser();

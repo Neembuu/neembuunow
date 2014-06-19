@@ -21,12 +21,8 @@ package neembuu.release1.app;
  *
  * @author Shashank Tulsyan
  */
-public interface SingleInstanceCheckCallback {
-    void alreadyRunning(long timeSince);
-    /**
-     * @param time
-     * @return return true indicates continue
-     */
-    boolean solelyRunning(long time);
-    void attemptedToRun(long time);
+public interface SingleInstanceCheckCallback 
+        extends RunAttemptListener,RunningStateListener{
+    void addRunAttemptListener(RunAttemptListener ral);
+    void addAlreadyRunningListener(RunningStateListener arl);
 }

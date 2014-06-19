@@ -25,10 +25,14 @@ import neembuu.vfs.file.SeekableConnectionFile;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jpfm.AccessLevel;
 import jpfm.FileFlags;
+import jpfm.FileId;
 import jpfm.annotations.NonBlocking;
+import jpfm.fs.ReadOnlyRawFileData;
 import jpfm.operations.readwrite.ReadRequest;
 import jpfm.volume.BasicCascadableAbstractFile;
 import jpfm.volume.OpenCloseListener;
@@ -177,18 +181,15 @@ final class SeekableConnectionFileImpl // package private
     @Override
     @ReadQueueManagerThread
     public final void close()  {
+        if(isOpenByCascading())return;
         readManager.close();
-        /*synchronized(readManager.getRegionHandlers().getModLock()){
-            for(Range<RegionHandler> handler : readManager.getRegionHandlers()){
-                handler.getProperty().close();
-            }
-        }*/
-        /*synchronized (openCloseListeners){
-            for(OpenCloseListener ocl : openCloseListeners){
-                ocl.closed(this);
-            }
-        }*/
     }
+    
+    final void closeCascade(){
+        readManager.close();
+    }
+    
+
 
     @Override
     public FileFlags getFileFlags() {
@@ -201,6 +202,7 @@ final class SeekableConnectionFileImpl // package private
 
     @Override
     public final void open() {
+        if(isOpenByCascading())return;
         readManager.open();
         synchronized(readManager.getRegionHandlers().getModLock()){
             for(Range<RegionHandler> handler : readManager.getRegionHandlers()){
@@ -212,6 +214,21 @@ final class SeekableConnectionFileImpl // package private
                 ocl.opened(this);
             }
         }*/
+    }
+    
+    final void openCascade(){
+        if(isOpen())return;
+        readManager.open();
+    }
+    
+    protected final AtomicInteger getCascadeReferenceCount(){
+        return cascadeReferenceCount;
+    }
+    
+    
+    @Override
+    public ReadOnlyRawFileData getReference(FileId fileId, AccessLevel level) {
+        return new ReadOnlyRawFileDataImpl(this);
     }
     
     private final List<OpenCloseListener> openCloseListeners

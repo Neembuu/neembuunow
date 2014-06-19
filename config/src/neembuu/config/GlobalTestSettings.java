@@ -17,9 +17,7 @@
 
 package neembuu.config;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 
 /**
  * This is used internally and parameter are subject to change anytime.

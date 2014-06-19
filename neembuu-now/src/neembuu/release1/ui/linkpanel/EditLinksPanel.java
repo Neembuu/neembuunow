@@ -52,6 +52,7 @@ public class EditLinksPanel extends javax.swing.JPanel {
         textArea = new javax.swing.JTextArea();
         saveButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
+        emptyCacheButton = new javax.swing.JButton();
 
         textArea.setColumns(20);
         textArea.setRows(5);
@@ -71,6 +72,13 @@ public class EditLinksPanel extends javax.swing.JPanel {
             }
         });
 
+        emptyCacheButton.setText(org.openide.util.NbBundle.getMessage(EditLinksPanel.class, "EditLinksPanel.emptyCacheButton.text")); // NOI18N
+        emptyCacheButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                emptyCacheButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -81,7 +89,9 @@ public class EditLinksPanel extends javax.swing.JPanel {
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(saveButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(emptyCacheButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(cancelButton)))
                 .addContainerGap())
         );
@@ -93,7 +103,8 @@ public class EditLinksPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(saveButton)
-                    .addComponent(cancelButton))
+                    .addComponent(cancelButton)
+                    .addComponent(emptyCacheButton))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -105,6 +116,10 @@ public class EditLinksPanel extends javax.swing.JPanel {
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         actions.cancel();
     }//GEN-LAST:event_cancelButtonActionPerformed
+
+    private void emptyCacheButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emptyCacheButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_emptyCacheButtonActionPerformed
 
     public EditLinksUIA ui(){
         return new EditLinksUIA() {
@@ -120,6 +135,7 @@ public class EditLinksPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
+    private javax.swing.JButton emptyCacheButton;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton saveButton;
     private javax.swing.JTextArea textArea;

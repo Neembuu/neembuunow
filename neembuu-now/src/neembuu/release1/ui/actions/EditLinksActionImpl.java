@@ -36,8 +36,10 @@ import neembuu.release1.api.ui.access.RemoveFromUI;
 import neembuu.release1.api.ui.actions.EditLinksAction;
 import neembuu.release1.defaultImpl.linkgroup.LinkGrouperImpl;
 import neembuu.release1.api.log.LoggerUtil;
+import neembuu.release1.api.ui.Message;
 import neembuu.release1.ui.actions.EditLinksActionImpl.Actions;
 import neembuu.release1.ui.linkpanel.EditLinksPanel;
+import neembuu.util.Throwables;
 
 /**
  *
@@ -61,6 +63,7 @@ public class EditLinksActionImpl implements EditLinksAction{
 
     @Override public void actionPerformed() {
         boolean ok = mainComponent.newMessage().setTitle("Are you sure?")
+                .setEmotion(Message.Emotion.EXPERT)
                 .setMessage("Editing links is an advanced option.\n"
                         + "Please proceed only if you know what you are doing.")
                 .ask();
@@ -141,14 +144,32 @@ public class EditLinksActionImpl implements EditLinksAction{
                 .setMessage(reason).show();
     }
     
+    private void emptyCacheImpl(){
+        boolean  x = mainComponent.newMessage().error()
+                .setTitle("Are you sure?")
+                .setMessage("This will delete all downloaded data.\n"
+                        + "This option is useful if previously corrupted"
+                        + "data was downloadeded, and needs to be cleaned.")
+                .ask();
+        if(!x)return;
+        Throwables.start(new Runnable() {
+            @Override public void run() {
+                try{linkGroup.getSession().clearCachedFileData();}
+                catch(Exception a){throw new RuntimeException(a);}
+            }
+        }, "Clearing cache",true);
+        
+    }
+    
     final class ActionsImpl implements Actions {
         private final EditLinksPanel elp;private final JDialog jd;
         ActionsImpl(EditLinksPanel elp, JDialog jd) {this.elp = elp;this.jd= jd;}
         @Override public void save() { saveImpl(elp); cancel(); }
         @Override public void cancel() { jd.setVisible(false); jd.dispose(); }
+        @Override public void emptyCache(){ emptyCacheImpl(); }
     }
     
     public static interface Actions {
-        void save(); void cancel();
+        void save(); void cancel(); void emptyCache();
     }
 }

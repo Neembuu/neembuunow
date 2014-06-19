@@ -17,9 +17,12 @@
 
 package neembuu.release1.user_analytics;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import neembuu.release1.api.file.NFExceptionDescriptor;
 import neembuu.release1.app.Application;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.log.LoggerUtil;
@@ -82,6 +85,38 @@ public class UserAnalytics {
         DefaultHttpClient httpclient = NHttpClient.getNewInstance();
         EntityUtils.consume(httpclient.execute(httppost).getEntity());
         LoggerUtil.L().info("done sending stats");
+    }
+    
+    public static void reportVirtualFileCreationFailure(NFExceptionDescriptor descriptor, Exception a)throws Exception{
+        LoggerUtil.L().info("Reporting error ..");
+        List<NameValuePair> formparams = new ArrayList<NameValuePair>();
+        formparams.add(new BasicNameValuePair("releasedate", Application.releaseTime()+""));
+        
+        // please check if is legal to send multiline text in forms.
+        // common sense suggests it should be.
+        formparams.add(new BasicNameValuePair("descriptor", 
+                descriptor==null?"null":descriptor.explainLastError()));
+        formparams.add(new BasicNameValuePair("os", System.getProperty("os.name")));
+        
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        a.printStackTrace(pw);
+        
+        String stackTrace = sw.toString();
+        LoggerUtil.L().info("stacktrace="+stackTrace);
+        formparams.add(new BasicNameValuePair("stacktrace", stackTrace));
+        
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, "UTF-8");
+        HttpPost httppost = new HttpPost("http://neembuu.sourceforge.net/reportVirtualFileCreationFailure.php");
+        httppost.setEntity(entity);
+        HttpParams params = new BasicHttpParams();
+        params.setParameter(
+                "http.useragent",
+                "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-GB; rv:1.9.2) Gecko/20100115 Firefox/3.6");
+        httppost.setParams(params);
+        DefaultHttpClient httpclient = NHttpClient.getNewInstance();
+        EntityUtils.consume(httpclient.execute(httppost).getEntity());
+        LoggerUtil.L().info("done sending error report");
     }
     
     public static void main(String[] args) throws Exception{

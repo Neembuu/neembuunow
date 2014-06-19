@@ -44,9 +44,11 @@ import neembuu.release1.api.ui.access.MainUIA;
 import neembuu.release1.api.ui.actions.AddLinksAction;
 import neembuu.release1.ui.actions.AddLinkAction;
 import neembuu.release1.api.ui.LinkGroupUICreator;
+import neembuu.release1.api.ui.systray.SysTray;
 import neembuu.release1.mountmanager.MountManager;
 import neembuu.release1.ui.actions.CloseNeembuuActionImpl;
 import neembuu.release1.ui.frame.JFrameDecorator;
+import neembuu.release1.ui.mc.LazyFrame;
 import neembuu.util.Throwables;
 
 /**
@@ -54,11 +56,12 @@ import neembuu.util.Throwables;
  * @author Shashank Tulsyan
  */
 public final class NeembuuUI {
-    private JFrame jf = new JFrame();
+    private volatile JFrame jf;// = new JFrame();
     private final MainPanel mp;
     private final LinksContainer lc;
     private final AddLinkAction ala;
     private final Settings settings;
+    private final SysTray sysTray;
     
     private MountManager mm;
     private OpenerAccess openerA;
@@ -75,9 +78,12 @@ public final class NeembuuUI {
         @Override public JButton neembuuVirtualFolderButton() {
             return mp.neembuuVirtualFolderButton; }};
     
-    public NeembuuUI(Settings settings) {
-        this.settings = settings;
-        mainComponent = new MainComponentImpl(jf);
+    public NeembuuUI(Settings settings,SysTray sysTray) {
+        this.settings = settings; this.sysTray = sysTray;
+        mainComponent = new MainComponentImpl(new LazyFrame() {
+            @Override public JFrame getJFrame() { if(jf==null)return new JFrame(); return jf; }
+            @Override public boolean available() { return true; }
+        });
         this.mp = new MainPanel(addLinksAction,mainComponent,listener);
         this.lc = new LinksContainer(mp,mp.linksPanel);
         lc.heightProperty().addListener(listener);
@@ -99,7 +105,7 @@ public final class NeembuuUI {
         this.mm = mm;
         initJFrame();
         ala.initialize(mm.getRealFileProvider(),mm.getMinimalistFileSystem());
-        JFrameDecorator fd = new JFrameDecorator(jf);
+        JFrameDecorator fd = new JFrameDecorator(new MainComponentImpl(jf),sysTray,settings);
         fd.getFrameDecoration().getCustomJFrame().contentArea_add(mp);
         //fd.getContentPane().add(mp);
         jf.setVisible(true);
@@ -123,6 +129,16 @@ public final class NeembuuUI {
 
     public IndefiniteTaskUI getIndefiniteTaskUI() {
         return indefiniteTaskUI;
+    }
+    
+    public IndefiniteTaskUI getIndefiniteTaskUI_withTrayNotification(){
+        return new IndefiniteTaskUI() {
+            @Override public IndefiniteTask showIndefiniteProgress(String message) {
+                IndefiniteTask it = indefiniteTaskUI.showIndefiniteProgress(message);
+                sysTray.newMessage().setMessage(message).show();
+                return it;
+            }
+        };
     }
     
     private IndefiniteTask showIndefiniteProgress(String message){

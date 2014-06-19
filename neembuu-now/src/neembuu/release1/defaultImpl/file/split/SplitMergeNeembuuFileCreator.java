@@ -19,6 +19,7 @@ package neembuu.release1.defaultImpl.file.split;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import neembuu.release1.api.file.NFExceptionDescriptor;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProviders;
@@ -33,7 +34,7 @@ import neembuu.vfs.file.SeekableConnectionFile;
  *
  * @author Shashank Tulsyan
  */
-public class SplitMergeNeembuuFileCreator implements NeembuuFileCreator {
+public class SplitMergeNeembuuFileCreator implements NeembuuFileCreator,NFExceptionDescriptor {
 
     private final LinkGroup linkGroup;
     private final MinimalistFileSystem root;
@@ -45,6 +46,19 @@ public class SplitMergeNeembuuFileCreator implements NeembuuFileCreator {
     }
     
     
+    @Override
+    public String explainLastError() {
+        try{
+            String s = "";
+            for(TrialLinkHandler tlh : linkGroup.getAbsorbedLinks()){
+                s+=tlh.getReferenceLinkString()+"\n";
+            }
+            return s;
+        }catch(Exception a){
+            a.printStackTrace();
+            return "";
+        }
+    }
     
     @Override
     public NeembuuFile create() throws Exception {

@@ -61,8 +61,8 @@ public class FrameDecoration extends javax.swing.JPanel {
         icon = new javax.swing.JLabel();
         frameControls = new javax.swing.JPanel();
         b1 = HiddenBorderButton.make(this, "/neembuu/release1/ui/images/cross.png", "/neembuu/release1/ui/images/cross_s.png", false);
-        b2 = HiddenBorderButton.make(this, "/neembuu/release1/ui/images/cross.png", "/neembuu/release1/ui/images/cross_s.png", false);
-        b3 = HiddenBorderButton.make(this, "/neembuu/release1/ui/images/cross.png", "/neembuu/release1/ui/images/cross_s.png", false);
+        b2 = HiddenBorderButton.make(this, "/neembuu/release1/ui/images/tray.png", "/neembuu/release1/ui/images/tray_s.png", false);
+        b3 = HiddenBorderButton.make(this, "/neembuu/release1/ui/images/dash.png", "/neembuu/release1/ui/images/dash_s.png", false);
 
         setBackground(new java.awt.Color(233, 228, 214));
 

@@ -22,6 +22,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import static java.nio.file.StandardOpenOption.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import neembuu.release1.api.log.LoggerUtil;
 import neembuu.util.Throwables;
 
 /**
@@ -38,11 +41,18 @@ public final class EnsureSingleInstance {
     private SingleInstanceCheckCallback callback;
     
     private FileLock fileLock = null;
+    
+    private final Logger l = LoggerUtil.getLogger(EnsureSingleInstance.class.getName());
 
     public EnsureSingleInstance(){
     }
-
+    
+    public EnsureSingleInstance(SingleInstanceCheckCallback callback){
+        this.callback = callback;
+    }
+    
     public void setCallback(SingleInstanceCheckCallback callback) {
+        if(this.callback!=null)throw new IllegalStateException("Already intialized with "+this.callback);
         this.callback = callback;
     }
     
@@ -52,9 +62,9 @@ public final class EnsureSingleInstance {
             @Override public void run() {
                 boolean running = tryInstanceLock();
                 if(running){
-                    System.out.println("It seems an instance is already running");                    
+                    l.info("It seems an instance is already running");                    
                 }else {
-                    System.out.println("Finished "+Thread.currentThread().getName());
+                    l.log(Level.FINE, "Finished {0}", Thread.currentThread().getName());
                 }
             }
         },this.toString());
@@ -68,17 +78,17 @@ public final class EnsureSingleInstance {
     private boolean tryInstanceLock(){
         try(FileChannel fc = FileChannel.open(Application.getResource(".instance"), READ, WRITE,CREATE)) {
             acquireFileLock(fc);
-            System.out.println("Initiating on "+Instantiated);
+            l.log(Level.FINE, "Initiating on {0}", Instantiated);
             boolean proceed = callback.solelyRunning(Instantiated);
             if(!proceed){
-                System.out.println("Callback denied permission to proceed");
+                l.info("Callback denied permission to proceed");
                 return false;
             }
             shutDownHook();
             startMonitoring(fc);
             return false;
         } catch (Exception e) {
-            e.printStackTrace();
+            l.log(Level.INFO,"Error in locking",e );
             return true;
         }
     }
@@ -88,7 +98,7 @@ public final class EnsureSingleInstance {
         if(fileLock==null){
             long previousInstance = previousInstanceTime(fc);
             markInstance(Instantiated, fc);
-            System.out.println("It seems an instance is already running, since : "+previousInstance);
+            l.log(Level.INFO, "It seems an instance is already running, since : {0}", previousInstance);
             callback.alreadyRunning(previousInstance);
             throw new IOException("could not lock");
         }
@@ -100,28 +110,28 @@ public final class EnsureSingleInstance {
         fc.position(0);
         int r = fc.read(bb);
         if(r<bb.capacity()){ //partial read
-            System.out.println("Partial read ="+r);
+            l.log(Level.FINE, "Partial read ={0}", r);
             return 0;
         } bb.flip();
         return bb.asLongBuffer().get();
     }
 
     private boolean markInstance(long timeStamp, FileChannel fc)throws IOException{
-        System.out.println("making="+timeStamp);
+        l.log(Level.FINE, "making={0}", timeStamp);
         ByteBuffer bb = ByteBuffer.allocate(8);
         bb.putLong(timeStamp);
         bb.flip();
         fc.position(0);
         int w = fc.write(bb);
         if(w<bb.capacity()){ //partial write
-            System.out.println("Partial write ="+w);
+            l.log(Level.FINE, "Partial write ={0}", w);
             return false;
         }
         fc.force(true);
-        System.out.println("done marking");
+        l.info("done marking");
         
         /*long prv = previousInstanceTime(fc);
-        System.out.println("prv="+prv+" cur="+timeStamp);*/
+        l.info("prv="+prv+" cur="+timeStamp);*/
         
         return true;
     }
@@ -143,7 +153,7 @@ public final class EnsureSingleInstance {
     }
     
     private void startMonitoring(FileChannel fc){
-        System.out.println("starting looping");
+        l.info("starting looping");
         while(Thread.currentThread() == thread){ 
             try{
                 loopElement(fc);

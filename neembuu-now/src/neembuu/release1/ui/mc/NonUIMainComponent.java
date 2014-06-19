@@ -43,6 +43,9 @@ public class NonUIMainComponent implements MainComponent{
     
     private static final class NonUIMessage implements Message {
         private String message,title;
+        @Override public Message warning() {
+            return this;
+        }
         @Override public Message error() {
             return this;
         }
@@ -101,6 +104,15 @@ public class NonUIMainComponent implements MainComponent{
         public boolean ask() {
             show();
             return true;//todo ask in console maybe?
+        }
+
+        @Override
+        public Object ask(Object[] options) {
+            return options!=null?options.length>0?options[0]:null:null;
+        }
+        
+        @Override public Object ask(Object[] options, int i) {
+            return options!=null?options.length>i?options[i]:null:null;
         }
 
         @Override

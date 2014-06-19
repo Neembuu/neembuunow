@@ -17,14 +17,20 @@
 
 package neembuu.release1.ui.linkpanel;
 
+import java.awt.Color;
 import neembuu.swing.HiddenBorderButton;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import neembuu.release1.api.ui.actions.CloseAction;
 import neembuu.release1.api.ui.actions.ExpandAction;
+import neembuu.release1.api.ui.actions.ForceDownloadAction;
 import neembuu.release1.api.ui.actions.SaveAction;
+import neembuu.util.Throwables;
 
 /**
  *
@@ -36,7 +42,15 @@ final class RightControlsPanel {
     private final JButton crossBtn;
     private final JButton downBtn;
     
+    private final JButton forceBtn;
+    
     private final JPanel panel;
+    
+    private final ImageIcon fd_rollover = new ImageIcon(RightControlsPanel.class.getResource("../images/forceDownload.png"));
+    private final ImageIcon fd_normal = new ImageIcon(new BufferedImage(fd_rollover.getIconWidth(),fd_rollover.getIconHeight(),BufferedImage.TYPE_INT_ARGB));
+    private final ImageIcon fd_active = new ImageIcon(RightControlsPanel.class.getResource("../images/forceDownloading.png"));
+    
+    private volatile ForceDownloadAction fda;
 
     RightControlsPanel() {
         panel = new JPanel();
@@ -44,11 +58,15 @@ final class RightControlsPanel {
         crossBtn = HiddenBorderButton.make(this,"../images/cross.png", "../images/cross_s.png",false);
         downBtn = HiddenBorderButton.make(this,"../images/down.png", "../images/down_s.png",false);
         
-        saveBtn.setBounds(0, 8, 24, 24);
-        crossBtn.setBounds(25, 8, 24, 24);
-        downBtn.setBounds(50, 8, 24, 24);
+        forceBtn = makeForceBtn();
+        
+        saveBtn.setBounds(0, 8, 16, 24);
+        forceBtn.setBounds(17, 8, 20, 24);
+        crossBtn.setBounds(37, 8, 12, 24);
+        downBtn.setBounds(49, 8, 15, 24);
         
         panel.add(saveBtn);
+        panel.add(forceBtn);
         panel.add(crossBtn);
         panel.add(downBtn);
         
@@ -56,8 +74,29 @@ final class RightControlsPanel {
         saveBtn.setVisible(false);
         crossBtn.setToolTipText("Close");
         downBtn.setToolTipText("Details");
+        forceBtn.setToolTipText("Force Download");
     }
 
+    private JButton makeForceBtn(){
+        final JButton forceDownload = new JButton();
+        forceDownload.setContentAreaFilled(false); //this is the piece of code you needed
+        forceDownload.setBorderPainted(false);
+        forceDownload.addActionListener(new ActionListener() {
+            @Override public void actionPerformed(ActionEvent e) {
+                Throwables.start(new Runnable() {@Override public void run() {
+                    if(fda==null)
+                        return;
+                    fda.forceDownload(!fda.isForceDownloading());
+
+                    SwingUtilities.invokeLater(new Runnable(){@Override public void run() {
+                        forceDownloadButtonStateChanged();
+                    }});}},"ForceDownload action thread",true);}});
+        forceDownload.setBackground(Color.WHITE);
+        forceDownload.setIcon(fd_normal);
+        forceDownload.setRolloverIcon(fd_rollover);
+        return forceDownload;
+    }
+    
     public JButton getSaveBtn() {
         return saveBtn;
     }
@@ -73,8 +112,23 @@ final class RightControlsPanel {
     public JPanel getPanel() {
         return panel;
     }
+
+    public JButton getForceBtn() {
+        return forceBtn;
+    }
     
-    
+    public final void forceDownloadButtonStateChanged(){
+        ForceDownloadAction fda1 = RightControlsPanel.this.fda;
+        if(!fda1.isForceDownloading()){
+            forceBtn.setIcon(fd_normal);
+            forceBtn.setToolTipText("Force Download");
+            forceBtn.setRolloverIcon(fd_rollover);
+        }else{
+            forceBtn.setIcon(fd_active);
+            forceBtn.setToolTipText("Force Downloading");
+            forceBtn.setRolloverIcon(fd_active);
+        }
+    }
     
     static RightControlsPanel makeRightControlPanel(){
         return new RightControlsPanel();
@@ -84,7 +138,8 @@ final class RightControlsPanel {
     void initActions(
             final ExpandAction expandContractPressed, 
             final SaveAction saveFileClicked, 
-            final CloseAction closeAction){
+            final CloseAction closeAction,
+            final ForceDownloadAction fda){
         downBtn.addActionListener(new ActionListener() {
             @Override public void actionPerformed(ActionEvent e) {
                 expandContractPressed.actionPerformed(); }});
@@ -94,5 +149,6 @@ final class RightControlsPanel {
         crossBtn.addActionListener(new ActionListener() {
             @Override public void actionPerformed(ActionEvent e) {
                 closeAction.actionPerformed(); }});
+        this.fda =fda;
     }
 }

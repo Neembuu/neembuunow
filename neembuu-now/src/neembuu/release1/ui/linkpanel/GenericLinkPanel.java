@@ -45,6 +45,7 @@ import neembuu.release1.api.ui.actions.DeleteAction;
 import neembuu.release1.api.ui.actions.ExpandAction;
 import neembuu.release1.api.ui.actions.ConnectionActions;
 import neembuu.release1.api.ui.actions.EditLinksAction;
+import neembuu.release1.api.ui.actions.ForceDownloadAction;
 import neembuu.release1.api.ui.actions.OpenAction;
 import neembuu.release1.api.ui.actions.ReAddAction;
 import neembuu.release1.api.ui.actions.SaveAction;
@@ -104,7 +105,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         initHeight();
         hiddenPaneInit();
         overlayInit();
-
+        
         changeDownloadModeButton.setToolTipText(downloadFullFileToolTip);
         killConnectionButton.setEnabled(false);
         
@@ -117,21 +118,21 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     }
     
     void initActions(
-            ExpandAction expandAction, OpenAction openAction, 
-            CloseAction closeAction, DeleteAction deleteAction, 
-            ReAddAction reAddAction, SaveAction saveAction, EditLinksAction editLinksAction,
-            ConnectionActions connectionActions, ChangeDownloadModeAction  changeDownloadModeAction) {
-        this.expandAction = expandAction;
-        this.deleteAction = deleteAction;
-        this.reAddAction = reAddAction;
-        this.editLinksAction = editLinksAction;
-        this.connectionActions = connectionActions;
-        this.changeDownloadModeAction = changeDownloadModeAction;
-        rightControlsPanel.initActions(expandAction, saveAction, closeAction);
-        fileIconPanel.setOpenAction(openAction);
+            ExpandAction ea, OpenAction oa, CloseAction ca, DeleteAction da, 
+            ReAddAction raa, SaveAction sa, EditLinksAction ela, ConnectionActions cona, 
+            ChangeDownloadModeAction cdma, ForceDownloadAction fda) {
+        this.expandAction = ea;
+        this.deleteAction = da;
+        this.reAddAction = raa;
+        this.editLinksAction = ela;
+        this.connectionActions = cona;
+        this.changeDownloadModeAction = cdma;
+        rightControlsPanel.initActions(ea, sa, ca, fda);
+        fileIconPanel.setOpenAction(oa);
+        rightControlsPanel.forceDownloadButtonStateChanged();
     }
     
-    
+
     void initializeName(String fileName){
         fileNameLabel.setText(fileName);
     }
@@ -701,22 +702,16 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         killConnectionButton.setBackground(Colors.BUTTON_TINT);
         
         MouseAdapter ma = new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
+            @Override public void mouseEntered(MouseEvent e) {
                 String s = progress.progress().getSelectedRangeTooltip();
                 if(s==null){s="No Connection is selected";}
                 selectedConnectionLabel.setText(s.replace("\n", " ").replace("<br/>", " "));
                 selectedConnectionLabel.setVisible(true);
             }
 
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                mouseEntered(e);
-            }
+            @Override public void mouseMoved(MouseEvent e) { mouseEntered(e); }
             
-
-            @Override
-            public void mouseExited(MouseEvent e) {
+            @Override public void mouseExited(MouseEvent e) {
                 selectedConnectionLabel.setVisible(false);
             }
         }; 

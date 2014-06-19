@@ -17,6 +17,7 @@
 
 package neembuu.release1.defaultImpl.file;
 
+import neembuu.release1.api.file.NFExceptionDescriptor;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.linkhandler.LinkHandler;
 import neembuu.release1.api.linkhandler.LinkHandlerProviders;
@@ -29,7 +30,8 @@ import neembuu.release1.api.ui.access.MinimalistFileSystem;
  *
  * @author Shashank Tulsyan
  */
-public class SimpleNeembuuFileCreator implements NeembuuFileCreator{
+public class SimpleNeembuuFileCreator 
+        implements NeembuuFileCreator,NFExceptionDescriptor {
 
     private final LinkGroup linkGroup;
     private final MinimalistFileSystem minimalistFileSystem;
@@ -39,8 +41,16 @@ public class SimpleNeembuuFileCreator implements NeembuuFileCreator{
         this.linkGroup = linkGroup;
         this.minimalistFileSystem = minimalistFileSystem;
     }
-    
-    
+
+    @Override
+    public String explainLastError() {
+        try{
+            return linkGroup.getAbsorbedLinks().get(0).getReferenceLinkString();
+        }catch(Exception a){
+            a.printStackTrace();
+            return "";
+        }
+    }
     
     @Override
     public NeembuuFile create() throws Exception{

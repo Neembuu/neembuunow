@@ -27,6 +27,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.*;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
@@ -70,19 +71,23 @@ public class MainComponentImpl implements MainComponent{
     
     private class MessageImpl implements Message {
         private String message,title;
-        private int type = JOptionPane.INFORMATION_MESSAGE; 
+        private int type = INFORMATION_MESSAGE; 
         
         private PreferredLocation pl;
         
         private Emotion e; private int timeout = 0;
         private JTextArea jta = null; private volatile JDialog dialog = null;
         
+        @Override public Message warning() {
+            type = WARNING_MESSAGE;return this;
+        }
+        
         @Override public Message error() {
-            type = JOptionPane.ERROR_MESSAGE;return this;
+            type = ERROR_MESSAGE;return this;
         }
 
         @Override public Message info() {
-            type = JOptionPane.INFORMATION_MESSAGE;return this;
+            type = INFORMATION_MESSAGE;return this;
         }
 
         @Override public Message setTitle(String title) {
@@ -102,11 +107,54 @@ public class MainComponentImpl implements MainComponent{
         }
         
         @Override public boolean ask(){
-            Icon i = getIconForEmotion(e);
-            type = JOptionPane.QUESTION_MESSAGE;
-            int x = JOptionPane.showConfirmDialog(getJFrame(),message,title,JOptionPane.YES_NO_OPTION,type,i);
+            /*Icon i = getIconForEmotion(e);
+            type = QUESTION_MESSAGE;
+            int x = showConfirmDialog(getJFrame(),message,title,YES_NO_OPTION,type,i);          
+            return x==YES_OPTION;*/
+            Object selectedValue = askImpl(null,true,-1);
+            System.out.println("reso="+selectedValue);
+            if(selectedValue == null)
+                return false;
             
-            return x==JOptionPane.YES_OPTION;
+            if(selectedValue instanceof Integer)
+                return ((Integer)selectedValue).intValue()==YES_OPTION;
+            return false;
+        }
+        
+        @Override public Object ask(Object[]options,int indexOfDefaultOption){
+            return askImpl(options, false,indexOfDefaultOption);
+        }
+        
+        @Override public Object ask(Object[]options){
+            return askImpl(options, false,-1);
+        }
+        
+        private Object askImpl(Object[]options,boolean bool,int indexOfDefaultOption){
+            Icon i = getIconForEmotion(e);
+            type = QUESTION_MESSAGE;
+            
+            final JOptionPane pane;
+            if(!bool){
+                if(indexOfDefaultOption>=0){
+                    pane = new JOptionPane(message,QUESTION_MESSAGE,DEFAULT_OPTION,
+                        i,options,options[indexOfDefaultOption]);
+                }else {
+                    pane = new JOptionPane(message,QUESTION_MESSAGE,DEFAULT_OPTION,
+                        i,options);
+                }
+            }else{
+                pane = new JOptionPane(message, QUESTION_MESSAGE,YES_NO_OPTION,i);
+            }
+            
+            dialog = pane.createDialog(getJFrame(), title);
+            setDialogLocation(dialog, pl);
+            javax.swing.Timer t = null;
+            if(timeout!=0){
+                startTimer();
+            }
+            dialog.show();
+            if(t!=null)t.stop();
+            return pane.getValue();
         }
 
         @Override public Message editable() {
@@ -123,9 +171,9 @@ public class MainComponentImpl implements MainComponent{
                 jp.add(messageLB);
             }
             jp.add(pf);
-            int okCxl = JOptionPane.showConfirmDialog(getJFrame(), jp, title, JOptionPane.OK_CANCEL_OPTION, type,i);
+            int okCxl = showConfirmDialog(getJFrame(), jp, title, OK_CANCEL_OPTION, type,i);
             
-            if (okCxl == JOptionPane.OK_OPTION) {
+            if (okCxl == OK_OPTION) {
               String password = new String(pf.getPassword());
               return password;
             }return null;
@@ -164,7 +212,7 @@ public class MainComponentImpl implements MainComponent{
                 }
             }
             
-            final JOptionPane pane = new JOptionPane(m,type,JOptionPane.DEFAULT_OPTION,i);
+            final JOptionPane pane = new JOptionPane(m,type,DEFAULT_OPTION,i);
             dialog = pane.createDialog(getJFrame(), title);
             setDialogLocation(dialog, pl);
             
@@ -179,6 +227,11 @@ public class MainComponentImpl implements MainComponent{
         }
         
         private void showC(final JDialog dialog){
+            startTimer();
+            dialog.setVisible(true); dialog.dispose();
+        }
+        
+        private void startTimer(){
             Timer t = new Timer(100,new ActionListener() {
                 private int totalDelay = 0;
                 @Override public void actionPerformed(ActionEvent e) {
@@ -192,12 +245,17 @@ public class MainComponentImpl implements MainComponent{
                     }
                 }
             }); if(timeout > 0) t.start();
-            dialog.setVisible(true); dialog.dispose();
         }
         
         private Icon getIconForEmotion(Emotion e){
             if(e==Emotion.I_AM_DEAD){
                 return neembuu.config.GlobalTestSettings.ONION_EMOTIONS.getQuestionImageIcon("Onion16.gif");
+            }else if(e==Emotion.EMBARRASSED){
+                return neembuu.config.GlobalTestSettings.ONION_EMOTIONS.getQuestionImageIcon("Onion6.gif");
+            }else if(e==Emotion.NOT_SURE){
+                return neembuu.config.GlobalTestSettings.ONION_EMOTIONS.getQuestionImageIcon("efb50fe2.gif");
+            }else if(e==Emotion.EXPERT){
+                return neembuu.config.GlobalTestSettings.ONION_EMOTIONS.getQuestionImageIcon("suggestions.gif");
             }
             return null;
         }
@@ -215,6 +273,8 @@ public class MainComponentImpl implements MainComponent{
                     x += getJFrame().getWidth();
                 }
                 dialog.setLocation(x,getJFrame().getLocation().y);
+            }else if(pl==Message.PreferredLocation.OnTopOfAll){
+                dialog.setAlwaysOnTop(true);
             }
         }
     }

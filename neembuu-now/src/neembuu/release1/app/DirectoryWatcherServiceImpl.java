@@ -90,7 +90,7 @@ public class DirectoryWatcherServiceImpl implements DirectoryWatcherService {
 
                     List<WatchEvent<?>> events = watckKey.pollEvents();
                     for (WatchEvent event : events) {
-                        System.out.println(event.kind()+": " + event.context().toString());
+                        logger.log(Level.INFO, "{0}: {1}", new Object[]{event.kind(), event.context().toString()});
                         if(event.kind()==ENTRY_MODIFY){
                             handle(watcher, true);
                         }
@@ -127,7 +127,7 @@ public class DirectoryWatcherServiceImpl implements DirectoryWatcherService {
     }
     
     private void handle(Object pathObj,boolean isRelative){
-        System.out.println("handling,"+pathObj);
+        logger.log(Level.FINE, "handling,{0}", pathObj);
         if(!(pathObj instanceof Path)){return;}
         
         Path path = (Path)pathObj;
@@ -159,7 +159,7 @@ public class DirectoryWatcherServiceImpl implements DirectoryWatcherService {
         
         boolean res = mcl.handleFile(path,extesion,creationTime);
         if(!res){
-            System.out.println("Could not handle file = "+path);
+            logger.log(Level.FINE, "Could not handle file = {0}", path);
         }
     }
     
