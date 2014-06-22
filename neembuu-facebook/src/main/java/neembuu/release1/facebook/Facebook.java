@@ -45,7 +45,7 @@ public class Facebook {
         List<FeedItem> feedItems = getMyHomeItemList();
         
         for (FeedItem feedItem : feedItems) {
-            System.out.println(feedItem);
+            out.println(feedItem);
         }
     }
     
@@ -72,41 +72,15 @@ public class Facebook {
      * @return Returns a list of item.
      */
     public static List<FeedItem> getMyWallItemList(){
-        List<FeedItem> feedItems = new ArrayList<FeedItem>();
-
         Connection<Post> filteredFeed = facebookClient.fetchConnection("me/feed", Post.class,
                 //Parameter.with("limit", FEED_LIMIT),
                 Parameter.with("type", "link"));
         
         out.println("Filtered feed count: " + filteredFeed.getData().size());
         
-        List<Post> youtubePost = new ArrayList<Post>();
+        List<Post> youtubePost = getFilteredPostList(filteredFeed);
         
-        //Get only feed relating to youtube
-        String link;
-        for (Post postFeed : filteredFeed.getData()) {
-            link = postFeed.getLink();
-            if(link != null && link.matches("https?://(www.youtube.com/watch\\?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=]*)?")){
-                youtubePost.add(postFeed);
-            }
-        }
-
-        //Populates with youtube video
-        FacebookFeedItem feedItem;
-        for (Post postFeed : youtubePost) {
-            //out.println("Post:" + postFeed);
-            //out.println("Link:" + postFeed.getLink());
-            
-            //Set values
-            feedItem = new FacebookFeedItem();
-            feedItem.setText(postFeed.getMessage());
-            feedItem.setUrl(postFeed.getLink());
-            feedItem.setImageUrl(postFeed.getPicture());
-            
-            feedItems.add(feedItem);
-        }
-        
-        return feedItems;
+        return getFeedItemFromPost(youtubePost);
     }
     
     
@@ -115,38 +89,67 @@ public class Facebook {
      * @return Returns a list of item.
      */
     public static List<FeedItem> getMyHomeItemList(){
-        List<FeedItem> feedItems = new ArrayList<FeedItem>();
-
         Connection<Post> filteredFeed = facebookClient.fetchConnection("me/home", Post.class,
                 Parameter.with("limit", FEED_LIMIT),
                 Parameter.with("type", "link"));
         
         out.println("Filtered feed count: " + filteredFeed.getData().size());
         
+        List<Post> youtubePost = getFilteredPostList(filteredFeed);
+
+        return getFeedItemFromPost(youtubePost);
+    }
+    
+    /**
+     * Get a list of Post with a video.
+     * @param feedList The feed list.
+     * @return Returns a list of Post with a video.
+     */
+    private static List<Post> getFilteredPostList(Connection<Post> feedList){
         List<Post> youtubePost = new ArrayList<Post>();
         
-        //Get only feed relating to youtube
         String link;
-        for (Post postFeed : filteredFeed.getData()) {
+        for (Post postFeed : feedList.getData()) {
             link = postFeed.getLink();
-            if(link != null && link.matches("https?://(www.youtube.com/watch\\?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=]*)?")){
+            if(isVideoLink(link)){
                 youtubePost.add(postFeed);
             }
+            //out.println(postFeed);
         }
-
-        //Populates with youtube video
+        return youtubePost;
+    }
+    
+    
+    /**
+     * Check if the given link is or not a video link.
+     * @param link The link of the post.
+     * @return Returns true if the link is a video, false otherwise.
+     */
+    private static boolean isVideoLink(String link){
+        //Get only feed relating to youtube
+        return link != null && link.matches("https?://(www.youtube.com/watch\\?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=]*)?");
+    }
+    
+    
+    /**
+     * Convert a list of Post to a list of FeedItem. 
+     * @param posts The Post list.
+     * @return Returns a list of FeedItem.
+     */
+    private static List<FeedItem> getFeedItemFromPost(List<Post> posts){
+        List<FeedItem> feedItems = new ArrayList<FeedItem>();
         FacebookFeedItem feedItem;
-        for (Post postFeed : youtubePost) {
+        for (Post postFeed : posts) {
             //out.println("Post:" + postFeed);
             //out.println("Link:" + postFeed.getLink());
             
             //Set values
             feedItem = new FacebookFeedItem();
+            feedItem.setAuthorName(postFeed.getFrom().getName());
             feedItem.setText(postFeed.getMessage());
             feedItem.setUrl(postFeed.getLink());
             feedItem.setImageUrl(postFeed.getPicture());
             
-            //Add to the list
             feedItems.add(feedItem);
         }
         

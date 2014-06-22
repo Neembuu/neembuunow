@@ -12,9 +12,27 @@ package neembuu.release1.facebook;
  */
 public interface FeedItem {
     
+    /**
+     * Get the text.
+     * @return Returns the text.
+     */
     public String text();
     
+    /**
+     * Get the url of the video.
+     * @return Returns the video url.
+     */
     public String url();
     
+    /**
+     * Get the image url of the video.
+     * @return Returns the image url of the video.
+     */
     public String imageURL(); // or image object
+    
+    /**
+     * Returns the author name.
+     * @return Returns the author name.
+     */
+    public String authorName();
 }
