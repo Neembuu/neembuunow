@@ -73,7 +73,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
     @Override
     public LinkHandler getLinkHandler(TrialLinkHandler tlh) throws Exception {
         if( !(tlh instanceof YT_TLH) || !tlh.canHandle()){return null;}
-        BasicLinkHandler.Builder linkHandlerBuilder = linkYoutubeExtraction(tlh); //clipConverterExtraction(tlh);
+        BasicLinkHandler.Builder linkHandlerBuilder = clipConverterExtraction(tlh); //linkYoutubeExtraction(tlh);
         return linkHandlerBuilder.build();
     }
     
