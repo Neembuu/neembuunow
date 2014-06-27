@@ -114,7 +114,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
         }
         
         
-        System.out.println("Title: " + grabbedTitle);
+        LOGGER.log(Level.INFO,"Title: " + grabbedTitle);
 
         throw new IllegalStateException("Legacy code");
         //this.filename = grabbedTitle; // complete file name without path 
@@ -131,7 +131,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
         try {
             String encodedUrl = StringUtils.stringBetweenTwoStrings(text, "\"url_encoded_fmt_stream_map\": \"", "\"");
             LOGGER.log(Level.INFO, "encoded url: {0}", encodedUrl);
-            System.out.println("encoded url: " + encodedUrl);
+            LOGGER.log(Level.INFO,"encoded url: " + encodedUrl);
             
             encodedUrl = encodedUrl.replaceFirst("\".*", "");
             
@@ -152,13 +152,13 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
                 
                 // remove duplicated &itag=xy
                 if (StringUtils.countString(fmtUrlPair[1], "itag=") == 2){
-//                    System.out.println("Deleting itag!");
+//                    LOGGER.log(Level.INFO,"Deleting itag!");
                     fmtUrlPair[1] = fmtUrlPair[1].replaceFirst("itag=[0-9]{1,3}", "");
                 }
 
-                //System.out.println("url[" + i + "]: " + urls[i]);
+                //LOGGER.log(Level.INFO,"url[" + i + "]: " + urls[i]);
                 LOGGER.log(Level.INFO, "fmtUrlPair[1]: {0}\nfmtUrlPair[0]: {1}", new Object[]{fmtUrlPair[1], fmtUrlPair[0]});
-//                System.out.println("fmtUrlPair[1]: "+ fmtUrlPair[1] +"\nfmtUrlPair[0]: " + fmtUrlPair[0]);
+//                LOGGER.log(Level.INFO,"fmtUrlPair[1]: "+ fmtUrlPair[1] +"\nfmtUrlPair[0]: " + fmtUrlPair[0]);
                 
                 finalUrls.add(fmtUrlPair[1]);
                     
@@ -215,14 +215,14 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
                     
                     long length = NHttpClientUtils.calculateLength(singleUrl, httpClient);
                     singleUrl = Utils.normalize(singleUrl);
-                    System.out.println("Normalized URL: " + singleUrl);
+                    LOGGER.log(Level.INFO,"Normalized URL: " + singleUrl);
 
 
                     if(length==0){
                         length = NHttpClientUtils.calculateLength(singleUrl,httpClient);
                     }
                     
-                    //System.out.println("Length: " + length);
+                    //LOGGER.log(Level.INFO,"Length: " + length);
                 
                     if(length <= 0){ continue; /*skip this url*/ }
 
@@ -234,7 +234,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
                         long duration = (int)(Double.parseDouble(dur)*1000);
                         if(c_duration < 0 ){ c_duration = duration; }
                         fileBuilder.putLongPropertyValue(PropertyProvider.LongProperty.MEDIA_DURATION_IN_MILLISECONDS, duration);
-                        System.out.println("dur="+dur);
+                        LOGGER.log(Level.INFO,"dur="+dur);
                     }catch(NumberFormatException a){
                         // ignore
                     }
@@ -243,7 +243,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
                         String type = fileName.substring(fileName.indexOf("(")+1);
                         type = type.substring(0, type.indexOf(")"));
                         fileBuilder.putStringPropertyValue(PropertyProvider.StringProperty.VARIANT_DESCRIPTION, type);
-                        System.out.println("type="+type);
+                        LOGGER.log(Level.INFO,"type="+type);
                     }catch(Exception a){
                         a.printStackTrace();
                     }
@@ -268,7 +268,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
         } catch (Exception ex) {
             int retryLimit = ((YT_TLH)tlh).retryLimit;
             ex.printStackTrace();
-            System.out.println("retry no. = " + retryCount);
+            LOGGER.log(Level.INFO,"retry no. = " + retryCount);
             if(retryCount > retryLimit) throw ex;
             return linkYoutubeExtraction(tlh, retryCount + 1);
         }
@@ -314,7 +314,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
             final String responseString = EntityUtils.toString(httpResponse.getEntity());
             
             JSONObject jSonObject = new JSONObject(responseString);
-            //System.out.println(jSonObject);
+            //LOGGER.log(Level.INFO,jSonObject);
             
             if(jSonObject.has("redirect")){
                 int count = retryCount;
@@ -329,7 +329,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
             
             JSONArray jSonArray = jSonObject.getJSONArray("url");
             
-            System.out.println("urls: " + jSonArray);
+            LOGGER.log(Level.INFO,"urls: " + jSonArray);
             
             //Set the group name as the name of the video
             String  nameOfVideo = jSonObject.getString("filename");
@@ -351,7 +351,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
             for (int i = 0; i < jSonArray.length(); i++) {
                 jSonObject = (JSONObject) jSonArray.get(i);
                 String fileName = jSonObject.getString("text");
-                System.out.println("Filename: " + fileName);
+                LOGGER.log(Level.INFO,"Filename: " + fileName);
                 
                 final String extension = jSonObject.getString("filetype").toLowerCase();
                 fileName = StringUtils.stringBetweenTwoStrings(fileName, ">", "<");
@@ -360,16 +360,16 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
                 String singleUrl = jSonObject.getString("url");
                 //singleUrl = singleUrl.substring(0, singleUrl.indexOf("#"));
                 //did some changes, but this doesn't help :(
-                System.out.println("Before normalization URL: " + singleUrl);
+                LOGGER.log(Level.INFO,"Before normalization URL: " + singleUrl);
                 long length = tryFindingSize(singleUrl);
                 singleUrl = Utils.normalize(singleUrl);
-                System.out.println("Normalized URL: " + singleUrl);
+                LOGGER.log(Level.INFO,"Normalized URL: " + singleUrl);
                 
                 
                 if(length==0){
                     length = NHttpClientUtils.calculateLength(singleUrl,httpClient);
                 }
-                //System.out.println("Length: " + length);
+                //LOGGER.log(Level.INFO,"Length: " + length);
                 
                 if(length <= 0){ continue; /*skip this url*/ }
                 
@@ -381,7 +381,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
                     long duration = (int)(Double.parseDouble(dur)*1000);
                     if(c_duration < 0 ){ c_duration = duration; }
                     fileBuilder.putLongPropertyValue(PropertyProvider.LongProperty.MEDIA_DURATION_IN_MILLISECONDS, duration);
-                    System.out.println("dur="+dur);
+                    LOGGER.log(Level.INFO,"dur="+dur);
                 }catch(Exception a){
                     // ignore
                 }
@@ -393,7 +393,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
                     if(type.contains("480")||type.contains("1080")){
                         fileBuilder.putBooleanPropertyValue(PropertyProvider.BooleanProperty.UNSTABLE_VARIANT, true);
                     }
-                    System.out.println("type="+type);
+                    LOGGER.log(Level.INFO,"type="+type);
                 }catch(Exception a){
                     a.printStackTrace();
                 }
@@ -417,7 +417,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
         } catch (Exception ex) {
             int retryLimit = ((YT_TLH)tlh).retryLimit;
             ex.printStackTrace();
-            System.out.println("retry no. = "+retryCount);
+            LOGGER.log(Level.INFO,"retry no. = "+retryCount);
             if(retryCount > retryLimit) throw ex;
             return clipConverterExtraction(tlh,retryCount+1);
         }
@@ -446,11 +446,11 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
      * @param urls ArrayList<String> with all the urls.
      */
     private void printUrls(ArrayList<String> urls) {
-        System.out.println("\n***** START PRINTING YOUTUBE URLS *****");
+        LOGGER.log(Level.INFO,"\n***** START PRINTING YOUTUBE URLS *****");
         for (String url : urls) {
-            System.out.println(url);
+            LOGGER.log(Level.INFO,url);
         }
-        System.out.println("***** END PRINTING YOUTUBE URLS *****\n");
+        LOGGER.log(Level.INFO,"***** END PRINTING YOUTUBE URLS *****\n");
     }
 
 
@@ -461,7 +461,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
      */
     private boolean handleCaptcha(JSONObject jSonObject) {
         try {
-            System.out.println("Handling captcha.");
+            LOGGER.log(Level.INFO,"Handling captcha.");
             
             final String redirect = jSonObject.getString("redirect");
             final String url = "http://www.clipconverter.cc" + redirect;
@@ -519,7 +519,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
          */
         @Override public boolean canHandle() {
             boolean result = url.matches("https?://(www.youtube.com/watch\\?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=]*)?");
-            LOGGER.log(Level.INFO, "Youtube can handle this? ", result);
+            LOGGER.log(Level.INFO, "Youtube can handle this? ", result); 
             return result;
         }
 

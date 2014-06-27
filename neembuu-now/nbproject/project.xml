@@ -80,6 +80,14 @@
                 <id>jar</id>
             </reference>
             <reference>
+                <foreign-project>neembuu-external-linkhandlers</foreign-project>
+                <artifact-type>jar</artifact-type>
+                <script>build.xml</script>
+                <target>jar</target>
+                <clean-target>clean</clean-target>
+                <id>jar</id>
+            </reference>
+            <reference>
                 <foreign-project>neembuu-linkhandlers</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
@@ -113,14 +121,6 @@
             </reference>
             <reference>
                 <foreign-project>util__logging_</foreign-project>
-                <artifact-type>jar</artifact-type>
-                <script>build.xml</script>
-                <target>jar</target>
-                <clean-target>clean</clean-target>
-                <id>jar</id>
-            </reference>
-            <reference>
-                <foreign-project>util__weaklisteners_</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
                 <target>jar</target>

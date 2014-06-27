@@ -39,7 +39,10 @@ import neembuu.vfs.readmanager.ReadRequestState;
 import neembuu.vfs.readmanager.TotalFileReadStatistics;
 
 /**
- *
+ * Check 3 things:
+ * (1)link is connectable or not
+ * (2) the file size
+ * (3) seeking works or not
  * @author davidepastore
  */
 public class YTTester {
@@ -60,6 +63,10 @@ public class YTTester {
         LinkHandler lh = ylhp.getLinkHandler(tlh);
         
         for (OnlineFile file : lh.getFiles()) {
+            // the logger that you are passing here
+            // you may passa  different logger which logs nothing
+            /// if the logs of other classes five you trouble.
+            /// for now leave it as it is .
             test(logger, 0, file); // A test would succeed only if seeking is also working..
             // but the problem since we are writing to the System.out
             // both connections would write togtether and we will not know

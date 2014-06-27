@@ -16,6 +16,7 @@
  */
 package neembuu.release1.api.log;
 
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Logger;
 
 /**
@@ -46,4 +47,13 @@ public final class LoggerUtil {
         }
         return serviceProvider.getLogger(name,true,true);
     }
+    
+    /*public static Logger getFileLogger(String name) {
+        if(serviceProvider==null){
+            return Logger.getLogger(name);
+        }
+        Logger l = serviceProvider.getLogger(name,false,true);
+        l.addHandler(new ConsoleHandler());
+        return l;
+    }*/
 }
