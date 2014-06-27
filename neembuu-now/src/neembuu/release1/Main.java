@@ -156,11 +156,12 @@ public final class Main {
             }});
     }
     
-    private void initialize(){
+    private void initialize(CallbackFromTestCode c){
         clipboardMonitor.startService();
         sysTray.initTray();
         nui.initialize(mountManager);
         mountManager.initialize();
+        if(c!=null){c.callback(); /*this will initialize youtube handlers and other stuff*/}
         initLinkHandlerProviders();
         initLinkGroupMakers();
         initOpener();
@@ -218,7 +219,10 @@ public final class Main {
         return mountManager;
     }
     
+    private static final AtomicBoolean initedLogger = new AtomicBoolean(false);
+    
     private void initLogger(){
+        if(!initedLogger.compareAndSet(false, true)){return;}
         try{
             if(Application.getRuntime() != Application.Runtime.Development){
                 java.io.File stdout = Application.getResource(Application.Resource.Logs, "std.out.txt").toFile();
@@ -245,7 +249,7 @@ public final class Main {
     }
     
     private static class InstHolder {
-        private static Main m = new Main();
+        private static Main m = new Main(); 
     }
     
     public static void main(String[] args, boolean lazy) {
@@ -254,9 +258,17 @@ public final class Main {
     }
     
     public static void main(String[] args) {
+        main(args,null);
+    }
+    
+    public static void main(String[] args, CallbackFromTestCode c) {
         InitLookAndFeel.init();
         Main m = get();
-        m.initialize();
+        m.initialize(c);
+    }
+    
+    public interface CallbackFromTestCode {
+        void callback();
     }
 
 }
