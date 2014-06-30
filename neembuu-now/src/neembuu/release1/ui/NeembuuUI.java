@@ -62,6 +62,7 @@ public final class NeembuuUI {
     private final AddLinkAction ala;
     private final Settings settings;
     private final SysTray sysTray;
+    private final boolean lazyUI;
     
     private MountManager mm;
     private OpenerAccess openerA;
@@ -78,8 +79,8 @@ public final class NeembuuUI {
         @Override public JButton neembuuVirtualFolderButton() {
             return mp.neembuuVirtualFolderButton; }};
     
-    public NeembuuUI(Settings settings,SysTray sysTray) {
-        this.settings = settings; this.sysTray = sysTray;
+    public NeembuuUI(Settings settings,SysTray sysTray,boolean lazyUI) {
+        this.settings = settings; this.sysTray = sysTray;this.lazyUI = lazyUI;
         mainComponent = new MainComponentImpl(new LazyFrame() {
             @Override public JFrame getJFrame() { if(jf==null)return new JFrame(); return jf; }
             @Override public boolean available() { return true; }
@@ -108,7 +109,8 @@ public final class NeembuuUI {
         JFrameDecorator fd = new JFrameDecorator(new MainComponentImpl(jf),sysTray,settings);
         fd.getFrameDecoration().getCustomJFrame().contentArea_add(mp);
         //fd.getContentPane().add(mp);
-        jf.setVisible(true);
+        if(!lazyUI)
+            jf.setVisible(true);
     }
     
     public void initOpenerA(OpenerAccess openerA){

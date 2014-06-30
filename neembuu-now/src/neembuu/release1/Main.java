@@ -78,7 +78,7 @@ public final class Main {
     public Main() {
         settings = SettingsImpl.I(this);//safe
         sysTray = new SysTrayImpl();
-        this.nui = new NeembuuUI(settings,sysTray);
+        this.nui = new NeembuuUI(settings,sysTray,lazyUI);
         //Application.setMainComponent(new NonUIMainComponent());
         Application.setMainComponent(nui.getMainComponent());
         
@@ -249,12 +249,8 @@ public final class Main {
         private static Main m = new Main(); 
     }
     
-    public static void main(String[] args, boolean lazy) {
-        Main.lazyUI = lazy;
-        main(args);
-    }
-    
     public static void main(String[] args) {
+        if(args!=null && args.length>0){ Main.lazyUI = args[0].equalsIgnoreCase("--lazyUI");}
         main(args,null);
     }
     
