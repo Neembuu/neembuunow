@@ -194,10 +194,10 @@ public final class Main {
     }
     
     private void initLinkHandlerProviders(){
-        // move out of this jar
-        /*LinkHandlerProviders.registerProvider(new DailymotionLinkHandlerProvider());
-        LinkHandlerProviders.registerProvider(new VimeoLinkHandlerProvider());*/
-        LinkHandlerProviders.registerProvider(new YoutubeLinkHandlerProvider());
+        // move out of this jar, postponded to next version
+        LinkHandlerProviders.registerProvider(new neembuu.release1.externalImpl.linkhandler.DailymotionLinkHandlerProvider());
+        LinkHandlerProviders.registerProvider(new neembuu.release1.externalImpl.linkhandler.VimeoLinkHandlerProvider());
+        LinkHandlerProviders.registerProvider(new neembuu.release1.externalImpl.linkhandler.YoutubeLinkHandlerProvider());
         LinkHandlerProviders.registerProvider(new ExternalLinkHandlersProvider(nui.getIndefiniteTaskUI()));
         //DefaultLinkHandler is the default handler
         LinkHandlerProviders.registerDefaultProvider(new DirectLinkHandlerProvider());

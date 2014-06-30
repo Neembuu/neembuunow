@@ -84,7 +84,7 @@ public final class NeembuuUI {
             @Override public JFrame getJFrame() { if(jf==null)return new JFrame(); return jf; }
             @Override public boolean available() { return true; }
         });
-        this.mp = new MainPanel(addLinksAction,mainComponent,listener);
+        this.mp = new MainPanel(addLinksAction,mainComponent,listener,indefiniteTaskUI);
         this.lc = new LinksContainer(mp,mp.linksPanel);
         lc.heightProperty().addListener(listener);
         ala = new AddLinkAction(getIndefiniteTaskUI(),getLinksContainer(),

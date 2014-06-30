@@ -23,8 +23,10 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import neembuu.release1.Main;
+import neembuu.release1.api.IndefiniteTask;
 import neembuu.release1.api.ui.AddLinkUI;
 import neembuu.release1.api.ui.HeightProperty;
+import neembuu.release1.api.ui.IndefiniteTaskUI;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.actions.AddLinksAction;
 import static neembuu.release1.ui.ContextMenuMouseListener.Actions.*;
@@ -40,12 +42,14 @@ public class MainPanel extends javax.swing.JPanel {
     private final AddLinksAction addLinksAction;
     private final HeightProperty.Listener listener;
     private final MainComponent mainComponent;
+    private final IndefiniteTaskUI itui;
     /**
      * Creates new form MainPanel
      */
-    MainPanel(AddLinksAction addLinksAction,MainComponent mainComponent, HeightProperty.Listener listener) {
+    MainPanel(AddLinksAction addLinksAction,MainComponent mainComponent, 
+            HeightProperty.Listener listener,IndefiniteTaskUI itui) {
         this.addLinksAction = addLinksAction;
-        this.listener = listener;
+        this.listener = listener; this.itui = itui;
         this.mainComponent = mainComponent;
         initComponents();
         
@@ -115,7 +119,6 @@ public class MainPanel extends javax.swing.JPanel {
         listOfLinksScroll = new javax.swing.JScrollPane();
         listOfLinks = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
-        linkAddStatusLabel = new javax.swing.JLabel();
         addOnlyFilesButton = new javax.swing.JButton();
         hideButton = HiddenBorderButton.make(this,"images/cross.png", "images/cross_s.png",false);
         linksScrollPane = new javax.swing.JScrollPane();
@@ -215,9 +218,6 @@ public class MainPanel extends javax.swing.JPanel {
         jLabel2.setFont(new java.awt.Font("Futura-Light", 0, 16)); // NOI18N
         jLabel2.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.jLabel2.text")); // NOI18N
 
-        linkAddStatusLabel.setFont(new java.awt.Font("Futura-Light", 0, 14)); // NOI18N
-        linkAddStatusLabel.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.linkAddStatusLabel.text")); // NOI18N
-
         addOnlyFilesButton.setFont(Fonts.MyriadPro.deriveFont(14f));
         addOnlyFilesButton.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.addOnlyFilesButton.text")); // NOI18N
         addOnlyFilesButton.addActionListener(new java.awt.event.ActionListener() {
@@ -242,7 +242,6 @@ public class MainPanel extends javax.swing.JPanel {
             .addGroup(addLinksPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(addLinksPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(linkAddStatusLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(listOfLinksScroll, javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, addLinksPanelLayout.createSequentialGroup()
                         .addComponent(jLabel2)
@@ -261,9 +260,7 @@ public class MainPanel extends javax.swing.JPanel {
                 .addGroup(addLinksPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(hideButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(linkAddStatusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(5, 5, 5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
                 .addComponent(listOfLinksScroll, javax.swing.GroupLayout.DEFAULT_SIZE, 89, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(addLinksPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -442,7 +439,8 @@ public class MainPanel extends javax.swing.JPanel {
         statusLabel.setVisible(true);
     }
     private void addLinkProgressSet(String a){
-        linkAddStatusLabel.setText(a);
+        IndefiniteTask it = itui.showIndefiniteProgress(a);
+        it.done(true, 3000);
     }
     
     private void addLinksPanelShow(boolean show){
@@ -469,7 +467,6 @@ public class MainPanel extends javax.swing.JPanel {
     private javax.swing.JButton helpButton;
     private javax.swing.JButton hideButton;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel linkAddStatusLabel;
     javax.swing.JPanel linksPanel;
     private javax.swing.JScrollPane linksScrollPane;
     javax.swing.JTextArea listOfLinks;

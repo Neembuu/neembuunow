@@ -30,6 +30,7 @@ import neembuu.release1.api.ui.linkpanel.OpenableEUI;
 import neembuu.release1.api.ui.access.MinimalistFileSystem;
 import neembuu.release1.api.ui.access.RemoveFromUI;
 import neembuu.release1.api.ui.actions.ChangeDownloadModeAction;
+import neembuu.release1.api.ui.actions.FileNameClickedAction;
 import neembuu.release1.api.ui.actions.ReAddAction;
 import neembuu.release1.api.ui.actions.SaveAction;
 import neembuu.release1.api.ui.linkpanel.ProgressProvider;
@@ -40,6 +41,7 @@ import neembuu.release1.ui.actions.ConnectionActionsImpl;
 import neembuu.release1.ui.actions.EditLinksActionImpl;
 import neembuu.release1.ui.actions.ExpandActionImpl;
 import static neembuu.release1.ui.actions.ExpandActionImpl.Mode.*;
+import neembuu.release1.ui.actions.FileNameClickedActionImpl;
 import neembuu.release1.ui.actions.ForceDownloadActionImpl;
 import neembuu.release1.ui.actions.LinkActionsImpl;
 import neembuu.release1.ui.actions.MultiVariantOpenAction;
@@ -110,12 +112,13 @@ public final class Link_UI_Factory {
                 lp.closeActionUIA, remover, mainComp, fileCreator, open,settings);
         ProgressImpl progress = makeProgress(lp,actions.getSave());
         ForceDownloadActionImpl fdai = new ForceDownloadActionImpl(lp.variantSelector);
-        addCallbacks(actions, open, lp, progress, cdma, null, true, actions.getSave(),fdai);
+        FileNameClickedActionImpl fnca = new FileNameClickedActionImpl(actions.getReAdd(), open);
+        addCallbacks(actions, open, lp, progress, cdma, null, true, actions.getSave(),fdai,fnca);
         
         lp.initActions(new ExpandActionImpl(lp.expandActionUIA,SingleLinkType), 
                 open, actions.getClose(), actions.getDelete(), 
                 actions.getReAdd(), actions.getSave(), editLinks(remover), 
-                new ConnectionActionsImpl(progress.progressProvider),cdma,fdai);
+                new ConnectionActionsImpl(progress.progressProvider),cdma,fdai,fnca);
         
         lp.closeActionUIA.fileNameLabel().setText(linkGroup.displayName());
         actions.getClose().initializeUIAsClosed();
@@ -136,12 +139,13 @@ public final class Link_UI_Factory {
         LinkActionsImpl actions = new LinkActionsImpl(linkGroup.getSession(),
                 lp.closeActionUIA, remover, mainComp, fileCreator, open,settings);
         ForceDownloadActionImpl fdai = new ForceDownloadActionImpl(null);
-        addCallbacks(actions, open, lp, progress, cdma, null, true, save,fdai);
+        FileNameClickedActionImpl fnca = new FileNameClickedActionImpl(actions.getReAdd(), open);
+        addCallbacks(actions, open, lp, progress, cdma, null, true, save,fdai,fnca);
         actions.getReAdd().addCallBack(new VariantProgressProvider(lp.progressUIA,save,null,null,true));
                 
-        lp.initActions(new ExpandActionImpl(lp.expandActionUIA,SplitLinkType), open, actions.getClose(),
-                actions.getDelete(), actions.getReAdd(), save, editLinks(remover), 
-                new ConnectionActionsImpl(progress.progressProvider), cdma,fdai);
+        lp.initActions(new ExpandActionImpl(lp.expandActionUIA,SplitLinkType), open, 
+            actions.getClose(),actions.getDelete(), actions.getReAdd(), save, editLinks(remover), 
+            new ConnectionActionsImpl(progress.progressProvider), cdma,fdai,fnca);
         
         lp.closeActionUIA.fileNameLabel().setText(linkGroup.displayName());
         actions.getClose().initializeUIAsClosed();
@@ -162,12 +166,13 @@ public final class Link_UI_Factory {
         LinkActionsImpl actions = new LinkActionsImpl(linkGroup.getSession(),
                 lp.closeActionUIA, remover,mainComp, fileCreator,open,settings);
         ForceDownloadActionImpl fdai = new ForceDownloadActionImpl(null);
-        addCallbacks(actions, open, lp, null, cdma, vpp, false,save,fdai);
+        FileNameClickedActionImpl fnca = new FileNameClickedActionImpl(actions.getReAdd(), open);
+        addCallbacks(actions, open, lp, null, cdma, vpp, false,save,fdai,fnca);
         actions.getReAdd().addCallBack(vpp);
                 
         lp.initActions(new ExpandActionImpl(lp.expandActionUIA,MultiVariantType),
                 open, actions.getClose(), actions.getDelete(), actions.getReAdd(), save, 
-                editLinks(remover), new ConnectionActionsImpl(vpp), cdma, fdai);
+                editLinks(remover), new ConnectionActionsImpl(vpp), cdma, fdai,fnca);
         
         lp.closeActionUIA.fileNameLabel().setText(linkGroup.displayName());
         actions.getClose().initializeUIAsClosed();
@@ -200,7 +205,8 @@ public final class Link_UI_Factory {
     private static void addCallbacks(LinkActionsImpl linkActionsImpl,
             ReAddAction.CallBack openActionImpl, GenericLinkPanel lp, ProgressImpl progress, 
             ChangeDownloadModeAction changeDownloadModeAction, ProgressProvider vpi, 
-            boolean initalizeProgress, SaveAction saveAction, ForceDownloadActionImpl fdai){
+            boolean initalizeProgress, SaveAction saveAction, ForceDownloadActionImpl fdai,
+            FileNameClickedActionImpl fnca){
         linkActionsImpl.getReAdd().addCallBack(openActionImpl);
         linkActionsImpl.getReAdd().addCallBack(new ReAddActionCallBackImpl(lp.closeActionUIA, 
                 vpi==null?progress.progressProvider:vpi, 
@@ -208,6 +214,7 @@ public final class Link_UI_Factory {
         linkActionsImpl.getReAdd().addCallBack(fdai);
         linkActionsImpl.getReAdd().addCallBack(Utils.newDisplayNameSaver());
         linkActionsImpl.getReAdd().addCallBack(UserAnalytics.newReportHandler());
+        linkActionsImpl.getReAdd().addCallBack(fnca);
         if(saveAction instanceof ReAddAction.CallBack)
             linkActionsImpl.getReAdd().addCallBack((ReAddAction.CallBack)saveAction);
     }

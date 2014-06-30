@@ -118,7 +118,7 @@ public class EditLinksPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void emptyCacheButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emptyCacheButtonActionPerformed
-        // TODO add your handling code here:
+        actions.emptyCache();
     }//GEN-LAST:event_emptyCacheButtonActionPerformed
 
     public EditLinksUIA ui(){

@@ -18,6 +18,7 @@ package neembuu.release1.ui.linkpanel;
 
 import neembuu.swing.HiddenBorderButton;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -45,6 +46,7 @@ import neembuu.release1.api.ui.actions.DeleteAction;
 import neembuu.release1.api.ui.actions.ExpandAction;
 import neembuu.release1.api.ui.actions.ConnectionActions;
 import neembuu.release1.api.ui.actions.EditLinksAction;
+import neembuu.release1.api.ui.actions.FileNameClickedAction;
 import neembuu.release1.api.ui.actions.ForceDownloadAction;
 import neembuu.release1.api.ui.actions.OpenAction;
 import neembuu.release1.api.ui.actions.ReAddAction;
@@ -82,6 +84,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     private ChangeDownloadModeAction  changeDownloadModeAction;
     private ConnectionActions connectionActions;
     private EditLinksAction editLinksAction;
+    private FileNameClickedAction fnca;
     
     private final String downloadFullFileToolTip = "<html>"
                 + "<b>Download entire file mode</b><br/>"
@@ -107,6 +110,7 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         overlayInit();
         
         changeDownloadModeButton.setToolTipText(downloadFullFileToolTip);
+        fileNameLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         killConnectionButton.setEnabled(false);
         
         variantSelectorButton.setBackground(Colors.BUTTON_TINT);
@@ -120,13 +124,14 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     void initActions(
             ExpandAction ea, OpenAction oa, CloseAction ca, DeleteAction da, 
             ReAddAction raa, SaveAction sa, EditLinksAction ela, ConnectionActions cona, 
-            ChangeDownloadModeAction cdma, ForceDownloadAction fda) {
+            ChangeDownloadModeAction cdma, ForceDownloadAction fda, FileNameClickedAction fnca) {
         this.expandAction = ea;
         this.deleteAction = da;
         this.reAddAction = raa;
         this.editLinksAction = ela;
         this.connectionActions = cona;
         this.changeDownloadModeAction = cdma;
+        this.fnca = fnca;
         rightControlsPanel.initActions(ea, sa, ca, fda);
         fileIconPanel.setOpenAction(oa);
         rightControlsPanel.forceDownloadButtonStateChanged();
@@ -279,6 +284,17 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         fileNamePane.setBackground(new java.awt.Color(255, 255, 255));
         fileNamePane.setFocusable(false);
         fileNamePane.setPreferredSize(new java.awt.Dimension(200, 40));
+        fileNamePane.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                fileNamePaneMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                fileNamePaneMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                fileNamePaneMouseExited(evt);
+            }
+        });
 
         fileNameLabel.setBackground(new java.awt.Color(255, 255, 255));
         fileNameLabel.setFont(Fonts.MyriadPro.deriveFont(17f));
@@ -647,6 +663,20 @@ final class GenericLinkPanel extends javax.swing.JPanel {
     private void editLinksButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editLinksButtonActionPerformed
         editLinksAction.actionPerformed();
     }//GEN-LAST:event_editLinksButtonActionPerformed
+
+    private Color oldColor = Color.BLACK;
+    private void fileNamePaneMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_fileNamePaneMouseEntered
+        oldColor = fileSizeLabel.getForeground();
+        fileSizeLabel.setForeground(Colors.PROGRESS_BAR_FILL_ACTIVE);
+    }//GEN-LAST:event_fileNamePaneMouseEntered
+
+    private void fileNamePaneMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_fileNamePaneMouseExited
+        fileSizeLabel.setForeground(oldColor==null?Color.BLACK:oldColor);
+    }//GEN-LAST:event_fileNamePaneMouseExited
+
+    private void fileNamePaneMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_fileNamePaneMouseClicked
+        fnca.actionPerformed();
+    }//GEN-LAST:event_fileNamePaneMouseClicked
 
     private JPanel getFileIconPanelWithButton(){
         return fileIconPanel.getJPanel();

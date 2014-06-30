@@ -62,12 +62,14 @@ public class EditLinksActionImpl implements EditLinksAction{
     }
 
     @Override public void actionPerformed() {
-        boolean ok = mainComponent.newMessage().setTitle("Are you sure?")
+        Object[]options = {"Yes","No"};
+        Object response = mainComponent.newMessage().setTitle("Are you sure?")
                 .setEmotion(Message.Emotion.EXPERT)
+                .setTimeout(10000)
                 .setMessage("Editing links is an advanced option.\n"
                         + "Please proceed only if you know what you are doing.")
-                .ask();
-        if(!ok)return;
+                .ask(options,1);
+        if(response!=options[0])return;
         
         String links = constructLinkParagraph();
         
@@ -77,7 +79,7 @@ public class EditLinksActionImpl implements EditLinksAction{
         elp.initAction(new ActionsImpl(elp,jd));
         elp.ui().textArea().setText(links);
         
-        jd.setSize(elp.getPreferredSize());
+        jd.setSize(600,250);
         jd.getContentPane().add(elp);
         jd.show();
     }
@@ -95,11 +97,15 @@ public class EditLinksActionImpl implements EditLinksAction{
     }
     
     public void saveImpl(EditLinksPanel elp){
-        boolean ok = mainComponent.newMessage().setTitle("Are you sure?")
-                .setMessage("To change links this file will be closed and opened again.\n"
-                        + "Is there is any issue in the process the buffered data will be deleted.")
-                .ask();
-        if(!ok)return;
+        Object[]options = {"Yes","No"};
+        Object response = mainComponent.newMessage().setTitle("Are you sure?")
+                .setMessage("To change links this file will be \n"
+                        + "closed and opened again.\n"
+                        + "If there is any issue in the \n"
+                        + "process the buffered data will be deleted.")
+                .setTimeout(10000)
+                .ask(options,1);
+        if(response!=options[0])return;
         
         String[]links = elp.ui().textArea().getText().split("\n");
         
@@ -145,13 +151,16 @@ public class EditLinksActionImpl implements EditLinksAction{
     }
     
     private void emptyCacheImpl(){
-        boolean  x = mainComponent.newMessage().error()
+        Object[]options = {"Yes","No"};
+        Object selected = mainComponent.newMessage().error()
+                .setEmotion(Message.Emotion.EXPERT)
                 .setTitle("Are you sure?")
+                .setTimeout(10000)
                 .setMessage("This will delete all downloaded data.\n"
-                        + "This option is useful if previously corrupted"
+                        + "This option is useful if previously corrupted\n"
                         + "data was downloadeded, and needs to be cleaned.")
-                .ask();
-        if(!x)return;
+                .ask(options,1);
+        if(selected!=options[0])return;
         Throwables.start(new Runnable() {
             @Override public void run() {
                 try{linkGroup.getSession().clearCachedFileData();}
