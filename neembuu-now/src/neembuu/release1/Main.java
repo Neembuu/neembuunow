@@ -218,11 +218,8 @@ public final class Main {
     public MountManager getMountManager() {
         return mountManager;
     }
-    
-    private static final AtomicBoolean initedLogger = new AtomicBoolean(false);
-    
+        
     private void initLogger(){
-        if(!initedLogger.compareAndSet(false, true)){return;}
         try{
             if(Application.getRuntime() != Application.Runtime.Development){
                 java.io.File stdout = Application.getResource(Application.Resource.Logs, "std.out.txt").toFile();
