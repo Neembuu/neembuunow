@@ -148,6 +148,7 @@ public final class MountManager {
     
     int c = 0;
     private void mountEventReceived(FormatterEvent event){
+        checkDetached(event);
         if(c>0)return;
         c++;
         
@@ -160,6 +161,23 @@ public final class MountManager {
                 openVirtualFolder();
             }
         });
+    }
+    
+    private void checkDetached(FormatterEvent event){
+        if(event.getEventType()==FormatterEvent.EVENT.DETACHED){
+            if(!event.getMessage().contains("external"))return;
+            mainComponent.getJFrame().setVisible(false);
+            mainComponent.getJFrame().setVisible(true);
+            mainComponent.newMessage()
+                    .setTitle("Virtual folder externally unmounted")
+                    .setMessage("Some external tool might have initiated an\n"
+                            + "unmount operation or and error might have occurred.\n"
+                            + "\n"
+                            + "The application is going to exit.")
+                    .setTimeout(10000)
+                    .show();
+            System.exit(-1);
+        }
     }
     
     private void openVirtualFolder(){

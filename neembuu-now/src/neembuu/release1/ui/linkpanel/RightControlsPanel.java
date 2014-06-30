@@ -75,6 +75,8 @@ final class RightControlsPanel {
         crossBtn.setToolTipText("Close");
         downBtn.setToolTipText("Details");
         forceBtn.setToolTipText("Force Download");
+        forceBtn.setVisible(false);// Implementation is not complete
+        // not intended for this version
     }
 
     private JButton makeForceBtn(){
