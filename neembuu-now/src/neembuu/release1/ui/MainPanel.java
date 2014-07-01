@@ -133,7 +133,7 @@ public class MainPanel extends javax.swing.JPanel {
             }
         });
 
-        neembuuVirtualFolderButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/logo_7_unselected.PNG"))); // NOI18N
+        neembuuVirtualFolderButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/logo_7_un_selected.png"))); // NOI18N
         neembuuVirtualFolderButton.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.neembuuVirtualFolderButton.text")); // NOI18N
         neembuuVirtualFolderButton.setToolTipText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.neembuuVirtualFolderButton.toolTipText")); // NOI18N
         neembuuVirtualFolderButton.setBorderPainted(false);
