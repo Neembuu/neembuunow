@@ -1,0 +1,8 @@
+CREATE TABLE video_urls (
+	_id 			INTEGER PRIMARY KEY AUTOINCREMENT,
+	key 			TEXT NOT NULL,
+	url 			TEXT NOT NULL,
+	cookie			TEXT,
+	useragent		TEXT,
+	UNIQUE(key)
+)

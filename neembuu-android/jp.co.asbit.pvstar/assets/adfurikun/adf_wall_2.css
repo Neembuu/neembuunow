@@ -1,0 +1,56 @@
+html {
+  background: #222;
+  -webkit-background-size: 30px 30px;
+  -moz-background-size: 30px 30px;
+  background-size: 30px 30px;
+  background-color: #222;
+  background-image: -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.25, #3a3d3c), color-stop(0.25, transparent), color-stop(0.5, transparent), color-stop(0.5, #3a3d3c), color-stop(0.75, #3a3d3c), color-stop(0.75, transparent), to(transparent));
+  background-image: -webkit-linear-gradient(-45deg, #3a3d3c 25%, transparent 25%, transparent 50%, #3a3d3c 50%, #3a3d3c 75%, transparent 75%, transparent);
+  background-image: -moz-linear-gradient(-45deg, #3a3d3c 25%, transparent 25%, transparent 50%, #3a3d3c 50%, #3a3d3c 75%, transparent 75%, transparent);
+  background-image: -ms-linear-gradient(-45deg, #3a3d3c 25%, transparent 25%, transparent 50%, #3a3d3c 50%, #3a3d3c 75%, transparent 75%, transparent);
+  background-image: -o-linear-gradient(-45deg, #3a3d3c 25%, transparent 25%, transparent 50%, #3a3d3c 50%, #3a3d3c 75%, transparent 75%, transparent);
+  background-image: linear-gradient(-45deg, #3a3d3c 25%, transparent 25%, transparent 50%, #3a3d3c 50%, #3a3d3c 75%, transparent 75%, transparent);
+}
+
+body {
+  color: #222;
+  background: #2e302f!important;
+}
+
+a {
+  color: #fff;
+}
+
+/* -----------------------------------------------------
+header
+-------------------------------------------------------- */
+.site_header {
+  background: #000;
+  color: #fff;
+}
+
+/* -----------------------------------------------------
+Contents
+-------------------------------------------------------- */
+@media only screen and (orientation: portrait) {
+  .app_list article {
+    background: #2e302f;
+    border-top: 1px solid #222;
+  }
+  .app_list article h1 {
+    color: #fff;
+  }
+}
+@media only screen and (orientation: landscape) {
+  .app_list article {
+    border-top: 1px solid #222;
+    background: #2e302f;
+  }
+  .app_list article h1 {
+    color: #fff;
+  }
+  .app_list article:nth-child(2), .app_list article:nth-child(4) {
+    border-right: 1px solid #222;
+    border-left: 1px solid #222;
+  }
+}
