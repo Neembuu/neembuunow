@@ -27,6 +27,7 @@ import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.file.NeembuuFileCreator;
 import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.settings.Settings;
+import neembuu.release1.api.ui.IndefiniteTaskUI;
 import neembuu.release1.api.ui.Message;
 import neembuu.release1.api.ui.access.CloseActionUIA;
 import neembuu.release1.api.ui.access.RemoveFromUI;
@@ -56,6 +57,7 @@ public class LinkActionsImpl {
     private final OpenAction openAction;
     
     private final Session s;
+    private final IndefiniteTaskUI itui;
 
     private final DeleteAction delete = new DeleteAction() {@Override public void actionPerformed() {
             delete();
@@ -82,10 +84,10 @@ public class LinkActionsImpl {
     
     public LinkActionsImpl(Session s,CloseActionUIA ui, RemoveFromUI removeFromUI, 
             MainComponent mainComponent, NeembuuFileCreator neembuuFileCreator, OpenAction oa,
-            Settings settings) {
-        this.ui = ui;this.removeFromUI = removeFromUI;openAction = oa;this.s=s;
+            Settings settings, IndefiniteTaskUI itui) {
+        this.ui = ui;this.removeFromUI = removeFromUI;openAction = oa;this.s=s;this.itui = itui;
         this.mainComponent = mainComponent; this.neembuuFileCreator = neembuuFileCreator;
-        save = new SaveActionImpl(mainComponent,settings);
+        save = new SaveActionImpl(mainComponent,settings,itui);
     }
     
     public DeleteAction getDelete() {return delete;}
@@ -211,7 +213,7 @@ public class LinkActionsImpl {
                 Throwables.start(new Runnable() {
                     @Override public void run() {
                         NFExceptionDescriptor nfed = neembuuFileCreator instanceof NFExceptionDescriptor?
-                                null:((NFExceptionDescriptor)neembuuFileCreator);
+                                ((NFExceptionDescriptor)neembuuFileCreator):null;
                         try{UserAnalytics.reportVirtualFileCreationFailure(nfed, a);}
                         catch(Exception a){ throw new RuntimeException(a); }
                     }

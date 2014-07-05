@@ -21,6 +21,7 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.charset.Charset;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
@@ -43,7 +44,7 @@ final class CustomFileHandler extends Handler{
     @Override
     public synchronized void publish(LogRecord record) {
         String message = getFormatter().format(record);
-        ByteBuffer bb = ByteBuffer.wrap(message.getBytes());
+        ByteBuffer bb = ByteBuffer.wrap(message.getBytes(Charset.forName("UTF-8")));
         try{
             if(fc.position()+message.length() > limit){
                 fc.position(0);

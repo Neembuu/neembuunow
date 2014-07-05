@@ -8,6 +8,7 @@ package neembuu.release1.defaultImpl.linkgroup;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.charset.Charset;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -52,7 +53,7 @@ public final class Utils {
             SeekableByteChannel dp = s.getOrCreateResource(LinkGroup.displayName_resourceName, StandardOpenOption.READ);
             ByteBuffer bb=ByteBuffer.allocate(Math.min((int)dp.size(),4*1024));
             dp.read(bb);
-            String t = new String(bb.array());
+            String t = new String(bb.array(),Charset.forName("UTF-8"));
             try{dp.close();}catch(Exception a){a.printStackTrace();}
             return t;
         }catch(Exception a){
@@ -85,7 +86,7 @@ public final class Utils {
                         LinkGroup.displayName_resourceName, 
                         StandardOpenOption.WRITE,StandardOpenOption.CREATE,
                         StandardOpenOption.TRUNCATE_EXISTING);
-        ByteBuffer bb=ByteBuffer.wrap(displayName.getBytes());
+        ByteBuffer bb=ByteBuffer.wrap(displayName.getBytes(Charset.forName("UTF-8")));
         dp.write(bb);
         try{dp.close();}catch(Exception a){a.printStackTrace();}
     }

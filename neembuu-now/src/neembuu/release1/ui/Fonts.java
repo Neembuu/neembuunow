@@ -22,6 +22,8 @@ import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
+import javax.swing.plaf.FontUIResource;
 
 /**
  *
@@ -31,6 +33,8 @@ public final class Fonts {
     public static final Font MyriadPro = initFont("MYRIADPRO-REGULAR.ttf");
     public static final Font FuturaLight = initFont("Futura-Light.ttf");
     public static final Font Amper = initFont("hmampersand-regular-webfont.ttf");
+    
+    private static volatile Font defaultFont = null;
     
     static java.awt.Font initFont(String fntName){
         try {
@@ -46,5 +50,17 @@ public final class Fonts {
             e.printStackTrace();
         }
         return new JPanel().getFont();
+    }
+    
+    public static void initDefaultFont(){
+        try{
+            defaultFont = (Font)UIManager.get("Label.font");
+        }catch(Exception a){
+            defaultFont = Font.getFont(Font.DIALOG);
+        }
+    }
+
+    public static Font getDefaultFont() {
+        return defaultFont;
     }
 }

@@ -19,7 +19,6 @@ package neembuu.release1.ui;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.ComponentOrientation;
 import java.awt.Graphics2D;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -47,7 +46,7 @@ public class InitLookAndFeel {
             colors();
             toolTip();
             scrollBar();
-        
+            Fonts.initDefaultFont();
             UIManager.put("Label.font",new FontUIResource(Fonts.MyriadPro.deriveFont(13f)));
             if(jc==null){
                 UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");

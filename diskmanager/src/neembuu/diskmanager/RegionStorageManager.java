@@ -38,7 +38,7 @@ public interface RegionStorageManager extends LoggerCreator, SeekableByteChannel
     int write(ByteBuffer src,long absoulteFileOffset)throws IOException;
     int read(ByteBuffer src,long absoulteFileOffset)throws IOException;
     
-    void transferTo_ReOpenIfRequired(WritableByteChannel wbc)throws IOException;
+    void transferTo_ReOpenIfRequired(WritableByteChannel wbc,long exclusiveLimit)throws IOException;
     
     public long endingByFileSize()throws IOException;
     

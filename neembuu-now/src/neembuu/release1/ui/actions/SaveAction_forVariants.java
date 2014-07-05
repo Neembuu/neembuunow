@@ -27,6 +27,7 @@ import javax.swing.JPopupMenu;
 import neembuu.release1.api.file.NeembuuFile;
 import neembuu.release1.api.file.Saveable;
 import neembuu.release1.api.settings.Settings;
+import neembuu.release1.api.ui.IndefiniteTaskUI;
 import neembuu.release1.api.ui.MainComponent;
 import neembuu.release1.api.ui.access.ProgressUIA;
 import neembuu.release1.api.ui.actions.ReAddAction.CallBack;
@@ -40,14 +41,16 @@ public class SaveAction_forVariants implements SaveAction,CallBack {
     private final MainComponent mainComponent;
     private final ProgressUIA ui;
     private final Settings settings;
+    private final IndefiniteTaskUI itui;
     private final List<PopupEntry> doneFiles = new LinkedList<PopupEntry>();
 
     private PopupEntry mainFileMenuItem = null;
     private String warning = null;
 
     public SaveAction_forVariants(MainComponent mainComponent,
-            ProgressUIA ui,Settings settings) {
-        this.mainComponent = mainComponent; this.ui = ui; this.settings = settings;
+            ProgressUIA ui,Settings settings,IndefiniteTaskUI itui) {
+        this.mainComponent = mainComponent; this.ui = ui; 
+        this.settings = settings; this.itui = itui;
     }
     
     @Override
@@ -81,7 +84,7 @@ public class SaveAction_forVariants implements SaveAction,CallBack {
         }
 
         @Override public void actionPerformed(ActionEvent e) {
-            SaveActionImpl sai = new SaveActionImpl(mainComponent,settings);
+            SaveActionImpl sai = new SaveActionImpl(mainComponent,settings,itui);
             sai.setFile(file);
             sai.sendWarning(warning); // delegating the task to show warning
             sai.actionPerformed();}

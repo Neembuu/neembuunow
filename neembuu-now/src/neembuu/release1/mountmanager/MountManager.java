@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jpfm.DefaultManager;
 import jpfm.FormatterEvent;
 import jpfm.JPfm;
 import jpfm.MountListener;
@@ -113,7 +114,13 @@ public final class MountManager {
         boolean retry = true;// false;
         if (attempt >= 0) { //1 for testing //0 for release
             try {
-                manager =  JPfm.setDefaultManager();
+                manager =  JPfm.setDefaultManager(LoggerUtil.getLogger("JPfm.Manager"),new DefaultManager.LibraryLoader() {
+                    @Override public boolean loadLibrary(Logger logger) {
+                        try{System.loadLibrary("jpfm_x86_rev113");}
+                        catch(Exception a){logger.log(Level.SEVERE,"could not load",a);return false;}
+                        return true;
+                    }
+                },false);
                 m = Mounts.mount(new MountParamsBuilder()
                         .set(MountParams.ParamType.MOUNT_LOCATION, mntLoc)
                         .set(MountParams.ParamType.FILE_SYSTEM, fs)

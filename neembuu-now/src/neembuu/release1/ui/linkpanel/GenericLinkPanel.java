@@ -55,6 +55,7 @@ import neembuu.release1.api.ui.linkpanel.VariantSelector;
 import neembuu.release1.ui.Colors;
 import neembuu.release1.ui.Fonts;
 import neembuu.release1.ui.HeightPropertyImpl;
+import neembuu.release1.ui.MainPanel;
 import neembuu.swing.TextBubbleBorder;
 
 /**
@@ -111,6 +112,9 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         
         changeDownloadModeButton.setToolTipText(downloadFullFileToolTip);
         fileNameLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        fileNameLabel.setFont(Fonts.getDefaultFont().deriveFont(Font.PLAIN).deriveFont(14f));//because 
+        // filename can contain unicode characters
+        
         killConnectionButton.setEnabled(false);
         
         variantSelectorButton.setBackground(Colors.BUTTON_TINT);
@@ -154,10 +158,10 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         layeredPane = new javax.swing.JLayeredPane();
         indefiniteProgress = new javax.swing.JLabel();
         overlay = new javax.swing.JPanel();
-        editLinksButton = HiddenBorderButton.make(this,"../images/edit_link.png", "../images/edit_link_s.png", false);
+        editLinksButton = HiddenBorderButton.make(GenericLinkPanel.class,"/neembuu/release1/ui/images/edit_link.png", "/neembuu/release1/ui/images/edit_link_s.png", false);
         rightOverlayElements = new javax.swing.JPanel();
-        delete = HiddenBorderButton.make(this,"../images/delete.png", "../images/delete_s.png", false);
-        reEnableButton = HiddenBorderButton.make(this,"../images/small+.png", "../images/small+_s.png", false);
+        delete = HiddenBorderButton.make(GenericLinkPanel.class,"/neembuu/release1/ui/images/delete.png", "/neembuu/release1/ui/images/delete_s.png", false);
+        reEnableButton = HiddenBorderButton.make(GenericLinkPanel.class,"/neembuu/release1/ui/images/small+.png", "/neembuu/release1/ui/images/small+_s.png", false);
         actualContentsPanel = new javax.swing.JPanel();
         vlcPane = getFileIconPanelWithButton();
         fileNamePane = new javax.swing.JPanel();
@@ -297,7 +301,6 @@ final class GenericLinkPanel extends javax.swing.JPanel {
         });
 
         fileNameLabel.setBackground(new java.awt.Color(255, 255, 255));
-        fileNameLabel.setFont(Fonts.MyriadPro.deriveFont(17f));
         fileNameLabel.setText(org.openide.util.NbBundle.getMessage(GenericLinkPanel.class, "GenericLinkPanel.fileNameLabel.text")); // NOI18N
         fileNameLabel.setMaximumSize(new java.awt.Dimension(152, 32));
         fileNameLabel.setMinimumSize(new java.awt.Dimension(152, 32));
@@ -666,12 +669,12 @@ final class GenericLinkPanel extends javax.swing.JPanel {
 
     private Color oldColor = Color.BLACK;
     private void fileNamePaneMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_fileNamePaneMouseEntered
-        oldColor = fileSizeLabel.getForeground();
-        fileSizeLabel.setForeground(Colors.PROGRESS_BAR_FILL_ACTIVE);
+        oldColor = fileNameLabel.getForeground();
+        fileNameLabel.setForeground(Colors.PROGRESS_BAR_FILL_ACTIVE);
     }//GEN-LAST:event_fileNamePaneMouseEntered
 
     private void fileNamePaneMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_fileNamePaneMouseExited
-        fileSizeLabel.setForeground(oldColor==null?Color.BLACK:oldColor);
+        fileNameLabel.setForeground(oldColor==null?Color.BLACK:oldColor);
     }//GEN-LAST:event_fileNamePaneMouseExited
 
     private void fileNamePaneMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_fileNamePaneMouseClicked

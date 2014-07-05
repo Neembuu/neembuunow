@@ -152,7 +152,7 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editLinksButtonActionPerformed"/>
               </Events>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="HiddenBorderButton.make(this,&quot;../images/edit_link.png&quot;, &quot;../images/edit_link_s.png&quot;, false)"/>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="HiddenBorderButton.make(GenericLinkPanel.class,&quot;/neembuu/release1/ui/images/edit_link.png&quot;, &quot;/neembuu/release1/ui/images/edit_link_s.png&quot;, false)"/>
               </AuxValues>
             </Component>
             <Container class="javax.swing.JPanel" name="rightOverlayElements">
@@ -205,7 +205,7 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="deleteActionPerformed"/>
                   </Events>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="HiddenBorderButton.make(this,&quot;../images/delete.png&quot;, &quot;../images/delete_s.png&quot;, false)"/>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="HiddenBorderButton.make(GenericLinkPanel.class,&quot;/neembuu/release1/ui/images/delete.png&quot;, &quot;/neembuu/release1/ui/images/delete_s.png&quot;, false)"/>
                   </AuxValues>
                 </Component>
                 <Component class="javax.swing.JButton" name="reEnableButton">
@@ -225,7 +225,7 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="reEnableButtonActionPerformed"/>
                   </Events>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="HiddenBorderButton.make(this,&quot;../images/small+.png&quot;, &quot;../images/small+_s.png&quot;, false)"/>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="HiddenBorderButton.make(GenericLinkPanel.class,&quot;/neembuu/release1/ui/images/small+.png&quot;, &quot;/neembuu/release1/ui/images/small+_s.png&quot;, false)"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
@@ -368,9 +368,6 @@
                   <Properties>
                     <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="ff" green="ff" red="ff" type="rgb"/>
-                    </Property>
-                    <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                      <Connection code="Fonts.MyriadPro.deriveFont(17f)" type="code"/>
                     </Property>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                       <ResourceString bundle="neembuu/release1/ui/linkpanel/Bundle.properties" key="GenericLinkPanel.fileNameLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>

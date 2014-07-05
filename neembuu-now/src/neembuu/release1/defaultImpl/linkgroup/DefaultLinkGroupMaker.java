@@ -19,6 +19,7 @@ package neembuu.release1.defaultImpl.linkgroup;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.charset.Charset;
 import neembuu.diskmanager.DiskManager;
 import neembuu.diskmanager.MakeSession;
 import neembuu.diskmanager.Session;
@@ -58,7 +59,7 @@ public class DefaultLinkGroupMaker implements LinkGroupMaker {
         try{
             SeekableByteChannel sbc = ms.metaData();
             TrialLinkHandler tlh = slg.getAbsorbedLinks().get(0);
-            ByteBuffer bb =ByteBuffer.wrap(tlh.getReferenceLinkString().getBytes());
+            ByteBuffer bb =ByteBuffer.wrap(tlh.getReferenceLinkString().getBytes(Charset.forName("UTF-8")));
             sbc.write(bb);
         }catch(Exception a){ ms.cancel();/*closes sbc as well*/ throw a;}
         

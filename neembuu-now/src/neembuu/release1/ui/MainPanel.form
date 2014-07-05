@@ -388,7 +388,7 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hideButtonActionPerformed"/>
               </Events>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="HiddenBorderButton.make(this,&quot;images/cross.png&quot;, &quot;images/cross_s.png&quot;,false)"/>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="HiddenBorderButton.make(MainPanel.class,&quot;/neembuu/release1/ui/images/cross.png&quot;, &quot;/neembuu/release1/ui/images/cross_s.png&quot;,false)"/>
               </AuxValues>
             </Component>
           </SubComponents>

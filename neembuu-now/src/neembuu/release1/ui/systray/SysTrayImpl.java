@@ -28,6 +28,7 @@ import javax.swing.ImageIcon;
 import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.ui.MinimalistMessage;
 import neembuu.release1.api.ui.systray.SysTray;
+import neembuu.release1.ui.MainPanel;
 
 /**
  *
@@ -64,7 +65,7 @@ public class SysTrayImpl implements SysTray {
     public final void initTray() {
         popup = new PopupMenu();
         trayIcon = new TrayIcon(
-            new ImageIcon(SysTrayImpl.class.getResource("../images/7_ls_small_transparent_16x16.png")).getImage(),
+            new ImageIcon(SysTrayImpl.class.getResource("/neembuu/release1/ui/images/7_ls_small_transparent_16x16.png")).getImage(),
             "NeembuuNow",popup);
         trayIcon.addActionListener(new ActionListener() {
             @Override public void actionPerformed(ActionEvent e) {

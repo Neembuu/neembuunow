@@ -69,7 +69,7 @@ public class FrameDecoration extends javax.swing.JPanel {
         frameBorder.setBackground(new java.awt.Color(255, 255, 251));
 
         contentArea.setBackground(new java.awt.Color(255, 255, 255));
-        contentArea.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(233, 228, 214)));
+        contentArea.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 252, 249)));
         contentArea.setLayout(new java.awt.BorderLayout());
 
         headerRegion.setBackground(new java.awt.Color(255, 255, 251));

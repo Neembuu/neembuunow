@@ -40,7 +40,7 @@ import neembuu.release1.api.ui.actions.OpenAction;
 final class FileIconPanel {
     
     FileIconPanel(){
-        final TintedGreyScaledImage image = TintedGreyScaledImage.make(this,"../images/vlc.png",false);
+        final TintedGreyScaledImage image = TintedGreyScaledImage.make(FileIconPanel.class,"/neembuu/release1/ui/images/vlc.png",false);
         
         Icon bw = image.getTintedImage(Colors.TINTED_IMAGE );
         Icon clr = image.getBaseImage();

@@ -17,6 +17,7 @@
 package neembuu.diskmanager.impl;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.ref.WeakReference;
@@ -179,11 +180,24 @@ final class DefaultRegionStorageManager implements RegionStorageManager{
     }
 
     @Override
-    public void transferTo_ReOpenIfRequired(WritableByteChannel wbc)throws IOException {
-        FileChannel tempFileChannel;
-        tempFileChannel = new RandomAccessFile(regionStore, "r").getChannel();
-        tempFileChannel.transferTo(0, amountWritten, wbc);
-        tempFileChannel.close();
+    public void transferTo_ReOpenIfRequired(WritableByteChannel wbc,long exclusiveLimit)throws IOException {
+        try(FileChannel tempFileChannel = new RandomAccessFile(regionStore, "r").getChannel()){
+            long position = 0;
+            long size = exclusiveLimit - startingOffset;
+            long maxCount = size;
+            while (position < size) {
+                long count = tempFileChannel.transferTo(position, maxCount, wbc);
+                if (count > 0){
+                    position += count;
+                    maxCount -= count;
+                }
+            }
+
+            //tempFileChannel.transferTo(0, exclusiveLimit - startingOffset, wbc);
+            tempFileChannel.close();
+        }catch(IOException a){
+            throw a;
+        }
     }
     
     public static String generatePeekString(ByteBuffer byteBuffer){

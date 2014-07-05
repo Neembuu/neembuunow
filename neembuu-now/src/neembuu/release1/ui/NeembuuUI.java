@@ -175,7 +175,7 @@ public final class NeembuuUI {
     private void initJFrame(){
         jf.setTitle("NEEMBUU");
         jf.setFont(Fonts.FuturaLight);
-        jf.setIconImage(new ImageIcon(NeembuuUI.class.getResource("images/7_ls_small_transparent_32x32.png") ).getImage());
+        jf.setIconImage(new ImageIcon(NeembuuUI.class.getResource("/neembuu/release1/ui/images/7_ls_small_transparent_32x32.png") ).getImage());
         jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jf.setMinimumSize(new Dimension(463+30,172));
         jf.setMaximumSize(new Dimension(463+200,700));

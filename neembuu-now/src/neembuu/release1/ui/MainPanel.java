@@ -120,7 +120,7 @@ public class MainPanel extends javax.swing.JPanel {
         listOfLinks = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
         addOnlyFilesButton = new javax.swing.JButton();
-        hideButton = HiddenBorderButton.make(this,"images/cross.png", "images/cross_s.png",false);
+        hideButton = HiddenBorderButton.make(MainPanel.class,"/neembuu/release1/ui/images/cross.png", "/neembuu/release1/ui/images/cross_s.png",false);
         linksScrollPane = new javax.swing.JScrollPane();
         linksPanel = new javax.swing.JPanel();
 
@@ -373,11 +373,11 @@ public class MainPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_neembuuVirtualFolderButtonActionPerformed
 
     private void neembuuVirtualFolderButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_neembuuVirtualFolderButtonMouseExited
-        neembuuVirtualFolderButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/logo_7_unselected.PNG"))); // NOI18N
+        neembuuVirtualFolderButton.setIcon(new javax.swing.ImageIcon(MainPanel.class.getResource("/neembuu/release1/ui/images/logo_7_un_selected.png"))); // NOI18N
     }//GEN-LAST:event_neembuuVirtualFolderButtonMouseExited
 
     private void neembuuVirtualFolderButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_neembuuVirtualFolderButtonMouseEntered
-        neembuuVirtualFolderButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/logo_7_selected.png"))); // NOI18N
+        neembuuVirtualFolderButton.setIcon(new javax.swing.ImageIcon(MainPanel.class.getResource("/neembuu/release1/ui/images/logo_7_selected.png"))); // NOI18N
     }//GEN-LAST:event_neembuuVirtualFolderButtonMouseEntered
 
     private void addLinksButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLinksButtonActionPerformed

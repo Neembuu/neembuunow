@@ -78,7 +78,7 @@
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
                 <LineBorder>
-                  <Color PropertyName="color" blue="d6" green="e4" red="e9" type="rgb"/>
+                  <Color PropertyName="color" blue="f9" green="fc" red="ff" type="rgb"/>
                 </LineBorder>
               </Border>
             </Property>

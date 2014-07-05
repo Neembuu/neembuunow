@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
@@ -100,7 +101,7 @@ public class SplitsLinkGroupMaker implements LinkGroupMaker{
             
             for (TrialLinkHandler tlh : slg.getAbsorbedLinks()) {
                 WBC wbc = new WBC(sbc);
-                sbc.write(ByteBuffer.wrap(tlh.getReferenceLinkString().getBytes()));
+                sbc.write(ByteBuffer.wrap(tlh.getReferenceLinkString().getBytes(Charset.forName("UTF-8"))));
                 sbc.write(ByteBuffer.wrap(newLine));
             }
         }catch(Exception a){ ms.cancel(); throw a;}

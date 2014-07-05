@@ -30,6 +30,7 @@ import neembuu.release1.api.ui.actions.CloseAction;
 import neembuu.release1.api.ui.actions.ExpandAction;
 import neembuu.release1.api.ui.actions.ForceDownloadAction;
 import neembuu.release1.api.ui.actions.SaveAction;
+import neembuu.release1.ui.MainPanel;
 import neembuu.util.Throwables;
 
 /**
@@ -46,17 +47,17 @@ final class RightControlsPanel {
     
     private final JPanel panel;
     
-    private final ImageIcon fd_rollover = new ImageIcon(RightControlsPanel.class.getResource("../images/forceDownload.png"));
+    private final ImageIcon fd_rollover = new ImageIcon(RightControlsPanel.class.getResource("/neembuu/release1/ui/images/forceDownload.png"));
     private final ImageIcon fd_normal = new ImageIcon(new BufferedImage(fd_rollover.getIconWidth(),fd_rollover.getIconHeight(),BufferedImage.TYPE_INT_ARGB));
-    private final ImageIcon fd_active = new ImageIcon(RightControlsPanel.class.getResource("../images/forceDownloading.png"));
+    private final ImageIcon fd_active = new ImageIcon(RightControlsPanel.class.getResource("/neembuu/release1/ui/images/forceDownloading.png"));
     
     private volatile ForceDownloadAction fda;
 
     RightControlsPanel() {
         panel = new JPanel();
-        saveBtn = HiddenBorderButton.make(this,"../images/save.png", "../images/save_s.png",false);
-        crossBtn = HiddenBorderButton.make(this,"../images/cross.png", "../images/cross_s.png",false);
-        downBtn = HiddenBorderButton.make(this,"../images/down.png", "../images/down_s.png",false);
+        saveBtn = HiddenBorderButton.make(RightControlsPanel.class,"/neembuu/release1/ui/images/save.png", "/neembuu/release1/ui/images/save_s.png",false);
+        crossBtn = HiddenBorderButton.make(RightControlsPanel.class,"/neembuu/release1/ui/images/cross.png", "/neembuu/release1/ui/images/cross_s.png",false);
+        downBtn = HiddenBorderButton.make(RightControlsPanel.class,"/neembuu/release1/ui/images/down.png", "/neembuu/release1/ui/images/down_s.png",false);
         
         forceBtn = makeForceBtn();
         

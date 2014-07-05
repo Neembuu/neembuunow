@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import static java.nio.file.StandardOpenOption.READ;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -218,7 +219,7 @@ public final class DefaultFileStorageManager implements FileStorageManager{
         }
     }
     
-    @Override public final void copyIfCompleteTo(SeekableByteChannel output, long fileSize)throws Exception{
+    @Override public final void copyIfCompleteTo(SeekableByteChannel output, long fileSize)throws Exception{    
         synchronized (drsms){
             Collections.sort(drsms, new Comparator<RegionStorageManager>() {
                 @Override public int compare(RegionStorageManager o1, RegionStorageManager o2) {
@@ -274,8 +275,14 @@ public final class DefaultFileStorageManager implements FileStorageManager{
             throw a;
         }
 
-        for (RegionStorageManager rsm : drsms) {
-            rsm.transferTo_ReOpenIfRequired(output.position(rsm.startingOffset()));
+        RegionStorageManager[]rsms = drsms.toArray(new RegionStorageManager[drsms.size()]);
+        for (int i = 0; i < rsms.length; i++) {
+            RegionStorageManager rsm = rsms[i];
+            long execlusiveLimit = fileSize;
+            if(i+1 < rsms.length){
+                execlusiveLimit = rsms[i+1].startingOffset();
+            }
+            rsm.transferTo_ReOpenIfRequired(output.position(rsm.startingOffset()),execlusiveLimit);
         }
     }
     

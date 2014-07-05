@@ -18,6 +18,7 @@
 package neembuu.release1.externalImpl.linkhandler;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -137,6 +138,6 @@ public class GenerateELH_Export {
         ELH_Export elh = gelh.elh();
         JSONObject jsono = new JSONObject(elh);
         System.out.println(jsono.toString(1));
-        Files.write(destDir.resolve("localindex.json"), jsono.toString().getBytes(), StandardOpenOption.CREATE,StandardOpenOption.WRITE);
+        Files.write(destDir.resolve("localindex.json"), jsono.toString().getBytes(Charset.forName("UTF-8")), StandardOpenOption.CREATE,StandardOpenOption.WRITE);
     }
 }

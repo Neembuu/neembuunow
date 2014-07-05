@@ -55,6 +55,7 @@ import neembuu.release1.ui.NeembuuUI;
 import neembuu.release1.ui.systray.SysTrayImpl;
 import neembuu.release1.versioning.CheckUpdate;
 import neembuu.release1.versioning.first_time_user.FirstTimeUser;
+import neembuu.util.PrintStreamDupToFile;
 import neembuu.util.Throwables;
 import neembuu.vfs.file.TroubleHandler;
 
@@ -137,9 +138,6 @@ public final class Main {
                 nui.getIndefiniteTaskUI_withTrayNotification());
         mcl.register(fgdc.defaultExtension(), fgdc);
         final DirectoryWatcherService dws = new DirectoryWatcherServiceImpl(mcl);
-        dws.startService();
-        dws.forceRescan(System.currentTimeMillis());
-        
         sicci.addRunAttemptListener(new RunAttemptListener() {
             @Override public void attemptedToRun(long time) {
                 Throwables.start(new Runnable() {@Override public void run() {
@@ -154,6 +152,8 @@ public final class Main {
             @Override public void attemptedToRun(long time) {
                 dws.forceRescan(time);
             }});
+        dws.startService();
+        dws.forceRescan(System.currentTimeMillis());
     }
     
     private void initialize(CallbackFromTestCode c){
@@ -222,9 +222,11 @@ public final class Main {
     private void initLogger(){
         try{
             if(Application.getRuntime() != Application.Runtime.Development){
-                java.io.File stdout = Application.getResource(Application.Resource.Logs, "std.out.txt").toFile();
-                System.setOut(new PrintStream(stdout));
-                System.setErr(new PrintStream(stdout));
+                java.io.File stdoutFile = Application.getResource(Application.Resource.Logs, "std.out.txt").toFile();
+                PrintStream stdOut = System.out;
+                PrintStream stdErr = System.err;
+                System.setOut(new PrintStreamDupToFile(stdoutFile,stdOut));
+                System.setErr(new PrintStreamDupToFile(stdoutFile,stdErr));
             }
         }catch(Exception a){
             a.printStackTrace();
@@ -250,8 +252,15 @@ public final class Main {
     }
     
     public static void main(String[] args) {
-        if(args!=null && args.length>0){ Main.lazyUI = args[0].equalsIgnoreCase("--lazyUI");}
-        main(args,null);
+        CommandLineParser clp = new CommandLineParser(new CommandLineParser.Callback() {
+            @Override public void defaultMain(String[]args) {
+                main(args,null);
+            }@Override public void lazyUI(boolean lazyUI) { Main.lazyUI = lazyUI;}
+            @Override public void flashGotMain(String[] args) {
+                neembuu.release1.app.FlashGotMain.main(args);
+            }
+        }, args);
+        clp.parse();
     }
     
     public static void main(String[] args, CallbackFromTestCode c) {

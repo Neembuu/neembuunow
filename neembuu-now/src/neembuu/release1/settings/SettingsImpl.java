@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
@@ -89,7 +90,8 @@ public class SettingsImpl implements Settings {
                 if(r<sz){
                     throw new UnsupportedOperationException("read did not succeed, req="+sz+" f="+r);
                 }
-                String value = new String(bb.array());
+                String value = new String(bb.array(),Charset.forName("UTF-8")); 
+                // For Excelsior Jet we need to explicitly specify UTF charset
                 return value;
             }else {
                 throw new UnsupportedOperationException("Very long string data, size="+sizeLimit);
@@ -125,7 +127,7 @@ public class SettingsImpl implements Settings {
     @Override
     public boolean set(String strV, String ... name){
         try(SeekableByteChannel s = getResource(name,WRITE,CREATE,TRUNCATE_EXISTING)){
-            ByteBuffer bb = ByteBuffer.wrap(strV.getBytes());
+            ByteBuffer bb = ByteBuffer.wrap(strV.getBytes(Charset.forName("UTF-8")));
             int w = s.write(bb);
             if(w<bb.capacity()){
                 throw new UnsupportedOperationException("underlying channel writting data partially"

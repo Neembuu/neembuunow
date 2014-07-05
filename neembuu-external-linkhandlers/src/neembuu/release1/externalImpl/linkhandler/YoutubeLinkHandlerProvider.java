@@ -43,7 +43,6 @@ import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.defaultImpl.external.ELHProvider;
 import neembuu.release1.defaultImpl.linkhandler.BasicLinkHandler;
 import neembuu.release1.defaultImpl.linkhandler.Utils;
-import org.apache.http.client.methods.HttpGet;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -519,7 +518,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
          */
         @Override public boolean canHandle() {
             boolean result = url.matches("https?://(www.youtube.com/watch\\?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=]*)?");
-            LOGGER.log(Level.INFO, "Youtube can handle this? ", result); 
+            LOGGER.log(Level.INFO, "Youtube can handle {0} ?  {1}", new Object[]{url,result}); 
             return result;
         }
 
