@@ -46,6 +46,7 @@ import neembuu.release1.api.ui.access.MinimalistFileSystem;
 import neembuu.release1.api.ui.access.MainUIA;
 import neembuu.release1.pismo.PismoInstaller;
 import neembuu.vfs.file.TroubleHandler;
+import org.shashaank.utils.jni.ClassScope;
 
 /**
  *
@@ -120,19 +121,8 @@ public final class MountManager {
         boolean retry = true;// false;
         if (attempt >= 0) { //1 for testing //0 for release
             try {
-                // THIS CODE IS TEMPORARY WILL BE FIXED SOON
-                if(excelsiorRuntime()){
-                    manager =  JPfm.setDefaultManager(LoggerUtil.getLogger("JPfm.Manager"),new DefaultManager.LibraryLoader() {
-                        @Override public boolean loadLibrary(Logger logger) {
-                            try{System.loadLibrary("jpfm_x86_rev113");}
-                            catch(Exception a){logger.log(Level.SEVERE,"could not load",a);return false;}
-                            return true;
-                        }
-                    },false);
-                }else { 
-                    manager = JPfm.setDefaultManager(LoggerUtil.getLogger("JPfm.Manager"));
-                }
-                
+                manager = JPfm.setDefaultManager(LoggerUtil.getLogger("JPfm.Manager"));
+                printListOfNativeLibrariesLoaded();
                 m = Mounts.mount(new MountParamsBuilder()
                         .set(MountParams.ParamType.MOUNT_LOCATION, mntLoc)
                         .set(MountParams.ParamType.FILE_SYSTEM, fs)
@@ -163,6 +153,21 @@ public final class MountManager {
             }
         }
         throw new RuntimeException("Neither can use pismo file mount nor can install it. Retried " + attempt + " time(s)");
+    }
+    
+    private void printListOfNativeLibrariesLoaded(){
+        try{
+            final String[] libraries = ClassScope.getLoadedLibraries(ClassLoader.getSystemClassLoader());
+            String res = "==================Native Libraries loaded=============\n";
+            for (int i = 0; i < libraries.length; i++) {
+                res += libraries[i]+"\n";
+            }
+            res+="==================Native Libraries loaded=============";
+            L.info(res);
+        }catch(Exception a){
+            L.log(Level.INFO,"Could not print list of native libraries",a);
+        }
+        
     }
     
     int c = 0;
