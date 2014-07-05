@@ -62,7 +62,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
     private final String K_CHALLENGE_URL = "https://www.google.com/recaptcha/api/challenge?k=";
     private final String K_CHALLENGE_CODE = "6LcVessSAAAAAH73irTtpZYKknjeBvN3nuUzJ2G3";
     
-    static final String REG_EXP = "https?://(www.youtube.com/watch\\?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=]*)?";
+    static final String REG_EXP = "https?://(www.youtube.com/watch\\?(feature=player_embedded&)?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=((\\w)|(\\W))]*)?";
     
     @Override
     public TrialLinkHandler tryHandling(final String url) {
@@ -517,7 +517,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
          * @return 
          */
         @Override public boolean canHandle() {
-            boolean result = url.matches("https?://(www.youtube.com/watch\\?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=]*)?");
+            boolean result = url.matches("https?://(www.youtube.com/watch\\?(feature=player_embedded&)?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=((\\w)|(\\W))]*)?");
             LOGGER.log(Level.INFO, "Youtube can handle {0} ?  {1}", new Object[]{url,result}); 
             return result;
         }
