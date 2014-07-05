@@ -1,0 +1,8 @@
+CREATE TABLE profile (
+	_id 			INTEGER PRIMARY KEY AUTOINCREMENT,
+	name 			TEXT NOT NULL,
+	message 		TEXT,
+	url 			TEXT,
+	created 		INTEGER NOT NULL,
+	modified 		INTEGER NOT NULL
+);

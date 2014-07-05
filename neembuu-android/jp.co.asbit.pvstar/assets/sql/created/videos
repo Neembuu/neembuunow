@@ -1,0 +1,16 @@
+CREATE TABLE videos (
+	_id 			INTEGER PRIMARY KEY AUTOINCREMENT,
+	search_engine 	TEXT NOT NULL,
+	video_id 		TEXT NOT NULL,
+	mylist_id 		INTEGER,
+	thumbnail_url 	TEXT NOT NULL,
+	title 			TEXT NOT NULL,
+	description 	TEXT,
+	duration 		TEXT,
+	view_count 		INTEGER,
+	sort			INTEGER,
+	created 		INTEGER NOT NULL,
+	modified 		INTEGER NOT NULL,
+
+	UNIQUE(video_id, mylist_id)
+);

@@ -1,0 +1,11 @@
+CREATE TABLE last_playlist (
+	_id 			INTEGER PRIMARY KEY AUTOINCREMENT,
+	search_engine 	TEXT NOT NULL,
+	video_id 		TEXT NOT NULL,
+	thumbnail_url 	TEXT NOT NULL,
+	title 			TEXT NOT NULL,
+	description 	TEXT,
+	duration 		TEXT,
+	view_count 		INTEGER,
+	UNIQUE(video_id)
+);

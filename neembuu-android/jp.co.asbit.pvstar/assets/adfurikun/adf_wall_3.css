@@ -1,0 +1,53 @@
+html {
+  background: #eee;
+  -webkit-background-size: 30px 30px;
+  -moz-background-size: 30px 30px;
+  background-size: 30px 30px;
+  background-color: #eee;
+  background-image: -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.25, #dddddd), color-stop(0.25, transparent), color-stop(0.5, transparent), color-stop(0.5, #dddddd), color-stop(0.75, #dddddd), color-stop(0.75, transparent), to(transparent));
+  background-image: -webkit-linear-gradient(-45deg, #dddddd 25%, transparent 25%, transparent 50%, #dddddd 50%, #dddddd 75%, transparent 75%, transparent);
+  background-image: -moz-linear-gradient(-45deg, #dddddd 25%, transparent 25%, transparent 50%, #dddddd 50%, #dddddd 75%, transparent 75%, transparent);
+  background-image: -ms-linear-gradient(-45deg, #dddddd 25%, transparent 25%, transparent 50%, #dddddd 50%, #dddddd 75%, transparent 75%, transparent);
+  background-image: -o-linear-gradient(-45deg, #dddddd 25%, transparent 25%, transparent 50%, #dddddd 50%, #dddddd 75%, transparent 75%, transparent);
+  background-image: linear-gradient(-45deg, #dddddd 25%, transparent 25%, transparent 50%, #dddddd 50%, #dddddd 75%, transparent 75%, transparent);
+}
+
+body {
+  color: #98D4DC;
+  background: #F5F5F5;
+}
+a {
+  color: #5af;
+}
+
+/* -----------------------------------------------------
+header
+-------------------------------------------------------- */
+.site_header {
+  background: #495489;
+  color: #fff;
+}
+
+/* -----------------------------------------------------
+Contents
+-------------------------------------------------------- */
+@media only screen and (orientation: portrait) {
+  .app_list article {
+    border-top: 1px solid #98D4DC;
+  }
+  .app_list article h1 {
+    color: #34495E;
+  }
+}
+@media only screen and (orientation: landscape) {
+  .app_list article {
+    border-top: 1px solid #98D4DC;
+  }
+  .app_list article h1 {
+    color: #34495E;
+  }
+  .app_list article:nth-child(2), .app_list article:nth-child(4) {
+    border-right: 1px solid #98D4DC;
+    border-left: 1px solid #98D4DC;
+  }
+}

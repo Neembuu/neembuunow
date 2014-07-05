@@ -1,0 +1,122 @@
+html{
+    background: #E2C6B0;
+    -webkit-background-size: 30px 30px;
+    -moz-background-size: 30px 30px;
+    background-size: 30px 30px;
+    background-color: #E2C6B0;
+    background-image: -webkit-gradient(linear, 0 0, 100% 100%,
+                color-stop(.25, #daad8a), color-stop(.25, transparent),
+                color-stop(.5, transparent), color-stop(.5, #daad8a),
+                color-stop(.75, #daad8a), color-stop(.75, transparent),
+                to(transparent));
+    background-image: -webkit-linear-gradient(-45deg, #daad8a 25%, transparent 25%,
+              transparent 50%, #daad8a 50%, #daad8a 75%,
+              transparent 75%, transparent);
+    background-image: -moz-linear-gradient(-45deg, #daad8a 25%, transparent 25%,
+              transparent 50%, #daad8a 50%, #daad8a 75%,
+              transparent 75%, transparent);
+    background-image: -ms-linear-gradient(-45deg, #daad8a 25%, transparent 25%,
+              transparent 50%, #daad8a 50%, #daad8a 75%,
+              transparent 75%, transparent);
+    background-image: -o-linear-gradient(-45deg, #daad8a 25%, transparent 25%,
+              transparent 50%, #daad8a 50%, #daad8a 75%,
+              transparent 75%, transparent);
+    background-image: linear-gradient(-45deg, #daad8a 25%, transparent 25%,
+              transparent 50%, #daad8a 50%, #daad8a 75%,
+              transparent 75%, transparent);
+}
+
+body {
+  color: #885039;
+  background: #F5F5F5;
+}
+
+a {
+  color: #5af;
+}
+
+/* -----------------------------------------------------
+header
+-------------------------------------------------------- */
+.site_header {
+  background: #84530d;
+  -webkit-background-size: 30px 30px;
+  -moz-background-size: 30px 30px;
+  background-size: 30px 30px;
+  background-color: #84530d;
+  background-image: -webkit-gradient(linear, 0 100%, 100% 0,
+                          color-stop(.25, rgba(93, 64, 56, 0.5)), color-stop(.25, transparent),
+                          color-stop(.5, transparent), color-stop(.5, rgba(93, 64, 56, 0.5)),
+                          color-stop(.75, rgba(93, 64, 56, 0.5)), color-stop(.75, transparent),
+                          to(transparent)),
+                    -webkit-gradient(linear, 0 0, 100% 100%,
+                          color-stop(.25, rgba(93, 64, 56, 0.5)), color-stop(.25, transparent),
+                          color-stop(.5, transparent), color-stop(.5, rgba(93, 64, 56, 0.5)),
+                          color-stop(.75, rgba(93, 64, 56, 0.5)), color-stop(.75, transparent),
+                          to(transparent));
+  background-image: -webkit-linear-gradient(45deg, rgba(93, 64, 56, 0.5) 25%, transparent 25%,
+                      transparent 50%, rgba(93, 64, 56, 0.5) 50%, rgba(93, 64, 56, 0.5) 75%,
+                      transparent 75%, transparent),
+                    -webkit-linear-gradient(-45deg, rgba(93, 64, 56, 0.5) 25%, transparent 25%,
+                      transparent 50%, rgba(93, 64, 56, 0.5) 50%, rgba(93, 64, 56, 0.5) 75%,
+                      transparent 75%, transparent);
+  background-image: -moz-linear-gradient(45deg, rgba(93, 64, 56, 0.5) 25%, transparent 25%,
+                      transparent 50%, rgba(93, 64, 56, 0.5) 50%, rgba(93, 64, 56, 0.5) 75%,
+                      transparent 75%, transparent),
+                    -moz-linear-gradient(-45deg, rgba(93, 64, 56, 0.5) 25%, transparent 25%,
+                      transparent 50%, rgba(93, 64, 56, 0.5) 50%, rgba(93, 64, 56, 0.5) 75%,
+                      transparent 75%, transparent);
+  background-image: -ms-linear-gradient(45deg, rgba(93, 64, 56, 0.5) 25%, transparent 25%,
+                      transparent 50%, rgba(93, 64, 56, 0.5) 50%, rgba(93, 64, 56, 0.5) 75%,
+                      transparent 75%, transparent),
+                    -ms-linear-gradient(-45deg, rgba(93, 64, 56, 0.5) 25%, transparent 25%,
+                      transparent 50%, rgba(93, 64, 56, 0.5) 50%, rgba(93, 64, 56, 0.5) 75%,
+                      transparent 75%, transparent);
+  background-image: -o-linear-gradient(45deg, rgba(93, 64, 56, 0.5) 25%, transparent 25%,
+                      transparent 50%, rgba(93, 64, 56, 0.5) 50%, rgba(93, 64, 56, 0.5) 75%,
+                      transparent 75%, transparent),
+                    -o-linear-gradient(-45deg, rgba(93, 64, 56, 0.5) 25%, transparent 25%,
+                      transparent 50%, rgba(93, 64, 56, 0.5) 50%, rgba(93, 64, 56, 0.5) 75%,
+                      transparent 75%, transparent);
+  background-image: linear-gradient(45deg, rgba(93, 64, 56, 0.5) 25%, transparent 25%,
+                      transparent 50%, rgba(93, 64, 56, 0.5) 50%, rgba(93, 64, 56, 0.5) 75%,
+                      transparent 75%, transparent),
+                    linear-gradient(-45deg, rgba(93, 64, 56, 0.5) 25%, transparent 25%,
+                      transparent 50%, rgba(93, 64, 56, 0.5) 50%, rgba(93, 64, 56, 0.5) 75%,
+                      transparent 75%, transparent);  color: #fff;
+  box-shadow:0 1px 3px rgba(0,0,0,.3);
+  -moz-box-shadow:0 1px 3px rgba(0,0,0,.3);
+  -webkit-box-shadow:0 1px 3px rgba(0,0,0,.3);
+  color: #fff;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* -----------------------------------------------------
+contents
+-------------------------------------------------------- */
+article {
+  background: #ffe;
+  border-bottom: 1px solid #AA6347;
+}
+article:first-child {
+  border-top: none;
+}
+article h1{
+  color:#34170F;
+}
+article h1 span {
+  background: #F58E7E;
+  color: #fff;
+}
+article img{
+  box-shadow: 1px 1px 2px rgba(30,0,0,.3);
+  -moz-box-shadow: 1px 1px 2px rgba(30,0,0,.3);
+  -webkit-box-shadow: 1px 1px 2px rgba(30,0,0,.3);
+}
+article .app_box .app_info .dl_button {
+  color: #fff;
+  border-bottom: 3px solid #df4a55;
+  background:#f76b74;
+}
