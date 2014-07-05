@@ -517,7 +517,7 @@ public class YoutubeLinkHandlerProvider implements LinkHandlerProvider {
          * @return 
          */
         @Override public boolean canHandle() {
-            boolean result = url.matches("https?://(www.youtube.com/watch\\?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=]*)?");
+            boolean result = url.matches("https?://(www.youtube.com/watch\\?(feature=player_embedded&)?v=|youtu.be/)([\\w\\-\\_]*)(&(amp;)?[\\w\\?=((\\w)|(\\W))]*)?");
             LOGGER.log(Level.INFO, "Youtube can handle {0} ?  {1}", new Object[]{url,result}); 
             return result;
         }
