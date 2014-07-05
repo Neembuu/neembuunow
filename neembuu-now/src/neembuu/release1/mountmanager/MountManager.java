@@ -109,18 +109,30 @@ public final class MountManager {
         }
     }
     
+    private static boolean excelsiorRuntime(){
+        String k = System.getProperty("runningexcelsior");
+        if(k==null)return false;
+        return k.equalsIgnoreCase("true");
+    }
+    
     private Mount mount(int attempt, Path mntLoc) throws Exception {
         Mount m = null;
         boolean retry = true;// false;
         if (attempt >= 0) { //1 for testing //0 for release
             try {
-                manager =  JPfm.setDefaultManager(LoggerUtil.getLogger("JPfm.Manager"),new DefaultManager.LibraryLoader() {
-                    @Override public boolean loadLibrary(Logger logger) {
-                        try{System.loadLibrary("jpfm_x86_rev113");}
-                        catch(Exception a){logger.log(Level.SEVERE,"could not load",a);return false;}
-                        return true;
-                    }
-                },false);
+                // THIS CODE IS TEMPORARY WILL BE FIXED SOON
+                if(excelsiorRuntime()){
+                    manager =  JPfm.setDefaultManager(LoggerUtil.getLogger("JPfm.Manager"),new DefaultManager.LibraryLoader() {
+                        @Override public boolean loadLibrary(Logger logger) {
+                            try{System.loadLibrary("jpfm_x86_rev113");}
+                            catch(Exception a){logger.log(Level.SEVERE,"could not load",a);return false;}
+                            return true;
+                        }
+                    },false);
+                }else { 
+                    manager = JPfm.setDefaultManager(LoggerUtil.getLogger("JPfm.Manager"));
+                }
+                
                 m = Mounts.mount(new MountParamsBuilder()
                         .set(MountParams.ParamType.MOUNT_LOCATION, mntLoc)
                         .set(MountParams.ParamType.FILE_SYSTEM, fs)
