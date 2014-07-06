@@ -18,7 +18,7 @@
 package neembuu.release1;
 
 import neembuu.release1.api.linkhandler.LinkHandlerProviders;
-import neembuu.release1.externalImpl.linkhandler.YoutubeLinkHandlerProvider;
+import neembuu.release1.externalImpl.linkhandler.SaveVideoYoutubeLinkHandlerProvider;
 
 /**
  *
@@ -28,7 +28,7 @@ public class SpecialMain {
     public static void main(String[] args) {
         Main.main(args, new Main.CallbackFromTestCode() {
             @Override public void callback() {
-                LinkHandlerProviders.registerProvider(new YoutubeLinkHandlerProvider());
+                LinkHandlerProviders.registerProvider(new SaveVideoYoutubeLinkHandlerProvider());
             }
         }); 
         // yes it is a bit of functional programming style, it is difficult to write in java, but it is the way to modular code
