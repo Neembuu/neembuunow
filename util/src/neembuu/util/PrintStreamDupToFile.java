@@ -19,6 +19,7 @@ package neembuu.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Locale;
@@ -30,7 +31,7 @@ import java.util.Locale;
 public final class PrintStreamDupToFile extends PrintStream{
     private final PrintStream original;
     public PrintStreamDupToFile(File file,PrintStream original) throws FileNotFoundException {
-        super(file);
+        super(new FileOutputStream(file),true);
         this.original = original;
     }
 

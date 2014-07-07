@@ -23,7 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jpfm.DefaultManager;
 import jpfm.FormatterEvent;
 import jpfm.JPfm;
 import jpfm.MountListener;
@@ -167,6 +166,11 @@ public final class MountManager {
         }catch(Exception a){
             L.log(Level.INFO,"Could not print list of native libraries",a);
         }
+        try{
+            for (java.util.logging.Handler  h : L.getHandlers()) {
+                h.flush();
+            }
+        }catch(Exception a){}
         
     }
     
@@ -229,6 +233,7 @@ public final class MountManager {
             if(!Files.isRegularFile(helpFile))return;
             jpfm.volume.RealFile rf = 
                 jpfm.volume.RealFileProvider.getNonBlockingRealFile(helpFile.toAbsolutePath().toString(), volume);
+            
             volume.add(rf);
         } catch (Exception e) {
             L.log(Level.SEVERE,"Could not put help file in virtual folder",e);
