@@ -56,7 +56,7 @@ public class YTTester {
         });
         
         
-        YoutubeLinkHandlerProvider ylhp = new YoutubeLinkHandlerProvider();
+        SaveVideoYoutubeLinkHandlerProvider ylhp = new SaveVideoYoutubeLinkHandlerProvider();
         
         TrialLinkHandler tlh = ylhp.tryHandling("http://www.youtube.com/watch?v=sFymchGbG1w");
         
