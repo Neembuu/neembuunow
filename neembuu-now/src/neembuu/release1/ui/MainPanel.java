@@ -68,8 +68,8 @@ public class MainPanel extends javax.swing.JPanel {
         
         //title.setFont(Fonts.Amper.deriveFont(17f));
         //title2.setFont(Fonts.Amper.deriveFont(16f));
-        title.setFont(Fonts.FuturaLight.deriveFont(18f));
-        title2.setFont(Fonts.FuturaLight.deriveFont(14f));
+        /*title.setFont(Fonts.FuturaLight.deriveFont(18f));
+        title2.setFont(Fonts.FuturaLight.deriveFont(14f));*/
         //title.setFont(Fonts.MyriadPro.deriveFont(18f));
         //title2.setFont(Fonts.MyriadPro.deriveFont(16f));
     }
@@ -106,14 +106,6 @@ public class MainPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         upperControlsPane = new javax.swing.JPanel();
-        neembuuVirtualFolderButton = new javax.swing.JButton();
-        title = new javax.swing.JLabel();
-        aboutButton = HiddenBorderButton.make("");
-        helpButton = HiddenBorderButton.make("");
-        showAddLinkUIButton = new javax.swing.JButton();
-        title2 = new javax.swing.JLabel();
-        progressAnimated = new javax.swing.JLabel();
-        statusLabel = new javax.swing.JLabel("",SwingConstants.CENTER);
         addLinksPanel = new javax.swing.JPanel();
         addLinksButton = new javax.swing.JButton();
         listOfLinksScroll = new javax.swing.JScrollPane();
@@ -121,6 +113,15 @@ public class MainPanel extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         addOnlyFilesButton = new javax.swing.JButton();
         hideButton = HiddenBorderButton.make(MainPanel.class,"/neembuu/release1/ui/images/cross.png", "/neembuu/release1/ui/images/cross_s.png",false);
+        jLayeredPane1 = new javax.swing.JLayeredPane();
+        indefiniteUIPanel = new javax.swing.JPanel();
+        statusLabel = new javax.swing.JLabel("",SwingConstants.CENTER);
+        progressAnimated = new javax.swing.JLabel();
+        upperUpperPanel = new javax.swing.JPanel();
+        showAddLinkUIButton = new javax.swing.JButton();
+        helpButton = HiddenBorderButton.make("");
+        neembuuVirtualFolderButton = new javax.swing.JButton();
+        aboutButton = HiddenBorderButton.make("");
         linksScrollPane = new javax.swing.JScrollPane();
         linksPanel = new javax.swing.JPanel();
 
@@ -132,70 +133,6 @@ public class MainPanel extends javax.swing.JPanel {
                 upperControlsPaneMouseClicked(evt);
             }
         });
-
-        neembuuVirtualFolderButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/logo_7_un_selected.png"))); // NOI18N
-        neembuuVirtualFolderButton.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.neembuuVirtualFolderButton.text")); // NOI18N
-        neembuuVirtualFolderButton.setToolTipText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.neembuuVirtualFolderButton.toolTipText")); // NOI18N
-        neembuuVirtualFolderButton.setBorderPainted(false);
-        neembuuVirtualFolderButton.setContentAreaFilled(false);
-        neembuuVirtualFolderButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        neembuuVirtualFolderButton.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                neembuuVirtualFolderButtonMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                neembuuVirtualFolderButtonMouseExited(evt);
-            }
-        });
-        neembuuVirtualFolderButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                neembuuVirtualFolderButtonActionPerformed(evt);
-            }
-        });
-
-        title.setFont(new java.awt.Font("Futura-Light", 0, 18)); // NOI18N
-        title.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.title.text")); // NOI18N
-
-        aboutButton.setFont(new java.awt.Font("Futura-Light", 0, 14)); // NOI18N
-        aboutButton.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.aboutButton.text")); // NOI18N
-        aboutButton.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        aboutButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        aboutButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                aboutButtonActionPerformed(evt);
-            }
-        });
-
-        helpButton.setFont(new java.awt.Font("Futura-Light", 0, 14)); // NOI18N
-        helpButton.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.helpButton.text")); // NOI18N
-        helpButton.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        helpButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        helpButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                helpButtonActionPerformed(evt);
-            }
-        });
-
-        showAddLinkUIButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/+.png"))); // NOI18N
-        showAddLinkUIButton.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.showAddLinkUIButton.text")); // NOI18N
-        showAddLinkUIButton.setToolTipText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.showAddLinkUIButton.toolTipText")); // NOI18N
-        showAddLinkUIButton.setContentAreaFilled(false);
-        showAddLinkUIButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        showAddLinkUIButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showAddLinkUIButtonActionPerformed(evt);
-            }
-        });
-
-        title2.setFont(new java.awt.Font("Futura-Light", 0, 14)); // NOI18N
-        title2.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.title2.text")); // NOI18N
-
-        progressAnimated.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/Animation.gif"))); // NOI18N
-        progressAnimated.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.progressAnimated.text")); // NOI18N
-
-        statusLabel.setFont(new java.awt.Font("Futura-Light", 0, 13)); // NOI18N
-        statusLabel.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.statusLabel.text")); // NOI18N
-        statusLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         addLinksPanel.setBackground(new java.awt.Color(255, 255, 255));
         addLinksPanel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -269,63 +206,171 @@ public class MainPanel extends javax.swing.JPanel {
                 .addGap(13, 13, 13))
         );
 
+        indefiniteUIPanel.setBackground(new java.awt.Color(255, 255, 255));
+
+        statusLabel.setFont(new java.awt.Font("Futura-Light", 0, 13)); // NOI18N
+        statusLabel.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.statusLabel.text")); // NOI18N
+        statusLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+
+        progressAnimated.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/Animation.gif"))); // NOI18N
+        progressAnimated.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.progressAnimated.text")); // NOI18N
+
+        javax.swing.GroupLayout indefiniteUIPanelLayout = new javax.swing.GroupLayout(indefiniteUIPanel);
+        indefiniteUIPanel.setLayout(indefiniteUIPanelLayout);
+        indefiniteUIPanelLayout.setHorizontalGroup(
+            indefiniteUIPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(indefiniteUIPanelLayout.createSequentialGroup()
+                .addGap(0, 65, Short.MAX_VALUE)
+                .addComponent(progressAnimated)
+                .addGap(0, 65, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, indefiniteUIPanelLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        indefiniteUIPanelLayout.setVerticalGroup(
+            indefiniteUIPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(indefiniteUIPanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(progressAnimated)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0))
+        );
+
+        upperUpperPanel.setBackground(new java.awt.Color(255, 255, 255));
+
+        showAddLinkUIButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/+.png"))); // NOI18N
+        showAddLinkUIButton.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.showAddLinkUIButton.text")); // NOI18N
+        showAddLinkUIButton.setToolTipText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.showAddLinkUIButton.toolTipText")); // NOI18N
+        showAddLinkUIButton.setContentAreaFilled(false);
+        showAddLinkUIButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        showAddLinkUIButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showAddLinkUIButtonActionPerformed(evt);
+            }
+        });
+
+        helpButton.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.helpButton.text")); // NOI18N
+        helpButton.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        helpButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        helpButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                helpButtonActionPerformed(evt);
+            }
+        });
+
+        neembuuVirtualFolderButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/logo_7_un_selected.png"))); // NOI18N
+        neembuuVirtualFolderButton.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.neembuuVirtualFolderButton.text")); // NOI18N
+        neembuuVirtualFolderButton.setToolTipText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.neembuuVirtualFolderButton.toolTipText")); // NOI18N
+        neembuuVirtualFolderButton.setBorderPainted(false);
+        neembuuVirtualFolderButton.setContentAreaFilled(false);
+        neembuuVirtualFolderButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        neembuuVirtualFolderButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                neembuuVirtualFolderButtonMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                neembuuVirtualFolderButtonMouseExited(evt);
+            }
+        });
+        neembuuVirtualFolderButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                neembuuVirtualFolderButtonActionPerformed(evt);
+            }
+        });
+
+        aboutButton.setText(org.openide.util.NbBundle.getMessage(MainPanel.class, "MainPanel.aboutButton.text")); // NOI18N
+        aboutButton.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        aboutButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        aboutButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aboutButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout upperUpperPanelLayout = new javax.swing.GroupLayout(upperUpperPanel);
+        upperUpperPanel.setLayout(upperUpperPanelLayout);
+        upperUpperPanelLayout.setHorizontalGroup(
+            upperUpperPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(upperUpperPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(neembuuVirtualFolderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(upperUpperPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(upperUpperPanelLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(showAddLinkUIButton, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
+                    .addGroup(upperUpperPanelLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(helpButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(aboutButton)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+        );
+        upperUpperPanelLayout.setVerticalGroup(
+            upperUpperPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(upperUpperPanelLayout.createSequentialGroup()
+                .addGroup(upperUpperPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(upperUpperPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(upperUpperPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(neembuuVirtualFolderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(upperUpperPanelLayout.createSequentialGroup()
+                                .addGap(15, 15, 15)
+                                .addComponent(showAddLinkUIButton, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(upperUpperPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(aboutButton)
+                        .addComponent(helpButton)))
+                .addGap(5, 5, 5))
+        );
+
+        javax.swing.GroupLayout jLayeredPane1Layout = new javax.swing.GroupLayout(jLayeredPane1);
+        jLayeredPane1.setLayout(jLayeredPane1Layout);
+        jLayeredPane1Layout.setHorizontalGroup(
+            jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                .addGap(0, 0, 0)
+                .addComponent(upperUpperPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(0, 0, 0))
+            .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                    .addGap(0, 90, Short.MAX_VALUE)
+                    .addComponent(indefiniteUIPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGap(0, 91, Short.MAX_VALUE)))
+        );
+        jLayeredPane1Layout.setVerticalGroup(
+            jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                .addGap(0, 0, 0)
+                .addComponent(upperUpperPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0))
+            .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                    .addGap(30, 30, 30)
+                    .addComponent(indefiniteUIPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addContainerGap(25, Short.MAX_VALUE)))
+        );
+        jLayeredPane1.setLayer(indefiniteUIPanel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane1.setLayer(upperUpperPanel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
         javax.swing.GroupLayout upperControlsPaneLayout = new javax.swing.GroupLayout(upperControlsPane);
         upperControlsPane.setLayout(upperControlsPaneLayout);
         upperControlsPaneLayout.setHorizontalGroup(
             upperControlsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(upperControlsPaneLayout.createSequentialGroup()
                 .addGap(10, 10, 10)
-                .addGroup(upperControlsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(upperControlsPaneLayout.createSequentialGroup()
-                        .addComponent(neembuuVirtualFolderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(upperControlsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(upperControlsPaneLayout.createSequentialGroup()
-                                .addComponent(title)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(title2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(upperControlsPaneLayout.createSequentialGroup()
-                                .addGroup(upperControlsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(aboutButton)
-                                    .addComponent(helpButton))
-                                .addGap(61, 61, 61)
-                                .addComponent(progressAnimated))
-                            .addGroup(upperControlsPaneLayout.createSequentialGroup()
-                                .addGap(70, 70, 70)
-                                .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(showAddLinkUIButton, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(26, 26, 26))
-                    .addGroup(upperControlsPaneLayout.createSequentialGroup()
-                        .addComponent(addLinksPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())))
+                .addComponent(addLinksPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+            .addComponent(jLayeredPane1)
         );
         upperControlsPaneLayout.setVerticalGroup(
             upperControlsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
             .addGroup(upperControlsPaneLayout.createSequentialGroup()
-                .addGroup(upperControlsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(upperControlsPaneLayout.createSequentialGroup()
-                        .addGap(5, 5, 5)
-                        .addGroup(upperControlsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(neembuuVirtualFolderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(upperControlsPaneLayout.createSequentialGroup()
-                                .addGroup(upperControlsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(title, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(title2, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(upperControlsPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(upperControlsPaneLayout.createSequentialGroup()
-                                        .addGap(2, 2, 2)
-                                        .addComponent(aboutButton)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(helpButton))
-                                    .addComponent(progressAnimated))
-                                .addGap(0, 0, 0)
-                                .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(upperControlsPaneLayout.createSequentialGroup()
-                        .addGap(20, 20, 20)
-                        .addComponent(showAddLinkUIButton, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLayeredPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(addLinksPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(21, 21, 21))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
 
         linksScrollPane.setBorder(null);
@@ -359,7 +404,7 @@ public class MainPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(upperControlsPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(linksScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE)
+                .addComponent(linksScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 89, Short.MAX_VALUE)
                 .addGap(0, 0, 0))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -466,7 +511,9 @@ public class MainPanel extends javax.swing.JPanel {
     private javax.swing.JButton addOnlyFilesButton;
     private javax.swing.JButton helpButton;
     private javax.swing.JButton hideButton;
+    private javax.swing.JPanel indefiniteUIPanel;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLayeredPane jLayeredPane1;
     javax.swing.JPanel linksPanel;
     private javax.swing.JScrollPane linksScrollPane;
     javax.swing.JTextArea listOfLinks;
@@ -475,9 +522,8 @@ public class MainPanel extends javax.swing.JPanel {
     private javax.swing.JLabel progressAnimated;
     private javax.swing.JButton showAddLinkUIButton;
     private javax.swing.JLabel statusLabel;
-    private javax.swing.JLabel title;
-    private javax.swing.JLabel title2;
     private javax.swing.JPanel upperControlsPane;
+    private javax.swing.JPanel upperUpperPanel;
     // End of variables declaration//GEN-END:variables
 
     private final AddLinkUI addLinkUI = new AddLinkUI() {

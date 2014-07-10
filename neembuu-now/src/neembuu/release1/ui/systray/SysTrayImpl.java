@@ -23,12 +23,11 @@ import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import neembuu.release1.api.log.LoggerUtil;
 import neembuu.release1.api.ui.MinimalistMessage;
 import neembuu.release1.api.ui.systray.SysTray;
-import neembuu.release1.ui.MainPanel;
+import neembuu.util.Throwables;
 
 /**
  *
@@ -38,8 +37,6 @@ public class SysTrayImpl implements SysTray {
     private PopupMenu popup;
     private TrayIcon trayIcon;
     private volatile Callback defaultAction = null;
-
-    private final Logger l = LoggerUtil.getLogger(SysTray.class.getName());
     
     public SysTrayImpl() {
     }
@@ -75,11 +72,23 @@ public class SysTrayImpl implements SysTray {
                 }
             }
         });
-        try {
-            SystemTray.getSystemTray().add(trayIcon);
-        } catch (Exception e) {
-            l.log(Level.SEVERE,"Could not make system tray",e);
-        }
+        Throwables.start(new Runnable() {
+            @Override public void run() {
+                long startTime = System.currentTimeMillis();
+                boolean done = false;
+                while(!done){
+                    try {
+                        SystemTray.getSystemTray().add(trayIcon);
+                        done = true;
+                    } catch (Exception e) {
+                        LoggerUtil.L().log(Level.SEVERE,"Could not make system tray",e);
+                    } try { Thread.sleep(1000); } catch (Exception e) {}
+                    if(System.currentTimeMillis()-startTime > 20000){
+                        done=true;
+                    }
+                }
+            }
+        }, "System tray init", true);
     }
 
     @Override

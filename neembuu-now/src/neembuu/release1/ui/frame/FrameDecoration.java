@@ -74,7 +74,7 @@ public class FrameDecoration extends javax.swing.JPanel {
 
         headerRegion.setBackground(new java.awt.Color(255, 255, 251));
 
-        title.setFont(new java.awt.Font("Futura-Light", 0, 18)); // NOI18N
+        title.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         title.setText(org.openide.util.NbBundle.getMessage(FrameDecoration.class, "FrameDecoration.title.text")); // NOI18N
 
         icon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/neembuu/release1/ui/images/7_ls_small_transparent_16x16.png"))); // NOI18N
@@ -125,9 +125,9 @@ public class FrameDecoration extends javax.swing.JPanel {
             .addGroup(headerRegionLayout.createSequentialGroup()
                 .addGap(6, 6, 6)
                 .addComponent(icon)
-                .addGap(0, 70, Short.MAX_VALUE)
+                .addGap(0, 85, Short.MAX_VALUE)
                 .addComponent(title)
-                .addGap(0, 70, Short.MAX_VALUE)
+                .addGap(0, 84, Short.MAX_VALUE)
                 .addComponent(frameControls, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );

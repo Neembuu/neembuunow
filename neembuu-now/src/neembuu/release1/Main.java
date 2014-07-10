@@ -143,6 +143,8 @@ public final class Main {
                 Throwables.start(new Runnable() {@Override public void run() {
                     try{Thread.sleep(2000); nui.getMainComponent().getJFrame().setAlwaysOnTop(false);}
                     catch(Exception a){throw new RuntimeException(a);}
+                    try{ handleFirstTimeUser(); }
+                    catch(Exception a){throw new RuntimeException(a);}
                 }});
                 nui.getMainComponent().getJFrame().setAlwaysOnTop(true);
                 nui.getMainComponent().getJFrame().setVisible(true);
@@ -171,6 +173,10 @@ public final class Main {
         
         AddLinksFromClipboardImpl.createAndStart(nui.getAddLinkUI(), clipboardMonitor);
         CheckUpdate.checkLater(nui.getMainComponent());
+        if(!lazyUI){  handleFirstTimeUser(); }
+    }
+    
+    private void handleFirstTimeUser(){
         FirstTimeUser.handleUser(nui.getAddLinkUI(),nui.getMainComponent(),settings);
     }
     
