@@ -18,12 +18,14 @@ package neembuu.vfs.connection.jdimpl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.logging.Level;
 import jd.http.Browser;
 import jd.http.Request;
 import jd.http.URLConnectionAdapter;
 import neembuu.vfs.connection.AbstractConnection;
 import neembuu.vfs.connection.NewConnectionParams;
+import neembuu.vfs.connection.checks.ContentSampleListener;
 
 /**
  *
@@ -40,7 +42,7 @@ public final class JDHTTPConnection extends AbstractConnection{
         this.jddm = jddm;
     }
     
-    
+
     @Override
     protected final void abortImpl() {
         urlca.disconnect();
@@ -77,13 +79,14 @@ public final class JDHTTPConnection extends AbstractConnection{
         Request request = br.createGetRequest(jddm.getURL());
        
         request.getHeaders().put("Range","bytes=" + getAdjustedOffset() + "-");
+        printRequest(request);
         try{
             urlca = br.openRequestConnection(request);
         }catch(Exception ae){
             cp.getTransientConnectionListener().failed(ae,cp);
             return;
         }
-        
+        printResponse(urlca);
         InputStream is = urlca.getInputStream();
         int firstByte = is.read();
         if(firstByte!=-1){
@@ -103,6 +106,8 @@ public final class JDHTTPConnection extends AbstractConnection{
             
             int i = 1;
             
+            reportCSL(b);
+            
             while(read!=-1){
                 write(b,0,read);
                 while(i<10){
@@ -116,7 +121,32 @@ public final class JDHTTPConnection extends AbstractConnection{
         }
     }
     
+    private void printRequest(Request request){
+        String headers = "Request Headers{";
+        for (int i = 0; i < request.getHeaders().size(); i++) {
+            String key = request.getHeaders().getKey(i);
+            String value = request.getHeaders().getValue(i);
+            headers+="\n\t"+key+":"+value;
+        }headers+="\n}";
+
+        cp.getDownloadThreadLogger().log(Level.INFO, headers);
+    }
     
+    private void reportCSL(byte[]b){
+        ContentSampleListener csl = getContentSampleListener();
+        if(csl!=null){
+            csl.receiveContentSample(b,cp.getOffset());
+        }
+    }
+    
+    private void printResponse(URLConnectionAdapter urlca){
+        String headers = "Response Headers{";
+        for(Map.Entry s : urlca.getHeaderFields().entrySet()){
+            headers+="\n\t"+s.getKey()+":"+s.getValue();
+        }headers+="\n}";
+        
+        cp.getDownloadThreadLogger().log(Level.INFO, headers);
+    }
     /*
      * Browser br = new Browser();
 	coalado1	br.forceDebug(true);

@@ -18,6 +18,7 @@
 package neembuu.vfs.connection;
 
 import jpfm.annotations.NonBlocking;
+import neembuu.vfs.connection.checks.SeekingAbility;
 
 /**
  * This is used to create a new connection.
@@ -59,4 +60,6 @@ public interface NewConnectionProvider {
      * not necessarily a url, can be torrent id.
      */
     public String getSourceDescription();
+    
+    public SeekingAbility seekingAbility();
 }

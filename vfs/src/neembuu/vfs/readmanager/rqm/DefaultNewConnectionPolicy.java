@@ -16,6 +16,11 @@
  */
 package neembuu.vfs.readmanager.rqm;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import neembuu.vfs.connection.checks.CanSeek;
+import neembuu.vfs.connection.checks.SeekingAbility;
+import neembuu.vfs.readmanager.NewReadHandlerProvider;
 import neembuu.vfs.readmanager.WaitForExpansionOrCreateNewConnectionPolicy;
 
 /**
@@ -24,11 +29,13 @@ import neembuu.vfs.readmanager.WaitForExpansionOrCreateNewConnectionPolicy;
  */
 public class DefaultNewConnectionPolicy implements WaitForExpansionOrCreateNewConnectionPolicy {
 
-    private DefaultNewConnectionPolicy() {
-    }
+    private final NewReadHandlerProvider provider;
+    private final static Logger l = Logger.getLogger(DefaultNewConnectionPolicy.class.getName());
 
-    static final DefaultNewConnectionPolicy SINGLETON
-            = new DefaultNewConnectionPolicy();
+    public DefaultNewConnectionPolicy(NewReadHandlerProvider provider) {
+        this.provider = provider;
+    }
+    
 
     @Override
     public final String toString() {
@@ -47,6 +54,11 @@ public class DefaultNewConnectionPolicy implements WaitForExpansionOrCreateNewCo
             double previousConnectionSpeed_inKiBps,
             long distanceToCover,
             long fileSize) {
+        boolean hasSeekingAbility = hasSeekingAbility(offset);
+        if(!hasSeekingAbility){
+            estimatedTimeTakenForCreatingANewConnection = Integer.MAX_VALUE;
+        }
+        
         double estimateTimeForExpansion = (distanceToCover * 1.0d
                 / (previousConnectionSpeed_inKiBps * 1024)) * 1000; //convert to milliseconds
             /*System.err.println("offset="+offset+" estimateTimeForExpansion="+estimateTimeForExpansion
@@ -61,12 +73,13 @@ public class DefaultNewConnectionPolicy implements WaitForExpansionOrCreateNewCo
                 // expansion will take less time or will not take too long comparatively
             // too long is defined as 1000ms
 
-            if (estimateTimeForExpansion > 7000 && estimatedTimeTakenForCreatingANewConnection < 10000) {
+            if (estimateTimeForExpansion > 7000 && estimatedTimeTakenForCreatingANewConnection < 10000
+                    && hasSeekingAbility) {
                 return WaitForExpansionOrCreateNewConnectionPolicy.Result.NEW_CONNECTION_SHOULD_BE_CREATED;
             } // is expansion will take more 
             // than x seconds do not expand. This is to avoid excessive downloading.
 
-            if (estimatedTimeTakenForCreatingANewConnection == Integer.MAX_VALUE) {
+            if (estimatedTimeTakenForCreatingANewConnection >= Integer.MAX_VALUE || !hasSeekingAbility) {
                 if (estimateTimeForExpansion <= 7000) {
                     return WaitForExpansionOrCreateNewConnectionPolicy.Result.WAIT_FOR_EXPANSION;//expand
                 }
@@ -74,8 +87,39 @@ public class DefaultNewConnectionPolicy implements WaitForExpansionOrCreateNewCo
             }
             return WaitForExpansionOrCreateNewConnectionPolicy.Result.WAIT_FOR_EXPANSION;//expand
         }
-
+        if(!hasSeekingAbility){
+            return WaitForExpansionOrCreateNewConnectionPolicy.Result.ZERO_FILL_THIS_READ_REQUEST;
+        }
         return WaitForExpansionOrCreateNewConnectionPolicy.Result.NEW_CONNECTION_SHOULD_BE_CREATED;//make new connection
     }
 
+    
+    int longSeekCheckCount = 0;
+    @Override public boolean hasSeekingAbility(long offset){
+        return hasSeekingAbility(offset,0);
+    }
+    
+    private boolean hasSeekingAbility(long offset, int attempt){
+        if(offset==0)return true; // don't block first connection dummy!
+        final SeekingAbility sa = provider.seekingAbility();
+        final long newConnectionCreationTime = provider.getNewHandlerCreationTime(offset);
+                    //sa.get()==Seek
+        if(sa.get()==CanSeek.NO)return false;
+        if(newConnectionCreationTime >= Integer.MAX_VALUE){
+            return false;
+        }       
+        if(sa.get()==CanSeek.YES)return true;
+        l.log(Level.INFO,"Waiting for seekability check {0} {1} ",new Object[]{attempt,longSeekCheckCount});
+        if(sa.get()!=CanSeek.UNKNOWN){
+            l.log(Level.INFO,"Assuming eekability {0}",sa.get());
+            return true;
+        }
+        if(attempt<5 && longSeekCheckCount<15){
+            try{Thread.sleep(1000);}catch(Exception a){}
+            longSeekCheckCount++;
+            return hasSeekingAbility(offset, attempt+1);
+        } // assume true
+        return true;
+    }
+    
 }

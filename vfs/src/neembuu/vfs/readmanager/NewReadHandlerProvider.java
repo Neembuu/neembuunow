@@ -20,6 +20,7 @@ package neembuu.vfs.readmanager;
 import neembuu.vfs.readmanager.rqm.ReadQueueManager;
 import java.util.logging.Logger;
 import neembuu.diskmanager.FileStorageManager;
+import neembuu.vfs.connection.checks.SeekingAbility;
 import neembuu.vfs.file.TroubleHandler;
 
 /**
@@ -49,6 +50,8 @@ public interface NewReadHandlerProvider  {
      * @return milliseconds
      */
     long getNewHandlerCreationTime(long offset);
+    
+    SeekingAbility seekingAbility();
     
     boolean isOpen();
     

@@ -20,6 +20,8 @@ package neembuu.release1.ui.linkpanel;
 import java.util.logging.Level;
 import neembuu.vfs.connection.NewConnectionParams;
 import neembuu.vfs.connection.NewConnectionProvider;
+import neembuu.vfs.connection.checks.CanSeek;
+import neembuu.vfs.connection.checks.SeekingAbility;
 
 /**
  *
@@ -53,6 +55,23 @@ public class FakeConnectionProvider implements NewConnectionProvider{
         }
 
         new StartNewConnectionThread().start();
+    }
+
+    @Override
+    public SeekingAbility seekingAbility() {
+        return new SeekingAbility() {
+            @Override public CanSeek get() {
+                return CanSeek.YES;
+            }
+
+            @Override public void removeListener(SeekingAbility.Listener l) {
+                throw new UnsupportedOperationException("Not supported yet."); 
+            }
+            
+            @Override public void addListener(SeekingAbility.Listener l) {
+                throw new UnsupportedOperationException("Not supported yet."); 
+            }
+        };
     }
 
     @Override public long estimateCreationTime(long offset) {

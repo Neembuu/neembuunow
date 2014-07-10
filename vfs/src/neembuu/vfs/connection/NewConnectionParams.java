@@ -164,8 +164,20 @@ public final class NewConnectionParams {
 
         public Builder() {
         }
+        
+        public final Builder copyFrom(NewConnectionParams ncp){
+            this.offset = ncp.offset;
+            this.minimumSizeRequired = ncp.minimumSizeRequired;
+            this.downloadDataCacheManager = ncp.downloadDataCacheManager;
+            this.readRequestState = ncp.readRequestState;
+            this.transientConnectionListener = ncp.transientConnectionListener;
+            this.throttlingLock = ncp.throttlingLock;
+            this.throttle = ncp.throttle;
+            this.downloadThreadLogger = ncp.downloadThreadLogger;
+            return this;
+        }
 
-        public final  DownloadDataChannel getDownloadDataChannel() {
+        public final DownloadDataChannel getDownloadDataChannel() {
             return downloadDataCacheManager;
         }
 

@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import neembuu.vfs.connection.NewConnectionParams;
 import neembuu.vfs.connection.NewConnectionProvider;
+import neembuu.vfs.connection.checks.SeekingAbility;
 
 /**
  * There is one download manager instance for every pending download job.
@@ -87,6 +88,11 @@ public final class DownloadManager implements NewConnectionProvider {
     @Override
     public final String getSourceDescription() {
         return "sampleImpl{"+link+"}";
+    }
+    
+    @Override
+    public SeekingAbility seekingAbility() {
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
     
     @Override

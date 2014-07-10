@@ -38,6 +38,8 @@ import neembuu.rangearray.RangeArrayFactory;
 import neembuu.vfs.file.DownloadConstrainHandler;
 import net.jcip.annotations.NotThreadSafe;
 import static jpfm.util.ReadUtils.*;
+import neembuu.vfs.connection.checks.CanSeek;
+import neembuu.vfs.connection.checks.SeekingAbility;
 import neembuu.vfs.file.TroubleHandler;
 import neembuu.vfs.readmanager.NewReadHandlerProvider;
 import neembuu.vfs.readmanager.RegionHandler;
@@ -81,7 +83,7 @@ public final class ReadQueueManager {
     private final MainDirectionThread mainDirectionThread;
     private final TotalFileReadStatisticsImpl totalReadStatistics;
     private final WaitForExpansionOrCreateNewConnectionPolicy 
-            waitForExpansionOrCreateNewConnectionPolicy;
+            newConnectionPolicy;
     
     private final DCH myDch;
     
@@ -89,7 +91,7 @@ public final class ReadQueueManager {
 
     public ReadQueueManager(NewReadHandlerProvider provider) {
         this.provider = provider;
-        this.waitForExpansionOrCreateNewConnectionPolicy = DefaultNewConnectionPolicy.SINGLETON;
+        this.newConnectionPolicy = new DefaultNewConnectionPolicy(provider);
         handlers = RangeArrayFactory.newDefaultRangeArray(new RangeArrayParams.Builder().setEntriesNeverDissolve().build());
         totalReadStatistics = new TotalFileReadStatisticsImpl(provider, handlers);
         myDch = new DCH(rQM_Access);
@@ -316,9 +318,8 @@ public final class ReadQueueManager {
                 if(indices[0]==-1) { // special case
                     rqmLogger.log(Level.INFO,
                             "Requesting new connection before existing connections (unsplitted). File offset={0}",requestStart);
-
-                    final long newConnectionCreationTime = provider.getNewHandlerCreationTime(pfread.getFileOffset());
-                    if(newConnectionCreationTime >= Integer.MAX_VALUE){
+                                                
+                    if(!newConnectionPolicy.hasSeekingAbility(pfread.getFileOffset())){
                         rqmLogger.log(Level.INFO,"Creation of new connection not possible");
                         pfread.addProperty(ReadRequestSplitType.LINEAR_READ__ZERO_FILL_READ_REQUEST__NEW_CONNECTION_BEFORE_ALL_EXISTING_CONNECTIONS);
                         pfread.addProperty(pfread.getFileOffset());
@@ -550,7 +551,7 @@ public final class ReadQueueManager {
                     
                     RegionHandler immediatePreviousRegion = handlers.get(i).getProperty();
                     final long newConnectionCreationTime = provider.getNewHandlerCreationTime(i_th_splitRequestStart);
-                    final Result newConnectionDecision = waitForExpansionOrCreateNewConnectionPolicy.result(
+                    final Result newConnectionDecision = newConnectionPolicy.result(
                             i_th_splitRequestStart,
                             newConnectionCreationTime,
                             immediatePreviousRegion.getThrottleStatistics().getDownloadSpeed_KiBps(),
@@ -633,8 +634,9 @@ public final class ReadQueueManager {
                         if(newConnectionDecision==Result.ZERO_FILL_THIS_READ_REQUEST){
                             pfread.addProperty(ReadRequestSplitType.LINEAR_READ___LIES_BETWEEN_TWO_DOWNLOADED_REGIONS__POLICY_FORCED_ZERO_FILL_READ_REQUEST).addProperty(handler.starting());
                             pfread.complete(JPfmError.SUCCESS);
-                        }else
+                        }else{
                             handler.handleRead(pfread);
+                        }
                         //notify about arrival of new request
                         break REQUEST_ITERATION;// we are done
                     }

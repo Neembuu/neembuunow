@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import neembuu.util.Throwables;
+import neembuu.vfs.connection.checks.ContentSampleListener;
 import net.jcip.annotations.GuardedBy;
 
 /**
@@ -60,11 +61,23 @@ public abstract class AbstractConnection extends OutputStream
     
     public static final int MINIMUM_GAP_FROM_END = 2*1024;
     
+    private volatile ContentSampleListener csl = null;
+    
     public AbstractConnection(final NewConnectionParams cp) {
         this.cp = cp; cp.getDownloadDataChannel().setAutoHandleThrottlingEnabled(true);
         downloadThreadLogger = cp.getDownloadThreadLogger();
     }
 
+    public final void setContentSampleListener(ContentSampleListener csl){
+        if(this.csl !=null){
+            throw new IllegalStateException("Already have "+this.csl+ " trying to add "+csl);
+        }this.csl = csl;
+    }
+
+    final protected ContentSampleListener getContentSampleListener() {
+        return csl;
+    }
+    
     @Override
     public final NewConnectionParams getConnectionParams() { // package private
         return cp;

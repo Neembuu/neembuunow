@@ -22,6 +22,9 @@ import java.util.logging.Logger;
 import neembuu.util.Throwables;
 import neembuu.vfs.connection.NewConnectionParams;
 import neembuu.vfs.connection.NewConnectionProvider;
+import neembuu.vfs.connection.checks.CanSeek;
+import neembuu.vfs.connection.checks.SeekingAbility;
+import neembuu.vfs.connection.jdimpl.checks.CheckSeekingCapability;
 
 
 /**
@@ -36,6 +39,7 @@ public final class JD_DownloadManager
     final boolean b; // package private
     final int c; // package private
     
+    private final CheckSeekingCapability csc;
     private static final Logger LOGGER = Logger.getLogger(JD_DownloadManager.class.getName());
     
     private final ConcurrentLinkedQueue<JDHTTPConnection> connection_list 
@@ -52,6 +56,7 @@ public final class JD_DownloadManager
         this.url = url;
         this.b = b;
         this.c = c;
+        this.csc = new CheckSeekingCapability(this);
     }
 
     final String getURL() { // package private
@@ -85,6 +90,7 @@ public final class JD_DownloadManager
                     JDHTTPConnection c = new JDHTTPConnection(
                             JD_DownloadManager.this,
                             connectionParams);
+                    c.setContentSampleListener(csc.getFirstSampleListener(connectionParams));
                     connection_list.add(c);
                     connectionsRequested();
                     c.connectAndSupply();
@@ -98,8 +104,14 @@ public final class JD_DownloadManager
     
     @Override
     public final long estimateCreationTime(long offset) {
+        if(csc.seekingAbility().get()==CanSeek.NO){
+            return Integer.MAX_VALUE;
+        }
         return averageConnectionCreationTime();
     }
+
+    @Override
+    public SeekingAbility seekingAbility() { return csc.seekingAbility(); }
 
     private long averageConnectionCreationTime() {
         int i = 0;

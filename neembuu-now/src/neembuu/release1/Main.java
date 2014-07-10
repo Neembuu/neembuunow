@@ -48,6 +48,7 @@ import neembuu.release1.app.MainCommandsListener;
 import neembuu.release1.app.RunAttemptListener;
 import neembuu.release1.app.SingleInstanceCheckCallbackImpl;
 import neembuu.release1.defaultImpl.external.ExternalLinkHandlersProvider;
+import neembuu.release1.defaultImpl.linkhandler.SeekabilityCheckingServiceImpl;
 import neembuu.release1.open.OpenerImpl;
 import neembuu.release1.settings.SettingsImpl;
 import neembuu.release1.ui.InitLookAndFeel;
@@ -207,6 +208,7 @@ public final class Main {
         LinkHandlerProviders.registerProvider(new ExternalLinkHandlersProvider(nui.getIndefiniteTaskUI()));
         //DefaultLinkHandler is the default handler
         LinkHandlerProviders.registerDefaultProvider(new DirectLinkHandlerProvider());
+        LinkHandlerProviders.registerSeekabilityCheckingService(new SeekabilityCheckingServiceImpl(nui.getMainComponent()));
     }
 
     public TroubleHandler getTroubleHandler() {

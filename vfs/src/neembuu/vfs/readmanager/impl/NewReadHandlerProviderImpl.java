@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import neembuu.diskmanager.*;
 import neembuu.rangearray.Range;
 import neembuu.rangearray.RangeUtils;
+import neembuu.vfs.connection.checks.SeekingAbility;
 import neembuu.vfs.file.TroubleHandler;
 import neembuu.vfs.progresscontrol.ThrottleFactory;
 import neembuu.vfs.readmanager.NewReadHandlerProvider;
@@ -134,6 +135,11 @@ final class NewReadHandlerProviderImpl
         }
         return rQMLogger;
     }    
+
+    @Override
+    public SeekingAbility seekingAbility() {
+        return seekableHttpFile.getNewConnectionProvider().seekingAbility();
+    }
     
     @Override
     public final long getNewHandlerCreationTime(long offset) {

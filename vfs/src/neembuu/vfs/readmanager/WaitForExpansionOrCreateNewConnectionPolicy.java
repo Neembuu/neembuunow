@@ -24,7 +24,6 @@ public interface WaitForExpansionOrCreateNewConnectionPolicy {
     /**
      * 
      * @param offset Location in the file for new connection creation
-     * @param estimatedTimeTakenForCreatingANewConnection in milliseconds
      * @param previousConnectionSpeed speed in bytes per second
      * @param distanceToCover The gap between the new request
      * and the ending of previous connection
@@ -42,4 +41,6 @@ public interface WaitForExpansionOrCreateNewConnectionPolicy {
         NEW_CONNECTION_SHOULD_BE_CREATED,
         ZERO_FILL_THIS_READ_REQUEST
     }
+    
+    boolean hasSeekingAbility(long offset);
 }

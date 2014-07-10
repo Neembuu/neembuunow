@@ -38,6 +38,8 @@ public final class LinkHandlerProviders {
     
     private static LinkHandlerProvider defaultLinkProvider;
     
+    private static SeekabilityCheckingService scs;
+    
     public static void registerProvider(LinkHandlerProvider fnasp){
         synchronized (providers){
             // weak reference to allow gcing?
@@ -95,6 +97,26 @@ public final class LinkHandlerProviders {
         // both should be tried and whichever works should be used.
         // also if both work, there should be a way to give preferance to one of them.
         // like some kind of priority/ranking flag
+        LinkHandler lh = getHandlerImpl(trialLinkHandler);
+        if(scs!=null){
+            scs.handle(lh);
+        }
+
+        return lh;
+    }
+    
+    public static void registerSeekabilityCheckingService(SeekabilityCheckingService scsrv){
+        if(scsrv==null){
+            throw new NullPointerException();
+        }
+        if(scs!=null){
+            throw new IllegalArgumentException("Already initialized with "+defaultLinkProvider+" trying to"
+                    + " replace with "+scsrv);
+        }
+        scs = scsrv;
+    }
+    
+    private static LinkHandler getHandlerImpl(TrialLinkHandler trialLinkHandler)throws Exception{
         if(!trialLinkHandler.canHandle())defaultLinkProvider.getLinkHandler(trialLinkHandler);
         for(LinkHandlerProvider fnasp : providersCopy()){
             LinkHandler lh = fnasp.getLinkHandler(trialLinkHandler);
